@@ -1,0 +1,1 @@
+require('expose-loader?HMAudio!./Audio.js')
