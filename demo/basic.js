@@ -4,9 +4,9 @@ const config = {
   onplay: e => console.log('onplay:', e),
   onpause: e => console.log('onpause:', e)
 }
-const HMAudio = window.HMAudio.default
+const EaseAudio = window.EaseAudio.default
 
-var audio = new HMAudio(config)
+var audio = new EaseAudio(config)
 // var isPlay = false
 
 function playMusic () {

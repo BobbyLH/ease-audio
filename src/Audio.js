@@ -1,7 +1,7 @@
 import AudioCtx from './audio_ctx'
 import AudioH5 from './audio_h5'
 
-export class HMLY_AUDIO {
+export class EaseAudio {
   constructor (config) {
     this.audio = this._createAudio(config)
 
@@ -59,4 +59,4 @@ function _logErr (msg) {
   console.error('[HMLY_AUDIO ERROR]:', msg)
 }
 
-export default HMLY_AUDIO
+export default EaseAudio
