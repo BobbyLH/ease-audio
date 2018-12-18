@@ -2,12 +2,13 @@ const path = require('path')
 
 module.exports = {
   entry: {
-    bundle: './src/index.js',
-    audio: './src/HMAudio.js'
+    index: './src/index.js',
+    audio: './src/EaseAudio.js'
   },
   output: {
     filename: '[name].js',
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve(__dirname, 'dist'),
+    libraryTarget: 'umd'
   },
   module: {
     rules: [

@@ -7,6 +7,7 @@
  *
  *  MIT License
  */
-const { HMLY_AUDIO } = require('./Audio')
+import { EaseAudio } from './Audio'
 
-module.exports = HMLY_AUDIO
+export { EaseAudio }
+export default EaseAudio
