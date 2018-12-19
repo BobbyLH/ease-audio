@@ -15,7 +15,21 @@ const playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 's
 export class AudioH5 {
   constructor (config) {
     this.isInit = false
+
     this.init = this.init.bind(this)
+    this.play = this.play.bind(this)
+    this.pause = this.pause.bind(this)
+    this.toggle = this.toggle.bind(this)
+    this.cut = this.cut.bind(this)
+    this.load = this.load.bind(this)
+    this.seek = this.seek.bind(this)
+    this.rate = this.rate.bind(this)
+    this.volume = this.volume.bind(this)
+    this.muted = this.muted.bind(this)
+    this.stop = this.stop.bind(this)
+    this.destory = this.destory.bind(this)
+    this.model = this.model.bind(this)
+
     this.init(config)
     this._presetEvent()
   }
@@ -153,19 +167,6 @@ export class AudioH5 {
     this.playModel = playModelSet[config.playModel || 0]
     this.playIndex = 0
     this.playList = [...this._srcAssem(config.src)]
-
-    this.play = this.play.bind(this)
-    this.pause = this.pause.bind(this)
-    this.toggle = this.toggle.bind(this)
-    this.cut = this.cut.bind(this)
-    this.load = this.load.bind(this)
-    this.seek = this.seek.bind(this)
-    this.rate = this.rate.bind(this)
-    this.volume = this.volume.bind(this)
-    this.muted = this.muted.bind(this)
-    this.stop = this.stop.bind(this)
-    this.destory = this.destory.bind(this)
-    this.model = this.model.bind(this)
   }
 
   _createAudio (config) {
