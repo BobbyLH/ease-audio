@@ -1,4 +1,5 @@
 .babelrc
 webpack.config.js
+/build
 /src
 /utils
