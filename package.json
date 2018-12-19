@@ -1,6 +1,6 @@
 {
   "name": "ease-audio",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "The Audio Player Project",
   "main": "dist/index.js",
   "scripts": {
