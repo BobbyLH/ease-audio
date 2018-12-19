@@ -20,7 +20,7 @@ export class EaseAudio {
 
   _createAudio (config) {
     let audio
-    const { usingWebAudio } = config
+    const { usingWebAudio } = config || {}
 
     try {
       if (usingWebAudio && (window.AudioContext || window.webkitAudioContext)) {
