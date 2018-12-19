@@ -14,8 +14,9 @@ const playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 's
 
 export class AudioH5 {
   constructor (config) {
-    this._init(config)
-    this._registerEvent(config)
+    this.isInit = false
+    this.init = this.init.bind(this)
+    this.init(config)
     this._presetEvent()
   }
 
@@ -26,103 +27,121 @@ export class AudioH5 {
     }
   }
 
+  init (config) {
+    if (!this.isInit && config && this._checkType(config, 'object', true) && JSON.stringify(config) !== '{}') {
+      this._initial(config)
+      this._registerEvent(config)
+    }
+  }
+
   play () {
-    this.audioH5.play()
+    this._checkInit() && this.audioH5.play()
   }
 
   pause () {
-    this.audioH5.pause()
+    this._checkInit() && this.audioH5.pause()
   }
 
   toggle () {
-    if (this.playState !== 'stoped' && this.playState !== 'ended' && this.playState !== 'loaderror' && this.playState !== 'playerror') {
+    if (this._checkInit() && this.playState !== 'stoped' && this.playState !== 'ended' && this.playState !== 'loaderror' && this.playState !== 'playerror') {
       this.playState === null || this.playState === 'paused' ? this.play() : this.pause()
     }
   }
 
   cut (params) {
     if (!params.src) return this._logErr(`cut -- The src is necessary`)
-    this.destory()
-    const config = {...this.config, ...params}
-    this._createAudio(config)
-    this._updatePlayList({type: 'add', list: [...this._srcAssem(config.src)]})
-    this.play()
+    if (this._checkInit()) {
+      this.destory()
+      const config = {...this.config, ...params}
+      this._createAudio(config)
+      this._updatePlayList({type: 'add', list: [...this._srcAssem(config.src)]})
+      this.play()
+    }
   }
 
   load () {
-    this.audioH5.load()
+    this._checkInit() && this.audioH5.load()
   }
 
   seek (val) {
-    // IE cannot set currentTime when the metaData is loading
-    if (isIE && !this.metaDataLoaded) {
-      this.seekValue = val
-      return
-    }
+    if (this._checkInit()) {
+      // IE cannot set currentTime when the metaData is loading
+      if (isIE && !this.metaDataLoaded) {
+        this.seekValue = val
+        return
+      }
 
-    if (this._checkType(val, 'number')) {
-      const duration = this.audioH5.duration
-      if (val > duration) val = duration
-      if (val < 0) val = 0
-      this.seekValue = null
-      this.audioH5.currentTime = val
-    } else {
-      return this.audioH5.currentTime
+      if (this._checkType(val, 'number')) {
+        const duration = this.audioH5.duration
+        if (val > duration) val = duration
+        if (val < 0) val = 0
+        this.seekValue = null
+        this.audioH5.currentTime = val
+      } else {
+        return this.audioH5.currentTime
+      }
     }
   }
 
   rate (val) {
-    if (this._checkType(val, 'number')) {
-      if (val > 2) val = 2
-      if (val < 0.5) val = 0.5
-      this.audioH5.playbackRate = val
-      this._updateConfig({rate: val})
-    } else {
-      return this.audioH5.playbackRate
+    if (this._checkInit()) {
+      if (this._checkType(val, 'number')) {
+        if (val > 2) val = 2
+        if (val < 0.5) val = 0.5
+        this.audioH5.playbackRate = val
+        this._updateConfig({rate: val})
+      } else {
+        return this.audioH5.playbackRate
+      }
     }
   }
 
   volume (val) {
-    if (this._checkType(val, 'number')) {
-      if (val > 1) val = 1
-      if (val < 0) val = 0
-      this.audioH5.muted = false
-      this.audioH5.volume = val
-      this._updateConfig({volume: val})
-    } else {
-      return this.audioH5.volume
+    if (this._checkInit()) {
+      if (this._checkType(val, 'number')) {
+        if (val > 1) val = 1
+        if (val < 0) val = 0
+        this.audioH5.muted = false
+        this.audioH5.volume = val
+        this._updateConfig({volume: val})
+      } else {
+        return this.audioH5.volume
+      }
     }
   }
 
   muted (bool) {
-    if (this._checkType(bool, 'boolean')) {
+    if (this._checkInit() && this._checkType(bool, 'boolean')) {
       this.audioH5.muted = bool
       this._updateConfig({muted: bool})
     }
   }
 
   stop () {
-    this._setPlayState(playStateSet[3])
-    this.audioH5.pause()
-    this.audioH5.src = 'javascript:void(0);'
+    if (this._checkInit()) {
+      this._setPlayState(playStateSet[3])
+      this.audioH5.pause()
+      this.audioH5.src = 'javascript:void(0);'
+    }
   }
 
   destory () {
     this.stop()
     this.audioH5 = null
+    this.isInit = false
   }
 
   // set play model
   model (modelIndex) {
-    // model contain: list-once(0), list-random(1), list-loop(2), single-once(3), single-loop(4)
-    if (!this._checkType(modelIndex, 'number')) return this._logErr(`setPlayModel -- Please pass correct params`)
-
-    this.playModel = playModelSet[modelIndex] || this.playModel
+    if (this._checkInit() && this._checkType(modelIndex, 'number')) {
+      // model contain: list-once(0), list-random(1), list-loop(2), single-once(3), single-loop(4)
+      this.playModel = playModelSet[modelIndex] || this.playModel
+    }
   }
 
   /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
-  _init (config) {
+  _initial (config) {
     // create Audio Object
     this._createAudio(config)
 
@@ -161,6 +180,8 @@ export class AudioH5 {
     this.audioH5.playbackRate = config.rate || config.playbackRate || 1
     this.audioH5.currentTime = config.seek || config.currentTime || 0
     this.audioH5.controls = false
+
+    this.isInit = true
   }
 
   _srcAssem (srcs) {
@@ -406,6 +427,14 @@ export class AudioH5 {
     if (typeof type !== 'string') return false
     if (getType(element) !== type) {
       !closeLog && this._logErr(`Your parameter(${element}) type is ${getType(element)}, please pass the ${type} type`)
+      return false
+    }
+    return true
+  }
+
+  _checkInit () {
+    if (!this.isInit) {
+      this._logErr("The Audio haven't been initiated")
       return false
     }
     return true
