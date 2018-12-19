@@ -5,6 +5,7 @@ export class EaseAudio {
   constructor (config) {
     this.audio = this._createAudio(config)
 
+    this.init = this.audio.init
     this.play = this.audio.play
     this.pause = this.audio.pause
     this.toggle = this.audio.toggle
