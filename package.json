@@ -5,9 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "webpack --mode development --watch",
-    "server": "node server.js",
-    "build": "webpack --mode production",
-    "prepublish": "npm run build"
+    "build": "node build/version && webpack --mode production"
   },
   "repository": {
     "type": "git",
