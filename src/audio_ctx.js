@@ -17,15 +17,11 @@ export class AudioCtx {
 
   }
 
-  destory () {
+  unload () {
 
   }
 
   seek () {
-
-  }
-
-  state () {
 
   }
 }

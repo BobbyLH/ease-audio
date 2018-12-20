@@ -27,7 +27,7 @@ export class AudioH5 {
     this.volume = this.volume.bind(this)
     this.muted = this.muted.bind(this)
     this.stop = this.stop.bind(this)
-    this.destory = this.destory.bind(this)
+    this.unload = this.unload.bind(this)
     this.model = this.model.bind(this)
 
     this.init(config)
@@ -65,7 +65,7 @@ export class AudioH5 {
   cut (params) {
     if (!params.src) return this._logErr(`cut -- The src is necessary`)
     if (this._checkInit()) {
-      this.destory()
+      this.unload()
       const config = {...this.config, ...params}
       this._createAudio(config)
       this._updatePlayList({type: 'add', list: [...this._srcAssem(config.src)]})
@@ -139,7 +139,7 @@ export class AudioH5 {
     }
   }
 
-  destory () {
+  unload () {
     this.stop()
     this.audioH5 = null
     this.isInit = false
