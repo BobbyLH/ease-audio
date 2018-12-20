@@ -15,7 +15,7 @@ export class EaseAudio {
     this.volume = this.audio.volume
     this.muted = this.audio.muted
     this.stop = this.audio.stop
-    this.destory = this.audio.destory
+    this.unload = this.audio.unload
     this.model = this.audio.model
   }
 
@@ -32,7 +32,7 @@ export class EaseAudio {
         audio = null
       }
     } catch (err) {
-      _logErr(err)
+      console.error('[EASE_AUDIO ERROR]:', err)
       audio = null
     }
 
@@ -47,17 +47,13 @@ export class EaseAudio {
     return this.audio.playState
   }
 
+  get playId () {
+    return this.audio.playList[this.audio.playIndex].id
+  }
+
   get networkState () {
     return this.audio.networkState
   }
-}
-
-function _log (msg) {
-  console.log('[HMLY_AUDIO]:', msg)
-}
-
-function _logErr (msg) {
-  console.error('[HMLY_AUDIO ERROR]:', msg)
 }
 
 export default EaseAudio
