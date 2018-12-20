@@ -37,6 +37,10 @@ export class AudioH5 {
     this.init(config)
   }
 
+  get duration () {
+    return this.audioH5.duration
+  }
+
   set setAudioConfig ({prop, value}) {
     if (this.audioH5[prop] && !this._checkType(this.audioH5[prop], 'function')) {
       this.audioH5[prop] = value
@@ -162,14 +166,13 @@ export class AudioH5 {
   _initial (config) {
     this.config = config // preserve initial config
     this.playState = null
-    this.metaDataLoaded = false
-    this.seekValue = null
     this.debug = config.debug || false
     this.logLevel = config.logLevel || logLevel[2]
     this.playId = 1000
     this.playModel = playModelSet[(config.playModel && this._checkType(config.playModel, 'number') && config.playModel) || (config.loop && 3) || 0]
     this.playIndex = 0
     this.playList = new Array(0)
+    this.buffered = new Array(0)
     this.eventMethods = {}
 
     // create Audio Object
@@ -304,6 +307,8 @@ export class AudioH5 {
   _cut ({src, autoCut}) {
     // can't cut audio if the playModel is single-once
     if (this._checkInit() && this.playModel !== 'single-once') {
+      this.metaDataLoaded = false
+      this.seekValue = null
       this._setPlayIndex(src && this.playList.length)
       if (!src && !this.playList[this.playIndex]) return this._setPlayState(playStateSet[4])
       const nextSrc = src || this.playList[this.playIndex].src
@@ -386,45 +391,6 @@ export class AudioH5 {
         this.onLoad && this.onLoad(e)
         return true
       },
-      durationchange: e => {
-        this._logEvent('durationchange')
-        this.playState === playStateSet[1] && this._setPlayState(playStateSet[0])
-        return true
-      },
-      loadedmetadata: e => {
-        this._logEvent('loadedmetadata')
-        this.metaDataLoaded = true
-        this.seekValue && this._seek(this.seekValue)
-        this.playState === playStateSet[1] && this._setPlayState(playStateSet[0])
-        return true
-      },
-      loadeddata: e => {
-        this._logEvent('loadeddata')
-        this.playState === playStateSet[1] && this._setPlayState(playStateSet[0])
-        return true
-      },
-      progress: e => {
-        this._logEvent('progress')
-        this.playState === playStateSet[1] && this._setPlayState(playStateSet[0])
-        this.onProgress && this.onProgress(e)
-        return true
-      },
-      seeking: e => {
-        this._logEvent('seeking')
-        this.playState === playStateSet[1] && this._setPlayState(playStateSet[0])
-        this.onSeek && this.onSeek(e)
-        return true
-      },
-      seeked: e => {
-        this._logEvent('seeked')
-        this.playState === playStateSet[1] && this._setPlayState(playStateSet[0])
-        return true
-      },
-      play: e => {
-        this._logEvent('play')
-        this.playState === playStateSet[1] && this._setPlayState(playStateSet[0])
-        return true
-      },
       // playing state
       playing: e => {
         this._logEvent('playing')
@@ -473,6 +439,37 @@ export class AudioH5 {
         return true
       },
       // others
+      progress: e => {
+        this._logEvent('progress')
+        const ranges = e.target.buffered
+        const total = (e.total || 1)
+        let buffered = 0
+        let loaded = (e.loaded || 0)
+        let progress = loaded / total
+
+        if (ranges && ranges.length) {
+          for (let i = 0, j = ranges.length; i < j; i++) {
+            this.buffered.push({
+              'start': ranges.start(i) * 1000,
+              'end': ranges.end(i) * 1000
+            })
+          }
+          buffered = (ranges.end(0) - ranges.start(0)) * 1000
+          loaded = Math.min(1, buffered / (e.target.duration * 1000))
+          progress = loaded / total
+        }
+
+        this.onProgress && this.onProgress({e, progress})
+        return true
+      },
+      durationchange: e => this._logEvent('durationchange'),
+      loadedmetadata: e => {
+        this._logEvent('loadedmetadata')
+        this.metaDataLoaded = true
+        this.seekValue && this.seek(this.seekValue)
+        return true
+      },
+      loadeddata: e => this._logEvent('loadeddata'),
       timeupdate: e => {
         // playState is loading but actually is playing
         if (this.playState === playStateSet[0]) {
@@ -495,6 +492,19 @@ export class AudioH5 {
         }
 
         this.onTimeupdate && this.onTimeupdate(e)
+        return true
+      },
+      seeking: e => {
+        this._logEvent('seeking')
+        this.onSeek && this.onSeek(e)
+        return true
+      },
+      seeked: e => {
+        this._logEvent('seeked')
+        return true
+      },
+      play: e => {
+        this._logEvent('play')
         return true
       },
       volumechange: e => {
