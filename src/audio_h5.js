@@ -12,6 +12,10 @@ const playStateSet = [
 
 const playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 'single-loop']
 
+const logLevel = ['detail', 'warn', 'error']
+
+const defaultSrc = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA'
+
 export class AudioH5 {
   constructor (config) {
     this.isInit = false
@@ -129,13 +133,18 @@ export class AudioH5 {
   stop () {
     if (this._checkInit()) {
       this._setPlayState(playStateSet[3])
+      this.audioH5.currentTime = 0
       this.audioH5.pause()
-      this.audioH5.src = 'javascript:void(0);'
+
+      const id = this.playList[this.playIndex] && this.playList[this.playIndex].id
+      this.onStop && this.onStop(id)
     }
   }
 
   unload () {
     this.stop()
+    this._rewriteEvent()
+    this.audioH5.src = defaultSrc
     this.audioH5 = null
     this.isInit = false
   }
@@ -156,10 +165,12 @@ export class AudioH5 {
     this.metaDataLoaded = false
     this.seekValue = null
     this.debug = config.debug || false
+    this.logLevel = config.logLevel || logLevel[2]
     this.playId = 1000
     this.playModel = playModelSet[(config.playModel && this._checkType(config.playModel, 'number') && config.playModel) || (config.loop && 3) || 0]
     this.playIndex = 0
     this.playList = new Array(0)
+    this.eventMethods = {}
 
     // create Audio Object
     this._createAudio(config)
@@ -195,7 +206,7 @@ export class AudioH5 {
         this.playId++
         return data
       })]
-    : [...['javascript:void(0);'].map(v => {
+    : [...[defaultSrc].map(v => {
       const data = {id: this.playId, src: v}
       this.playId++
       return data
@@ -306,6 +317,8 @@ export class AudioH5 {
         this.unload()
         const config = {...this.config, src: nextSrc}
         this._createAudio(config)
+        this._presetEvent()
+        this._registerEvent(config)
         this.play()
       }
 
@@ -315,119 +328,192 @@ export class AudioH5 {
     return this._setPlayState(playStateSet[4])
   }
 
-  /* binding event */
+  /* expose binding event */
   _onplay (cb) {
-    this._bindEvent(cb, 'play')
-  }
-
-  _onready (cb) {
-    this._bindEvent(cb, 'playing')
-  }
-
-  _oncanplay (cb) {
-    this._bindEvent(cb, 'canplaythrough')
+    this.onPlay = cb
   }
 
   _onpause (cb) {
-    this._bindEvent(cb, 'pause')
+    this.onPause = cb
+  }
+
+  _onstop (cb) {
+    this.onStop = cb
   }
 
   _onend (cb) {
-    this._bindEvent(cb, 'ended')
+    this.onEnd = cb
   }
 
-  _onloading (cb) {
-    this._bindEvent(cb, 'loadstart')
-  }
-
-  _onloaded (cb) {
-    this._bindEvent(cb, 'loadedmetadata')
+  _onload (cb) {
+    this.onLoad = cb
   }
 
   _onprogress (cb) {
-    this._bindEvent(cb, 'progress')
+    this.onProgress = cb
   }
 
   _onvolume (cb) {
-    this._bindEvent(cb, 'volumechange')
+    this.onVolume = cb
   }
 
-  _onseeking (cb) {
-    this._bindEvent(cb, 'seeking')
+  _onseek (cb) {
+    this.onSeek = cb
   }
 
-  _onseeked (cb) {
-    this._bindEvent(cb, 'seeked')
-  }
-
-  _onratechange (cb) {
-    this._bindEvent(cb, 'ratechange')
+  _onrate (cb) {
+    this.onRate = cb
   }
 
   _ontimeupdate (cb) {
-    this._bindEvent(cb, 'timeupdate')
+    this.onTimeupdate = cb
   }
 
   _onloaderror (cb) {
-    this._bindEvent(cb, 'error')
+    this.onLoadError = cb
   }
 
   _onplayerror (cb) {
-    this._bindEvent(cb, 'stalled')
+    this.onPlayError = cb
   }
 
   _presetEvent () {
-    // loading state
-    this._bindEvent(e => this.playState === playStateSet[1] && this._setPlayState(playStateSet[0]), 'loadstart')
-    this._bindEvent(e => this.playState === playStateSet[1] && this._setPlayState(playStateSet[0]), 'durationchange')
-    this._bindEvent(e => {
-      this.metaDataLoaded = true
-      this.seekValue && this._seek(this.seekValue)
-      return this.playState === playStateSet[1] && this._setPlayState(playStateSet[0])
-    }, 'loadedmetadata')
-    this._bindEvent(e => this.playState === playStateSet[1] && this._setPlayState(playStateSet[0]), 'loadeddata')
-    this._bindEvent(e => this.playState === playStateSet[1] && this._setPlayState(playStateSet[0]), 'progress')
-    this._bindEvent(e => this.playState === playStateSet[1] && this._setPlayState(playStateSet[0]), 'seeking')
+    this.eventMethods = {
+      // loading state
+      loadstart: e => {
+        this._logEvent('loadstart')
+        this.playState === playStateSet[1] && this._setPlayState(playStateSet[0])
+        this.onLoad && this.onLoad(e)
+        return true
+      },
+      durationchange: e => {
+        this._logEvent('durationchange')
+        this.playState === playStateSet[1] && this._setPlayState(playStateSet[0])
+        return true
+      },
+      loadedmetadata: e => {
+        this._logEvent('loadedmetadata')
+        this.metaDataLoaded = true
+        this.seekValue && this._seek(this.seekValue)
+        this.playState === playStateSet[1] && this._setPlayState(playStateSet[0])
+        return true
+      },
+      loadeddata: e => {
+        this._logEvent('loadeddata')
+        this.playState === playStateSet[1] && this._setPlayState(playStateSet[0])
+        return true
+      },
+      progress: e => {
+        this._logEvent('progress')
+        this.playState === playStateSet[1] && this._setPlayState(playStateSet[0])
+        this.onProgress && this.onProgress(e)
+        return true
+      },
+      seeking: e => {
+        this._logEvent('seeking')
+        this.playState === playStateSet[1] && this._setPlayState(playStateSet[0])
+        this.onSeek && this.onSeek(e)
+        return true
+      },
+      seeked: e => {
+        this._logEvent('seeked')
+        this.playState === playStateSet[1] && this._setPlayState(playStateSet[0])
+        return true
+      },
+      play: e => {
+        this._logEvent('play')
+        this.playState === playStateSet[1] && this._setPlayState(playStateSet[0])
+        return true
+      },
+      // playing state
+      playing: e => {
+        this._logEvent('playing')
+        this._setPlayState(playStateSet[1])
+        this.onPlay && this.onPlay(e)
+        return true
+      },
+      canplaythrough: e => {
+        this._logEvent('canplaythrough')
+        this.playState === playStateSet[0] && this._setPlayState(playStateSet[1])
+        return true
+      },
+      // paused state
+      pause: e => {
+        this._logEvent('pause')
+        this._setPlayState(playStateSet[2])
+        this.onPause && this.onPause(e)
+        return true
+      },
+      // ended state
+      ended: e => {
+        this._logEvent('ended')
 
-    // playing state
-    this._bindEvent(e => this._setPlayState(playStateSet[1]), 'play')
-    this._bindEvent(e => this.playState === playStateSet[0] && this._setPlayState(playStateSet[1]), 'playing')
-    this._bindEvent(e => this.playState === playStateSet[0] && this._setPlayState(playStateSet[1]), 'seeked')
-    this._bindEvent(e => this.playState === playStateSet[0] && this._setPlayState(playStateSet[1]), 'canplaythrough')
+        if (this.isEnd) {
+          this.isEnd = false
+        } else {
+          this.isEnd = true
+          this._cut({autoCut: true})
+          this.onEnd && this.onEnd(e)
+        }
 
-    // paused state
-    this._bindEvent(e => this._setPlayState(playStateSet[2]), 'pause')
+        return true
+      },
+      // loaderror state
+      error: e => {
+        this._logEvent('error')
+        this._setPlayState(playStateSet[5])
+        this.onLoadError && this.onLoadError(e)
+        return true
+      },
+      // playerror state
+      stalled: e => {
+        this._logEvent(`stalled`)
+        this._setPlayState(playStateSet[6])
+        this.onPlayError && this.onPlayError(e)
+        return true
+      },
+      // others
+      timeupdate: e => {
+        // playState is loading but actually is playing
+        if (this.playState === playStateSet[0]) {
+          this._logEvent("timeupdate's playing")
+          this._setPlayState(playStateSet[1])
+          this.onPlay && this.onPlay(e)
+        }
 
-    // stoped state
-    this._bindEvent(e => {
-      this.abortLoad = true
-      this._log('abort')
-      this._setPlayState(playStateSet[3])
-    }, 'abort')
+        // Depending on currentTime and duration to mimic end event
+        const isEnd = this.audioH5.duration && this.audioH5.currentTime === this.audioH5.duration
+        if (isEnd) {
+          this._logEvent("timeupdate's ended")
+          if (this.isEnd) {
+            this.isEnd = false
+          } else {
+            this.isEnd = true
+            this._cut({autoCut: true})
+            this.onEnd && this.onEnd(e)
+          }
+        }
 
-    // ended state
-    this._bindEvent(e => {
-      return this._cut({autoCut: true})
-    }, 'ended')
+        this.onTimeupdate && this.onTimeupdate(e)
+        return true
+      },
+      volumechange: e => {
+        this._logEvent('volumechange')
+        this.onVolume && this.onVolume(e)
+        return true
+      },
+      ratechange: e => {
+        this._logEvent('ratechange')
+        this.onRate && this.onRate(e)
+        return true
+      },
+      abort: e => this._logEvent('abort'),
+      suspend: e => this._logEvent('suspend')
+    }
 
-    // loaderror state
-    this._bindEvent(e => {
-      if (this.abortLoad) {
-        this.abortLoad = false
-        return
-      }
-      this._log('error')
-      return this._setPlayState(playStateSet[5])
-    }, 'error')
-
-    // playerror state
-    this._bindEvent(e => {
-      this._logErr(`stalled -- ${e}`)
-      return this._setPlayState(playStateSet[6])
-    }, 'stalled')
-
-    // others
-    this._bindEvent(e => this._log('purposing to suspend loading source'), 'suspend')
+    for (let k in this.eventMethods) {
+      this._bindEvent(this.eventMethods[k], k)
+    }
   }
 
   _bindEvent (cb, event) {
@@ -450,6 +536,14 @@ export class AudioH5 {
     })
   }
 
+  _rewriteEvent () {
+    if (this._checkInit()) {
+      for (let k in this.eventMethods) {
+        this._removeEvent(this.eventMethods[k], k)
+      }
+    }
+  }
+
   _checkType (element, type, closeLog) {
     if (typeof type !== 'string') return false
     if (getType(element) !== type) {
@@ -467,8 +561,16 @@ export class AudioH5 {
     return true
   }
 
+  _logEvent (event) {
+    const canLog = this.logLevel === 'detail'
+
+    return canLog && this._log(`trigger ${event} event`)
+  }
+
   _log (msg) {
-    return this.debug && console.log('[EASE_AUDIO_H5 MESSAGE]:', msg)
+    const canLog = this.logLevel === 'detail' || this.logLevel === 'warn'
+
+    return this.debug && canLog && console.log('[EASE_AUDIO_H5 MESSAGE]:', msg)
   }
 
   _logErr (err) {
