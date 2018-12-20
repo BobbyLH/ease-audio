@@ -10,7 +10,9 @@ function init () {
     src: 'http://audio.xmcdn.com/group29/M01/AA/71/wKgJXVrpaoXApbrYABINQqa4hlE219.m4a',
     onplay: e => console.log('onplay:', e),
     onpause: e => console.log('onpause:', e),
-    onstop: id => console.log('onstop', id)
+    onstop: id => console.log('onstop', id),
+    onseek: e => console.log('onseek:', e),
+    onprogress: e => console.log('onprogress:', e)
   }
   audio.init(config)
 }
@@ -32,7 +34,7 @@ function playMusic () {
 }
 
 function seek () {
-  audio.seek(50)
+  audio.seek(200)
 }
 
 function volume () {
@@ -55,4 +57,8 @@ function getId () {
 
 function stop () {
   audio.stop()
+}
+
+function duration () {
+  console.log(audio.duration)
 }
