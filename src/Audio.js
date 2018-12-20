@@ -32,7 +32,7 @@ export class EaseAudio {
         audio = null
       }
     } catch (err) {
-      _logErr(err)
+      console.error('[EASE_AUDIO ERROR]:', err)
       audio = null
     }
 
@@ -50,14 +50,6 @@ export class EaseAudio {
   get networkState () {
     return this.audio.networkState
   }
-}
-
-function _log (msg) {
-  console.log('[HMLY_AUDIO]:', msg)
-}
-
-function _logErr (msg) {
-  console.error('[HMLY_AUDIO ERROR]:', msg)
 }
 
 export default EaseAudio

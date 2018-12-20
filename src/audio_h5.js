@@ -30,8 +30,8 @@ export class AudioH5 {
     this.unload = this.unload.bind(this)
     this.model = this.model.bind(this)
 
-    this.init(config)
     this._presetEvent()
+    this.init(config)
   }
 
   set props ({prop, value}) {
@@ -79,13 +79,13 @@ export class AudioH5 {
 
   seek (val) {
     if (this._checkInit()) {
-      // IE cannot set currentTime when the metaData is loading
-      if (isIE && !this.metaDataLoaded) {
-        this.seekValue = val
-        return
-      }
-
       if (this._checkType(val, 'number')) {
+        // IE cannot set currentTime when the metaData is loading
+        if (isIE && !this.metaDataLoaded) {
+          this.seekValue = val
+          return
+        }
+
         const duration = this.audioH5.duration
         if (val > duration) val = duration
         if (val < 0) val = 0
@@ -442,11 +442,11 @@ export class AudioH5 {
   }
 
   _log (msg) {
-    return this.debug && console.log('[AUDIO_H5 MESSAGE]:', msg)
+    return this.debug && console.log('[EASE_AUDIO_H5 MESSAGE]:', msg)
   }
 
   _logErr (err) {
-    return this.debug && console.error('[AUDIO_H5 ERROR]:', err)
+    return this.debug && console.error('[EASE_AUDIO_H5 ERROR]:', err)
   }
 }
 
