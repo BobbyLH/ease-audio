@@ -4,7 +4,8 @@
   "description": "The Audio Player Project",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "webpack --config build/webpack.config.js --mode development --watch",
+    "dev": "node demo/server.js",
+    "static": "webpack --config build/webpack.config.js --mode development --watch",
     "build": "node build/version && webpack --config build/webpack.config.js --mode production"
   },
   "repository": {
@@ -20,7 +21,9 @@
     "babel-loader": "^8.0.4",
     "expose-loader": "^0.7.5",
     "express": "^4.16.4",
+    "html-webpack-plugin": "^3.2.0",
     "webpack": "^4.27.1",
-    "webpack-cli": "^3.1.2"
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-middleware": "^3.4.0"
   }
 }
