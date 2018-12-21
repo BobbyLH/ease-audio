@@ -587,8 +587,7 @@ export class AudioH5 {
   _checkType (element, type, closeLog) {
     if (typeof type !== 'string') return false
     if (getType(element) !== type) {
-      const caller = arguments && arguments.callee && arguments.callee.caller && arguments.callee.caller.name
-      !closeLog && this._logErr(`${caller} - Your parameter(${element}) type is ${getType(element)}, please pass the ${type} type`)
+      !closeLog && this._logErr(`Your parameter(${element}) type is ${getType(element)}, please pass the ${type} type`)
       return false
     }
     return true
