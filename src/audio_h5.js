@@ -209,7 +209,7 @@ export class AudioH5 {
     this.audioH5.loop = config.loop || false
     this.audioH5.src = this.playList[this.playIndex].src
     this.audioH5.preload = config.preload || false
-    this.audioH5.volume = config.volume || config.volume === 0 ? 0 : 1
+    this.audioH5.volume = config.volume || (config.volume === 0 ? 0 : 1)
     this.audioH5.muted = config.muted || false
     this.audioH5.playbackRate = config.rate || config.playbackRate || 1
     this.audioH5.currentTime = config.seek || config.currentTime || 0
