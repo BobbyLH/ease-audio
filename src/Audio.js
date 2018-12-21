@@ -51,6 +51,10 @@ export class EaseAudio {
     return this.audio.playList[this.audio.playIndex].id
   }
 
+  get playList () {
+    return this.audio.playList
+  }
+
   get networkState () {
     return this.audio.networkState
   }
