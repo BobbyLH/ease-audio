@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "node demo/server.js",
     "static": "webpack --config build/webpack.config.js --mode development --watch",
-    "build": "npm run build_version && npm run build_git && webpack --config build/webpack.config.js --mode production",
+    "build": "npm run build_version && npm run build_webpack && npm run build_git",
+    "build_webpack": "webpack --config build/webpack.config.js --mode production",
     "build_version": "node build/version",
     "build_git": "node build/git.js master"
   },
