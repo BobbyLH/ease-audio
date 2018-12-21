@@ -51,7 +51,6 @@ export class AudioH5 {
   init (config) {
     if (!this.isInit && config && this._checkType(config, 'object', true) && JSON.stringify(config) !== '{}') {
       this._initial(config)
-      this._presetEvent()
       this._registerEvent(config)
     }
   }
@@ -147,7 +146,7 @@ export class AudioH5 {
 
   unload () {
     this.stop()
-    this._rewriteEvent()
+    this._unregisterEvent()
     this.audioH5.src = defaultSrc
     this.audioH5 = null
     this.isInit = false
@@ -322,7 +321,6 @@ export class AudioH5 {
         this.unload()
         const config = {...this.config, src: nextSrc}
         this._createAudio(config)
-        this._presetEvent()
         this._registerEvent(config)
         this.play()
       }
@@ -382,7 +380,21 @@ export class AudioH5 {
     this.onPlayError = cb
   }
 
-  _presetEvent () {
+  // bind event callback
+  _bindEventCallback (config) {
+    const eventNames = Object.keys(config)
+    eventNames.forEach(v => {
+      if (v.indexOf('on') === 0) {
+        const eventName = `_${v}`
+        this[eventName] && this[eventName](config[v])
+      }
+    })
+  }
+
+  // register Audio Event
+  _registerEvent (config) {
+    this._bindEventCallback(config)
+
     this.eventMethods = {
       // loading state
       loadstart: e => {
@@ -526,27 +538,8 @@ export class AudioH5 {
     }
   }
 
-  _bindEvent (cb, event) {
-    if (!this._checkType(event, 'string')) return this._logErr(`[bind event name is not string`)
-    this._checkType(cb, 'function') && addListener(event, cb, this.audioH5)
-  }
-
-  _removeEvent (cb, event) {
-    if (!this._checkType(event, 'string')) return this._logErr(`[unbind event name is not string`)
-    this._checkType(cb, 'function') && removeListener(event, cb, this.audioH5)
-  }
-
-  _registerEvent (config) {
-    const eventNames = Object.keys(config)
-    eventNames.forEach(v => {
-      if (v.indexOf('on') === 0) {
-        const eventName = `_${v}`
-        this[eventName] && this[eventName](config[v])
-      }
-    })
-  }
-
-  _rewriteEvent () {
+  // unregister Audio Event
+  _unregisterEvent () {
     if (this._checkInit()) {
       for (let k in this.eventMethods) {
         this._removeEvent(this.eventMethods[k], k)
@@ -554,6 +547,19 @@ export class AudioH5 {
     }
   }
 
+  // bind event
+  _bindEvent (cb, event) {
+    if (!this._checkType(event, 'string')) return this._logErr(`[bind event name is not string`)
+    this._checkType(cb, 'function') && addListener(event, cb, this.audioH5)
+  }
+
+  // remove event
+  _removeEvent (cb, event) {
+    if (!this._checkType(event, 'string')) return this._logErr(`[unbind event name is not string`)
+    this._checkType(cb, 'function') && removeListener(event, cb, this.audioH5)
+  }
+
+  // check type
   _checkType (element, type, closeLog) {
     if (typeof type !== 'string') return false
     if (getType(element) !== type) {
@@ -563,6 +569,7 @@ export class AudioH5 {
     return true
   }
 
+  // check whether or not init Audio
   _checkInit () {
     if (!this.isInit) {
       this._logErr("The Audio haven't been initiated")
@@ -571,18 +578,21 @@ export class AudioH5 {
     return true
   }
 
+  // event logger
   _logEvent (event) {
     const canLog = this.logLevel === 'detail'
 
     return canLog && this._log(`trigger ${event} event`)
   }
 
+  // normal logger
   _log (msg) {
     const canLog = this.logLevel === 'detail' || this.logLevel === 'warn'
 
     return this.debug && canLog && console.log('[EASE_AUDIO_H5 MESSAGE]:', msg)
   }
 
+  // error logger
   _logErr (err) {
     return this.debug && console.error('[EASE_AUDIO_H5 ERROR]:', err)
   }
