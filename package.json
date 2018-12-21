@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "node demo/server.js",
     "static": "webpack --config build/webpack.config.js --mode development --watch",
-    "build": "node build/version && webpack --config build/webpack.config.js --mode production"
+    "build": "npm run build_version && npm run build_git && webpack --config build/webpack.config.js --mode production",
+    "build_version": "node build/version",
+    "build_git": "node build/git.js master"
   },
   "repository": {
     "type": "git",
@@ -22,6 +24,7 @@
     "expose-loader": "^0.7.5",
     "express": "^4.16.4",
     "html-webpack-plugin": "^3.2.0",
+    "simple-git": "^1.107.0",
     "webpack": "^4.27.1",
     "webpack-cli": "^3.1.2",
     "webpack-dev-middleware": "^3.4.0"
