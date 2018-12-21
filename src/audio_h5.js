@@ -94,7 +94,7 @@ export class AudioH5 {
 
   seek (val) {
     if (this._checkInit()) {
-      if (this._checkType(val, 'number')) {
+      if (this._checkType(val, 'number', true)) {
         // IE cannot set currentTime when the metaData is loading
         if (isIE && !this.metaDataLoaded) {
           this.seekValue = val
@@ -114,7 +114,7 @@ export class AudioH5 {
 
   rate (val) {
     if (this._checkInit()) {
-      if (this._checkType(val, 'number')) {
+      if (this._checkType(val, 'number', true)) {
         if (val > 2) val = 2
         if (val < 0.5) val = 0.5
         this.audioH5.playbackRate = val
@@ -127,7 +127,7 @@ export class AudioH5 {
 
   volume (val) {
     if (this._checkInit()) {
-      if (this._checkType(val, 'number')) {
+      if (this._checkType(val, 'number', true)) {
         if (val > 1) val = 1
         if (val < 0) val = 0
         this.audioH5.muted = false
@@ -173,7 +173,7 @@ export class AudioH5 {
   // set play model
   model (modelIndex) {
     if (this._checkInit()) {
-      if (this._checkType(modelIndex, 'number')) {
+      if (this._checkType(modelIndex, 'number', true)) {
         // model contain: list-once(0), list-random(1), list-loop(2), single-once(3), single-loop(4)
         this.playModel = playModelSet[modelIndex] || this.playModel
       } else {
@@ -573,13 +573,13 @@ export class AudioH5 {
 
   // bind event
   _bindEvent (cb, event) {
-    if (!this._checkType(event, 'string')) return this._logErr(`[bind event name is not string`)
+    if (!this._checkType(event, 'string')) return this._logErr(`bindEvent - bind event name is not string`)
     this._checkType(cb, 'function') && addListener(event, cb, this.audioH5)
   }
 
   // remove event
   _removeEvent (cb, event) {
-    if (!this._checkType(event, 'string')) return this._logErr(`[unbind event name is not string`)
+    if (!this._checkType(event, 'string')) return this._logErr(`removeEvent - unbind event name is not string`)
     this._checkType(cb, 'function') && removeListener(event, cb, this.audioH5)
   }
 
@@ -587,7 +587,8 @@ export class AudioH5 {
   _checkType (element, type, closeLog) {
     if (typeof type !== 'string') return false
     if (getType(element) !== type) {
-      !closeLog && this._logErr(`Your parameter(${element}) type is ${getType(element)}, please pass the ${type} type`)
+      const caller = arguments && arguments.callee && arguments.callee.caller && arguments.callee.caller.name
+      !closeLog && this._logErr(`${caller} - Your parameter(${element}) type is ${getType(element)}, please pass the ${type} type`)
       return false
     }
     return true
@@ -596,7 +597,7 @@ export class AudioH5 {
   // check whether or not init Audio
   _checkInit () {
     if (!this.isInit) {
-      this._logErr("The Audio haven't been initiated")
+      this._logErr("checkInit - The Audio haven't been initiated")
       return false
     }
     return true
