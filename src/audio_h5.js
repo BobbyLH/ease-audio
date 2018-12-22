@@ -33,6 +33,9 @@ export class AudioH5 {
     this.stop = this.stop.bind(this)
     this.unload = this.unload.bind(this)
     this.model = this.model.bind(this)
+    this.on = this.on.bind(this)
+    this.off = this.off.bind(this)
+    this.once = this.once.bind(this)
 
     this.init(config)
   }
@@ -180,6 +183,30 @@ export class AudioH5 {
         return this.playModel
       }
     }
+  }
+
+  // bind event
+  on (event, cb) {
+    const eventName = `_on${event}`
+    this[eventName] && this[eventName](cb)
+  }
+
+  // unbind event
+  off (event) {
+    const eventName = `_on${event}`
+    this[eventName] && this[eventName](null)
+  }
+
+  // fire only one time
+  once (event, cb) {
+    const eventName = `_on${event}`
+    const existed = this[`on${event[0].toUpperCase()}${event.substr(1)}`]
+    const once = e => {
+      cb && cb(e)
+      existed && existed(e)
+      this[eventName] && this[eventName](existed)
+    }
+    this[eventName] && this[eventName](once)
   }
 
   /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */

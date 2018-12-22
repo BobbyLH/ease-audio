@@ -17,6 +17,9 @@ export class EaseAudio {
     this.stop = this.audio.stop
     this.unload = this.audio.unload
     this.model = this.audio.model
+    this.on = this.audio.on
+    this.off = this.audio.off
+    this.once = this.audio.once
   }
 
   _createAudio (config) {
