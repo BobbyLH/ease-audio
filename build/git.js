@@ -6,7 +6,7 @@ const version = `${match[1]}.${match[2]}.${match[3]}`
 async function autoGit () {
   const simpleGit = require('simple-git/promise')
   const git = simpleGit(__dirname)
-  const {current} = await git.branch()
+  const { current } = await git.branch()
   const branch = (process.argv && process.argv[2]) || current
   const message = `version - ${version}`
   let gitStatus = null
