@@ -71,7 +71,7 @@ rootDom.appendChild(onceBtn)
 function init () {
   const config = {
     debug: true,
-    logLevel: 'detail',
+    logLevel: 'info',
     // autoplay: true,
     src: 'http://audio.xmcdn.com/group29/M01/AA/71/wKgJXVrpaoXApbrYABINQqa4hlE219.m4a',
     onplay: e => console.log('onplay:', e),
