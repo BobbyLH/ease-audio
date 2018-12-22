@@ -12,6 +12,8 @@ const playStateSet = [
 
 const playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 'single-loop']
 
+const supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onload', 'onprogress', 'onvolume', 'onseek', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror']
+
 const logLevel = ['detail', 'warn', 'error']
 
 const defaultSrc = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA'
@@ -60,7 +62,7 @@ export class AudioH5 {
 
   play () {
     if (this._checkInit()) {
-      this._blockEvent(false)
+      this._blockEvent({block: false})
       this.audioH5.play()
       return this.playList[this.playIndex] && this.playList[this.playIndex].id
     }
@@ -153,13 +155,13 @@ export class AudioH5 {
 
   stop () {
     if (this._checkInit() && this.playState !== playStateSet[3]) {
-      this._blockEvent(true)
+      this._blockEvent({block: true})
       this.audioH5.currentTime = 0
       this.audioH5.pause()
 
       const id = this.playList[this.playIndex] && this.playList[this.playIndex].id
       this._setPlayState(playStateSet[3])
-      this.onStop && this.onStop(id)
+      this._fireEventQueue(id, 'onstop')
 
       return id
     }
@@ -173,7 +175,7 @@ export class AudioH5 {
     this.isInit = false
   }
 
-  // set play model
+  /* set play model */
   model (modelIndex) {
     if (this._checkInit()) {
       if (this._checkType(modelIndex, 'number', true)) {
@@ -185,28 +187,33 @@ export class AudioH5 {
     }
   }
 
-  // bind event
+  /* add event to events queue */
   on (event, cb) {
-    const eventName = `_on${event}`
-    this[eventName] && this[eventName](cb)
-  }
-
-  // unbind event
-  off (event) {
-    const eventName = `_on${event}`
-    this[eventName] && this[eventName](null)
-  }
-
-  // fire only one time
-  once (event, cb) {
-    const eventName = `_on${event}`
-    const existed = this[`on${event[0].toUpperCase()}${event.substr(1)}`]
-    const once = e => {
-      cb && cb(e)
-      existed && existed(e)
-      this[eventName] && this[eventName](existed)
+    if (this._checkType(event, 'string') && this._checkType(cb, 'function')) {
+      const queueName = event.indexOf('on') === 0 ? event : `on${event}`
+      this._onEvent(queueName, cb)
     }
-    this[eventName] && this[eventName](once)
+  }
+
+  /* remove event from events queue */
+  off (event, cb) {
+    if (this._checkType(event, 'string')) {
+      const queueName = event.indexOf('on') === 0 ? event : `on${event}`
+      this._offEvent(queueName, cb)
+    }
+  }
+
+  /* fire only one time */
+  once (event, cb) {
+    if (this._checkType(event, 'string') && this._checkType(cb, 'function')) {
+      const queueName = event.indexOf('on') === 0 ? event : `on${event}`
+      const funcName = `EASE_AUDIO_${queueName.toUpperCase()}_ONCE_CALLBACK`
+      const once = e => {
+        cb && cb(e)
+        this._offEvent(queueName, once, funcName)
+      }
+      this._onEvent(queueName, once, funcName)
+    }
   }
 
   /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
@@ -245,6 +252,7 @@ export class AudioH5 {
     this.isInit = true
   }
 
+  /* assemble src and playId */
   _srcAssem (srcs) {
     const srcArr = srcs
     ? this._checkType(srcs, 'array', true)
@@ -271,7 +279,7 @@ export class AudioH5 {
     this.config = {...this.config, ...params}
   }
 
-  // set play state
+  /* set play state */
   _setPlayState (state) {
     if (this._checkType(state, 'string') && this.playState !== state) {
       const readyState = this.audioH5.readyState
@@ -299,7 +307,7 @@ export class AudioH5 {
     }
   }
 
-  // set play index
+  /* set play index */
   _setPlayIndex (index) {
     const playModel = this.playModel
     const maxIndex = this.playList.length - 1
@@ -330,13 +338,13 @@ export class AudioH5 {
     }
   }
 
-  // reset play list
+  /* reset play list */
   _resetPlayList () {
     this.playList = []
     this._setPlayIndex(0)
   }
 
-  // update play list
+  /* update play list */
   _updatePlayList ({type, list, index}) {
     switch (type) {
       case 'add':
@@ -353,7 +361,7 @@ export class AudioH5 {
     }
   }
 
-  // cut audio
+  /* cut audio */
   _cut ({src, autoCut}) {
     // can't cut audio if the playModel is single-once
     if (this._checkInit() && this.playModel !== 'single-once') {
@@ -382,86 +390,57 @@ export class AudioH5 {
     return this._setPlayState(playStateSet[4])
   }
 
-  /* expose binding events */
-  _onplay (cb) {
-    this.onPlay = cb
+  /* generate received event callback queue */
+  _onEvent (event, cb, name) {
+    if (supportEvents.indexOf(event) !== -1) {
+      if (!this[event]) this[event] = {}
+      this[event][name || cb.name || `anonymous-${new Date().getTime()}`] = cb
+    }
   }
 
-  _onpause (cb) {
-    this.onPause = cb
+  /* delete received event callback queue */
+  _offEvent (event, cb, name) {
+    if (supportEvents.indexOf(event) !== -1) {
+      if (!cb) this[event] = null
+      else if (name || cb.name) delete this[event][name || cb.name]
+    }
   }
 
-  _onstop (cb) {
-    this.onStop = cb
-  }
-
-  _onend (cb) {
-    this.onEnd = cb
-  }
-
-  _onload (cb) {
-    this.onLoad = cb
-  }
-
-  _onprogress (cb) {
-    this.onProgress = cb
-  }
-
-  _onvolume (cb) {
-    this.onVolume = cb
-  }
-
-  _onseek (cb) {
-    this.onSeek = cb
-  }
-
-  _onrate (cb) {
-    this.onRate = cb
-  }
-
-  _ontimeupdate (cb) {
-    this.onTimeupdate = cb
-  }
-
-  _onloaderror (cb) {
-    this.onLoadError = cb
-  }
-
-  _onplayerror (cb) {
-    this.onPlayError = cb
-  }
-
-  // bind event callback
-  _bindEventCallback (config) {
-    const eventNames = Object.keys(config)
-    eventNames.forEach(v => {
-      if (v.indexOf('on') === 0) {
-        const eventName = `_${v}`
-        this[eventName] && this[eventName](config[v])
+  /* fire event callback queue */
+  _fireEventQueue (e, eventQueue) {
+    if (this[eventQueue]) {
+      for (let k in this[eventQueue]) {
+        this[eventQueue][k](e)
       }
-    })
+    }
   }
 
-  // register Audio Event
+  /* register Audio Event */
   _registerEvent (config) {
     const curry = (cb, eventName) => e => {
-      if (!this._triggerEvent(eventName)) return
-      cb && cb(e)
-      return true
+      if (!this._triggerEventController(eventName)) return
+      return cb && cb(e)
     }
 
-    this._bindEventCallback(config)
+    /* bindind received event callbacks */
+    const configKeys = Object.keys(config)
+    configKeys.forEach(v => {
+      if (v.indexOf('on') === 0) {
+        const funcName = `EASE_AUDIO_${v.toUpperCase()}_INITIAL_CALLBACK`
+        this._onEvent(v, config[v], funcName)
+      }
+    })
 
     this.eventMethods = {
       // loading state
       loadstart: e => {
         this.playState === playStateSet[1] && this._setPlayState(playStateSet[0])
-        this.onLoad && this.onLoad(e)
+        this._fireEventQueue(e, 'onload')
       },
       // playing state
       playing: e => {
         this._setPlayState(playStateSet[1])
-        this.onPlay && this.onPlay(e)
+        this._fireEventQueue(e, 'onplay')
       },
       canplaythrough: e => {
         this.playState === playStateSet[0] && this._setPlayState(playStateSet[1])
@@ -469,7 +448,7 @@ export class AudioH5 {
       // paused state
       pause: e => {
         this._setPlayState(playStateSet[2])
-        this.onPause && this.onPause(e)
+        this._fireEventQueue(e, 'onpause')
       },
       // ended state
       ended: e => {
@@ -478,18 +457,18 @@ export class AudioH5 {
         } else {
           this.isEnd = true
           this._cut({autoCut: true})
-          this.onEnd && this.onEnd(e)
+          this._fireEventQueue(e, 'onend')
         }
       },
       // loaderror state
       error: e => {
         this._setPlayState(playStateSet[5])
-        this.onLoadError && this.onLoadError(e)
+        this._fireEventQueue(e, 'onloaderror')
       },
       // playerror state
       stalled: e => {
         this._setPlayState(playStateSet[6])
-        this.onPlayError && this.onPlayError(e)
+        this._fireEventQueue(e, 'onplayerror')
       },
       // others
       progress: e => {
@@ -511,7 +490,7 @@ export class AudioH5 {
           progress = loaded / total
         }
 
-        this.onProgress && this.onProgress({e, progress})
+        this._fireEventQueue({e, progress}, 'onprogress')
       },
       durationchange: e => {},
       loadedmetadata: e => {
@@ -524,7 +503,7 @@ export class AudioH5 {
         if (this.playState === playStateSet[0]) {
           this._log("timeupdate's playing")
           this._setPlayState(playStateSet[1])
-          this.onPlay && this.onPlay(e)
+          this._fireEventQueue(e, 'onplay')
         }
 
         // Depending on currentTime and duration to mimic end event
@@ -536,22 +515,22 @@ export class AudioH5 {
           } else {
             this.isEnd = true
             this._cut({autoCut: true})
-            this.onEnd && this.onEnd(e)
+            this._fireEventQueue(e, 'onend')
           }
         }
 
-        this.onTimeupdate && this.onTimeupdate(e)
+        this._fireEventQueue(e, 'ontimeupdate')
       },
       seeking: e => {
-        this.onSeek && this.onSeek(e)
+        this._fireEventQueue(e, 'onseek')
       },
       seeked: e => {},
       play: e => {},
       volumechange: e => {
-        this.onVolume && this.onVolume(e)
+        this._fireEventQueue(e, 'onvolume')
       },
       ratechange: e => {
-        this.onRate && this.onRate(e)
+        this._fireEventQueue(e, 'onrate')
       },
       abort: e => {},
       suspend: e => {}
@@ -562,21 +541,12 @@ export class AudioH5 {
     }
 
     for (let k in this.eventMethods) {
-      this._blockEvent(false)
+      this._blockEvent({block: false})
       this._bindEvent(this.eventMethods[k], k)
     }
   }
 
-  // block all events callback trigger
-  _blockEvent (bool) {
-    if (this._checkInit()) {
-      for (let k in this.eventMethods) {
-        this._eventController(k, !bool)
-      }
-    }
-  }
-
-  // unregister Audio Event
+  /* unregister Audio Event */
   _unregisterEvent () {
     if (this._checkInit()) {
       for (let k in this.eventMethods) {
@@ -585,42 +555,50 @@ export class AudioH5 {
     }
   }
 
-  // whether or not trigger event callback
-  _triggerEvent (event) {
+  /* not remove but block event callback */
+  _blockEvent ({event, block}) {
+    if (this._checkInit()) {
+      if (event && this._checkType(event, 'string', true)) {
+        this.eventController[event] = !block
+      } else {
+        for (let k in this.eventMethods) {
+          this.eventController[k] = !block
+        }
+      }
+    }
+  }
+
+  /* whether or not trigger event callback */
+  _triggerEventController (event) {
     if (!this.eventController[event]) return false
     this.logLevel === 'detail' && this._log(`trigger ${event} event`)
 
     return true
   }
 
-  // event callback controller
-  _eventController (event, bool) {
-    this.eventController[event] = bool
-  }
-
-  // bind event
+  /* bind event */
   _bindEvent (cb, event) {
     if (!this._checkType(event, 'string')) return this._logErr(`bindEvent - bind event name is not string`)
     this._checkType(cb, 'function') && addListener(event, cb, this.audioH5)
   }
 
-  // remove event
+  /* remove event */
   _removeEvent (cb, event) {
     if (!this._checkType(event, 'string')) return this._logErr(`removeEvent - unbind event name is not string`)
     this._checkType(cb, 'function') && removeListener(event, cb, this.audioH5)
   }
 
-  // check type
-  _checkType (element, type, closeLog) {
+  /* check type */
+  _checkType (element, type, closeLogger) {
     if (typeof type !== 'string') return false
     if (getType(element) !== type) {
-      !closeLog && this._logErr(`Your parameter(${element}) type is ${getType(element)}, please pass the ${type} type`)
+      !closeLogger && this._logErr(`Your parameter(${element}) type is ${getType(element)}, please pass the ${type} type`)
       return false
     }
     return true
   }
 
-  // check whether or not init Audio
+  /* check whether or not init Audio */
   _checkInit () {
     if (!this.isInit) {
       this._logErr("checkInit - The Audio haven't been initiated")
@@ -629,14 +607,14 @@ export class AudioH5 {
     return true
   }
 
-  // normal logger
+  /* normal logger */
   _log (msg) {
     const canLog = this.logLevel === 'detail' || this.logLevel === 'warn'
 
     return this.debug && canLog && console.log('[EASE_AUDIO_H5 MESSAGE]:', msg)
   }
 
-  // error logger
+  /* error logger */
   _logErr (err) {
     return this.debug && console.error('[EASE_AUDIO_H5 ERROR]:', err)
   }
