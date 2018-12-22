@@ -14,7 +14,7 @@ const playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 's
 
 const supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onload', 'onprogress', 'onvolume', 'onseek', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror']
 
-const logLevel = ['detail', 'warn', 'error']
+const logLevel = ['detail', 'info', 'warn', 'error', 'silent']
 
 const defaultSrc = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA'
 
@@ -222,7 +222,7 @@ export class AudioH5 {
     this.config = config // preserve initial config
     this.playState = null
     this.debug = config.debug || false
-    this.logLevel = config.logLevel || logLevel[2]
+    this.logLevel = (logLevel.indexOf(config.logLevel) !== -1 && config.logLevel) || logLevel[3]
     this.playId = 1000
     this.playModel = playModelSet[(config.playModel && this._checkType(config.playModel, 'number') && config.playModel) || (config.loop && 3) || 0]
     this.playIndex = 0
@@ -301,7 +301,7 @@ export class AudioH5 {
           break
       }
 
-      this._log(`setPlayState - ${state}`)
+      this._logInfo(`setPlayState - ${state}`)
       this.playState = state
       return this.playState
     }
@@ -336,6 +336,9 @@ export class AudioH5 {
       default:
         this.playIndex = index || this.playIndex
     }
+
+    this._logInfo(`setPlayIndex - ${this.playIndex}`)
+    return this.playIndex
   }
 
   /* reset play list */
@@ -501,7 +504,7 @@ export class AudioH5 {
       timeupdate: e => {
         // playState is loading but actually is playing
         if (this.playState === playStateSet[0]) {
-          this._log("timeupdate's playing")
+          this._logInfo("timeupdate's playing")
           this._setPlayState(playStateSet[1])
           this._fireEventQueue(e, 'onplay')
         }
@@ -509,7 +512,7 @@ export class AudioH5 {
         // Depending on currentTime and duration to mimic end event
         const isEnd = this.audioH5.duration && this.audioH5.currentTime === this.audioH5.duration
         if (isEnd) {
-          this._log("timeupdate's ended")
+          this._logInfo("timeupdate's ended")
           if (this.isEnd) {
             this.isEnd = false
           } else {
@@ -571,26 +574,26 @@ export class AudioH5 {
   /* whether or not trigger event callback */
   _triggerEventController (event) {
     if (!this.eventController[event]) return false
-    this.logLevel === 'detail' && this._log(`trigger ${event} event`)
+    this._log(`trigger ${event} event`)
 
     return true
   }
 
   /* bind event */
   _bindEvent (cb, event) {
-    if (!this._checkType(event, 'string')) return this._logErr(`bindEvent - bind event name is not string`)
+    if (!this._checkType(event, 'string', true)) return this._logErr(`bindEvent - bind event name is not string`)
     this._checkType(cb, 'function') && addListener(event, cb, this.audioH5)
   }
 
   /* remove event */
   _removeEvent (cb, event) {
-    if (!this._checkType(event, 'string')) return this._logErr(`removeEvent - unbind event name is not string`)
+    if (!this._checkType(event, 'string', true)) return this._logErr(`removeEvent - unbind event name is not string`)
     this._checkType(cb, 'function') && removeListener(event, cb, this.audioH5)
   }
 
   /* check type */
   _checkType (element, type, closeLogger) {
-    if (typeof type !== 'string') return false
+    if (typeof type !== 'string') return this._logWarn('checkType - The type must be string')
     if (getType(element) !== type) {
       !closeLogger && this._logErr(`Your parameter(${element}) type is ${getType(element)}, please pass the ${type} type`)
       return false
@@ -601,22 +604,38 @@ export class AudioH5 {
   /* check whether or not init Audio */
   _checkInit () {
     if (!this.isInit) {
-      this._logErr("checkInit - The Audio haven't been initiated")
+      this._logWarn("checkInit - The Audio haven't been initiated")
       return false
     }
     return true
   }
 
-  /* normal logger */
-  _log (msg) {
-    const canLog = this.logLevel === 'detail' || this.logLevel === 'warn'
+  /* detail logger */
+  _log (detail) {
+    const canLog = this.logLevel !== 'silent' && this.logLevel === 'detail'
 
-    return this.debug && canLog && console.log('[EASE_AUDIO_H5 MESSAGE]:', msg)
+    return canLog && this.debug && console.log('[EASE_AUDIO_H5 DETAIL]:', detail)
+  }
+
+  /* info logger */
+  _logInfo (info) {
+    const canLog = this.logLevel !== 'silent' && this.logLevel !== 'error' && this.logLevel !== 'warn'
+
+    return canLog && this.debug && console.info('[EASE_AUDIO_H5 INFO]:', info)
+  }
+
+  /* warn logger */
+  _logWarn (warn) {
+    const canLog = this.logLevel !== 'silent' && this.logLevel !== 'error'
+
+    return canLog && this.debug && console.warn('[EASE_AUDIO_H5 WARN]:', warn)
   }
 
   /* error logger */
   _logErr (err) {
-    return this.debug && console.error('[EASE_AUDIO_H5 ERROR]:', err)
+    const canLog = this.logLevel !== 'silent'
+
+    return canLog && this.debug && console.error('[EASE_AUDIO_H5 ERROR]:', err)
   }
 }
 
