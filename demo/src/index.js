@@ -134,7 +134,7 @@ function on () {
 }
 
 function off () {
-  audio.on('play')
+  audio.off('play')
 }
 
 function once () {
