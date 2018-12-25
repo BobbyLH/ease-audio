@@ -1,5 +1,5 @@
 # Description
-[ease-audio.js](https://github.com/Bobby90622/ease-audio) is an audio library base on **HTML5 Audio** and **Web Audio**.
+[ease-audio.js](https://github.com/BobbyLH/ease-audio) is an audio library base on **HTML5 Audio** and **Web Audio**.
 
 
 
@@ -7,7 +7,7 @@
 
 Several options to get up and running:
 
-* Clone the repo: `git clone https://github.com/Bobby90622/ease-audio`
+* Clone the repo: `git clone https://github.com/BobbyLH/ease-audio`
 * Install with [npm](https://www.npmjs.com/package/ease-audio): `npm install ease-audio`
 * Install with [Yarn](https://yarnpkg.com/en/package/ease-audio): `yarn add ease-audio`
 
