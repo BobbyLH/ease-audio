@@ -112,7 +112,7 @@ sound.volume(0.5)
 
 ### Options
 #### src `Array/String` `[]` *`required`*
-The sources to the track(s) to be loaded for the sound (URLs or base64 data URIs). These should be in order of preference, howler.js will automatically load the first one that is compatible with the current browser..
+The sources to the track(s) to be loaded for the sound (URLs or base64 data URIs).
 #### volume `Number` `1.0`
 The volume of the specific track, from `0.0` to `1.0`.
 #### loop `Boolean` `false`
