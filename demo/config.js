@@ -1,5 +1,7 @@
 const path = require('path')
+const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+
 const htmlWebpackPlugin = new HtmlWebpackPlugin({
   title: 'Ease Audio',
   path: path.resolve(__dirname),
@@ -24,6 +26,9 @@ module.exports = {
       }
     ]
   },
-  plugins: [htmlWebpackPlugin],
+  plugins: [
+    htmlWebpackPlugin,
+    new webpack.ProgressPlugin()
+  ],
   mode: 'development'
 }
