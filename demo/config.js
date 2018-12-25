@@ -1,6 +1,7 @@
 const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const DashboardPlugin = require('webpack-dashboard/plugin')
 
 const htmlWebpackPlugin = new HtmlWebpackPlugin({
   title: 'Ease Audio',
@@ -28,7 +29,9 @@ module.exports = {
   },
   plugins: [
     htmlWebpackPlugin,
-    new webpack.ProgressPlugin()
+    new webpack.ProgressPlugin(),
+    new webpack.HotModuleReplacementPlugin(),
+    new DashboardPlugin()
   ],
   mode: 'development'
 }
