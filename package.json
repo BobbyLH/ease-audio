@@ -2,6 +2,17 @@
   "name": "ease-audio",
   "version": "0.0.18",
   "description": "The Audio Player Project",
+  "keywords": [
+    "ease",
+    "ease-audio",
+    "ease-audio.js",
+    "audio",
+    "sound",
+    "web audio",
+    "webaudio",
+    "html5",
+    "html5 audio"
+  ],
   "main": "dist/index.js",
   "scripts": {
     "dev": "node demo/server.js",
