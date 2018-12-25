@@ -1,6 +1,8 @@
 # Description
 [ease-audio.js](https://github.com/Bobby90622/ease-audio) is an audio library base on **HTML5 Audio** and **Web Audio**.
 
+
+
 ## Quick Start
 
 Several options to get up and running:
@@ -19,6 +21,8 @@ In the browser:
     });
 </script>
 ```
+
+
 
 ## Examples
 
@@ -101,6 +105,7 @@ sound.play();
 // Change the volume.
 sound.volume(0.5)
 ```
+
 
 
 ## API
@@ -200,9 +205,11 @@ This is called by default, but if you set `preload` to false, you must call `loa
 #### unload()
 Unload and destroy the EaseAudio object. This will immediately stop all sounds attached to this sound and remove it from the cache.
 
+
 ### Properties
 #### duration `Number`
 Return the track duration property.
+
 
 
 ## License
