@@ -29,7 +29,9 @@ module.exports = {
   },
   plugins: [
     htmlWebpackPlugin,
-    new webpack.ProgressPlugin(),
+    new webpack.ProgressPlugin(function handler (percentage, msg) {
+      console.log((percentage.toFixed(2) * 100) + '%', msg)
+    }),
     new webpack.HotModuleReplacementPlugin(),
     new DashboardPlugin()
   ],
