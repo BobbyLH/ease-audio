@@ -36,7 +36,7 @@ export class EaseAudio {
     return this.audio.playId
   }
 
-  get playing () {
+  get playingData () {
     return this.audio.playList[this.audio.playIndex]
   }
 
