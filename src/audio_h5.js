@@ -27,6 +27,7 @@ export class AudioH5 {
     this.pause = this.pause.bind(this)
     this.toggle = this.toggle.bind(this)
     this.cut = this.cut.bind(this)
+    this.pick = this.pick.bind(this)
     this.load = this.load.bind(this)
     this.seek = this.seek.bind(this)
     this.rate = this.rate.bind(this)
@@ -59,7 +60,7 @@ export class AudioH5 {
       this._initial(config)
       this._registerEvent(config)
 
-      return {playId: this.playId, playList: this.playList}
+      return {playId: this.playId, playing: this.playList[this.playIndex], playList: this.playList}
     }
   }
 
@@ -92,7 +93,28 @@ export class AudioH5 {
     if (this._checkType(params, 'object')) this._updateConfig(params)
     if (this.playList[this.playIndex]) {
       this._cut()
-      return {playId: this.playId, playList: this.playList}
+
+      return {playId: this.playId, playing: this.playList[this.playIndex], playList: this.playList}
+    }
+  }
+
+  pick (playId) {
+    if (this._checkInit() && this._checkType(playId, 'number', true)) {
+      for (let i = 0; i < this.playList.length; i++) {
+        if (this.playList[i].playId === playId) {
+          this.unload()
+
+          this._setPlayIndex(i)
+          const src = this.playList[this.playIndex].src
+
+          const config = {...this.config, src}
+          this._createAudio(config)
+          this._registerEvent(config)
+          this.play()
+        }
+      }
+
+      return {playId: this.playId, playing: this.playList[this.playIndex], playList: this.playList}
     }
   }
 
@@ -227,7 +249,7 @@ export class AudioH5 {
     if (this._checkType(action, 'string', true) && (!list || this._checkType(list, 'array', true)) && (!playId || this._checkType(playId, 'number', true))) {
       this._updatePlayList({action, list, playId})
 
-      return {playId: this.playId, playList: this.playList}
+      return {playId: this.playId, playing: this.playList[this.playIndex], playList: this.playList}
     }
   }
 
@@ -383,32 +405,28 @@ export class AudioH5 {
 
   /* cut audio */
   _cut (onEndCut) {
+    this.stop()
     // can't cut audio if the playModel is single-once
     if (this._checkInit() && this.playModel !== 'single-once') {
       this.metaDataLoaded = false
       this.seekValue = null
       this._setPlayIndex()
-      if (!this.playList[this.playIndex]) return this.stop()
-      const nextSrc = this.playList[this.playIndex].src
+      if (!this.playList[this.playIndex]) return
+      const src = this.playList[this.playIndex].src
 
       if (onEndCut) {
         // resolve the IOS auto play problem
-        this.stop()
-        this.audioH5.src = nextSrc
-        this.play()
+        this.audioH5.src = src
       } else {
         this.unload()
-        const config = {...this.config, src: nextSrc}
+        const config = {...this.config, src}
         this._createAudio(config)
         this._registerEvent(config)
-        this.playId = (this.playList[this.playIndex] && this.playList[this.playIndex].playId) || this.playId
-        this.play()
       }
 
+      this.play()
       return this._setPlayState(playStateSet[1])
     }
-
-    return this.stop()
   }
 
   /* generate received event callback queue */
