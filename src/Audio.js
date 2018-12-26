@@ -16,30 +16,11 @@ export class EaseAudio {
     this.muted = this.audio.muted
     this.stop = this.audio.stop
     this.unload = this.audio.unload
-    this.model = this.audio.model
     this.on = this.audio.on
     this.off = this.audio.off
     this.once = this.audio.once
-  }
-
-  _createAudio (config) {
-    let audio
-    const { usingWebAudio } = config || {}
-
-    try {
-      if (usingWebAudio && (window.AudioContext || window.webkitAudioContext)) {
-        audio = new AudioCtx(config)
-      } else if (window.Audio) {
-        audio = new AudioH5(config)
-      } else {
-        audio = null
-      }
-    } catch (err) {
-      console.error('[EASE_AUDIO ERROR]:', err)
-      audio = null
-    }
-
-    return audio
+    this.model = this.audio.model
+    this.playlist = this.audio.playlist
   }
 
   get duration () {
@@ -51,7 +32,7 @@ export class EaseAudio {
   }
 
   get playId () {
-    return this.audio.playList[this.audio.playIndex].id
+    return this.audio.playId
   }
 
   get playList () {
@@ -61,6 +42,41 @@ export class EaseAudio {
   get networkState () {
     return this.audio.networkState
   }
+
+  _createAudio (config) {
+    let audio = {
+      init: initFunc,
+      play: initFunc,
+      pause: initFunc,
+      toggle: initFunc,
+      load: initFunc,
+      seek: initFunc,
+      volume: initFunc,
+      muted: initFunc,
+      stop: initFunc,
+      unload: initFunc,
+      on: initFunc,
+      off: initFunc,
+      once: initFunc
+    }
+    const { usingWebAudio } = config || {}
+
+    try {
+      if (usingWebAudio && (window.AudioContext || window.webkitAudioContext)) {
+        audio = new AudioCtx(config)
+      } else if (window.Audio) {
+        audio = new AudioH5(config)
+      }
+    } catch (err) {
+      console.error('[EASE_AUDIO ERROR]:', err)
+    }
+
+    return audio
+  }
+}
+
+function initFunc () {
+  return console.error('[EASE_AUDIO ERROR]: Initialize failed')
 }
 
 export default EaseAudio
