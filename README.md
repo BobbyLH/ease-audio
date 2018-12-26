@@ -38,7 +38,7 @@ sound.play();
 ### More options:
 ```javascript
 var sound = new EaseAudio({
-  src: ['sound1.mp3', 'sound2.mp3'],
+  playlist: ['sound1.mp3', 'sound2.mp3'],
   volume: 1,
   playModel: 'list-once',
   preload: true,
@@ -72,7 +72,7 @@ var sound = new EaseAudio({
 ### Listen for events:
 ```javascript
 var sound = new EaseAudio({
-  src: ['sound.mp3']
+  src: 'sound.mp3'
 });
 
 // Clear listener after first call.
@@ -111,8 +111,10 @@ sound.volume(0.5)
 ## API
 
 ### Options
-#### src `Array/String` `[]` *`required`*
+#### src `Array/String` `[]`
 The sources to the track(s) to be loaded for the sound (URLs or base64 data URIs).
+#### playlist `Array` `[]`
+The play list for list model, the src property is *`required`*.
 #### volume `Number` `1.0`
 The volume of the specific track, from `0.0` to `1.0`.
 #### loop `Boolean` `false`
@@ -154,15 +156,20 @@ Fires when the sound has been seeked. The first parameter is the event object.
 ### Methods
 #### play()
 Begins playback of a sound. Returns the sound id to be used with other methods. Only method that can't be chained.
-* **sprite/id**: `String/Number` `optional` Takes one parameter that can either be a sprite or sound ID. If a sprite is passed, a new sound will play based on the sprite's definition. If a sound ID is passed, the previously played sound will be played (for example, after pausing it). However, if an ID of a sound that has been drained from the pool is passed, nothing will play.
 
 #### pause()
 Pauses playback of sound or group, saving the `seek` of playback.
-* **id**: `Number` `optional` The sound ID. If none is passed, all sounds in group are paused.
 
 #### stop()
 Stops playback of sound, resetting `seek` to `0`.
-* **id**: `Number` `optional` The sound ID. If none is passed, all sounds in group are stopped.
+
+#### toggle()
+
+#### cut()
+
+#### pick(id)
+
+#### playlist(params)
 
 #### mute([muted])
 Mutes the sound, but doesn't pause the playback.
@@ -179,10 +186,6 @@ Get/set the rate of playback for a sound. This method optionally takes 0, 1 or 2
 #### seek([seek])
 Get/set the position of playback for a sound. This method optionally takes 0, 1 or 2 arguments.
 * **seek**: `Number` `optional` The position to move current playback to (in seconds).
-
-#### duration([id])
-Get the duration of the audio source. Will return 0 until after the `load` event fires.
-* **id**: `Number` `optional` The sound ID to check. Passing an ID will return the duration of the sprite being played on this instance; otherwise, the full source duration is returned.
 
 #### on(event, function)
 Listen for events. Multiple events can be added by calling this multiple times.
