@@ -10,6 +10,7 @@ export class EaseAudio {
     this.pause = this.audio.pause
     this.toggle = this.audio.toggle
     this.cut = this.audio.cut
+    this.pick = this.audio.pick
     this.load = this.audio.load
     this.seek = this.audio.seek
     this.volume = this.audio.volume
@@ -33,6 +34,10 @@ export class EaseAudio {
 
   get playId () {
     return this.audio.playId
+  }
+
+  get playing () {
+    return this.audio.playList[this.audio.playIndex]
   }
 
   get playList () {
