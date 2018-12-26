@@ -15,7 +15,7 @@
   ],
   "main": "dist/index.js",
   "scripts": {
-    "dev": "node demo/server.js",
+    "dev": "webpack-dashboard -p 3300 -- node demo/server.js",
     "static": "webpack --config build/webpack.config.js --mode development --watch",
     "build": "npm run build_branch && npm run build_webpack && npm run build_version && npm run build_git",
     "build_branch": "node build/branch",
@@ -41,6 +41,7 @@
     "simple-git": "^1.107.0",
     "webpack": "^4.27.1",
     "webpack-cli": "^3.1.2",
+    "webpack-dashboard": "^2.0.0",
     "webpack-dev-middleware": "^3.4.0"
   }
 }

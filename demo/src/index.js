@@ -8,6 +8,7 @@ const playBtn = document.createElement('button')
 const seekBtn = document.createElement('button')
 const volumeBtn = document.createElement('button')
 const muteBtn = document.createElement('button')
+const playlistBtn = document.createElement('button')
 const cutBtn = document.createElement('button')
 const getIdBtn = document.createElement('button')
 const stopBtn = document.createElement('button')
@@ -39,6 +40,10 @@ rootDom.appendChild(volumeBtn)
 muteBtn.innerText = '静音'
 muteBtn.onclick = muted
 rootDom.appendChild(muteBtn)
+
+playlistBtn.innerText = '播放列表'
+playlistBtn.onclick = playlist
+rootDom.appendChild(playlistBtn)
 
 cutBtn.innerText = '切歌'
 cutBtn.onclick = cut
@@ -73,14 +78,18 @@ function init () {
     debug: true,
     logLevel: 'info',
     // autoplay: true,
-    src: 'http://audio.xmcdn.com/group29/M01/AA/71/wKgJXVrpaoXApbrYABINQqa4hlE219.m4a',
+    // src: 'http://audio.xmcdn.com/group29/M01/AA/71/wKgJXVrpaoXApbrYABINQqa4hlE219.m4a',
     onplay: e => console.log('onplay:', e),
     onpause: e => console.log('onpause:', e),
     onstop: id => console.log('onstop', id),
     onseek: e => console.log('onseek:', e),
-    onprogress: e => console.log('onprogress:', e)
+    onprogress: e => console.log('onprogress:', e),
+    playlist: [
+      {src: 'http://audio.xmcdn.com/group36/M0A/28/2C/wKgJUloyLSPzMzrUAA_CiRLIGrE559.m4a'},
+      {src: 'http://audio.xmcdn.com/group21/M0B/2E/08/wKgJLVrpYaLCVIMPABFX6j5WjMk013.m4a'}
+    ]
   }
-  audio.init(config)
+  console.log('res init', audio.init(config))
 }
 
 function load () {
@@ -111,10 +120,21 @@ function muted () {
   audio.muted(true)
 }
 
-function cut () {
-  audio.cut({
-    src: ['http://audio.xmcdn.com/group36/M0A/28/2C/wKgJUloyLSPzMzrUAA_CiRLIGrE559.m4a']
+function playlist () {
+  const res = audio.playlist({
+    action: 'add',
+    list: [
+      {src: 'http://audio.xmcdn.com/group36/M0A/28/2C/wKgJUloyLSPzMzrUAA_CiRLIGrE559.m4a'},
+      {src: 'http://audio.xmcdn.com/group21/M0B/2E/08/wKgJLVrpYaLCVIMPABFX6j5WjMk013.m4a'}
+    ]
   })
+  console.log('playlist res', res)
+}
+
+function cut () {
+  const res = audio.cut()
+  console.log('cut res', res)
+  if (!res) console.log('playlist', audio.playList)
 }
 
 function getId () {

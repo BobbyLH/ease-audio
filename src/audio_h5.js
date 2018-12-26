@@ -38,6 +38,7 @@ export class AudioH5 {
     this.on = this.on.bind(this)
     this.off = this.off.bind(this)
     this.once = this.once.bind(this)
+    this.playlist = this.playlist.bind(this)
 
     this.init(config)
   }
@@ -46,7 +47,7 @@ export class AudioH5 {
     return this.audioH5.duration
   }
 
-  set setAudioConfig ({prop, value}) {
+  set setProps ({prop, value}) {
     if (this.audioH5[prop] && !this._checkType(this.audioH5[prop], 'function')) {
       this.audioH5[prop] = value
       this._updateConfig({prop: value})
@@ -54,9 +55,11 @@ export class AudioH5 {
   }
 
   init (config) {
-    if (!this.isInit && config && this._checkType(config, 'object', true) && JSON.stringify(config) !== '{}') {
+    if (!this.isInit && config && this._checkType(config, 'object') && JSON.stringify(config) !== '{}') {
       this._initial(config)
       this._registerEvent(config)
+
+      return {playId: this.playId, playList: this.playList}
     }
   }
 
@@ -64,14 +67,16 @@ export class AudioH5 {
     if (this._checkInit()) {
       this._blockEvent({block: false})
       this.audioH5.play()
-      return this.playList[this.playIndex] && this.playList[this.playIndex].id
+
+      return this.playId
     }
   }
 
   pause () {
     if (this._checkInit()) {
       this.audioH5.pause()
-      return this.playList[this.playIndex] && this.playList[this.playIndex].id
+
+      return this.playId
     }
   }
 
@@ -79,27 +84,29 @@ export class AudioH5 {
     if (this._checkInit() && this.playState !== 'stoped' && this.playState !== 'ended' && this.playState !== 'loaderror' && this.playState !== 'playerror') {
       this.playState === null || this.playState === 'paused' ? this.play() : this.pause()
 
-      return this.playList[this.playIndex] && this.playList[this.playIndex].id
+      return this.playId
     }
   }
 
   cut (params) {
-    if (this._checkType(params, 'object', true)) this._updateConfig(params)
-    this._cut({src: params && params.src})
-
-    return this.playList[this.playIndex] && this.playList[this.playIndex].id
+    if (this._checkType(params, 'object')) this._updateConfig(params)
+    if (this.playList[this.playIndex]) {
+      this._cut()
+      return {playId: this.playId, playList: this.playList}
+    }
   }
 
   load () {
     if (this._checkInit()) {
       this.audioH5.load()
-      return this.playList[this.playIndex] && this.playList[this.playIndex].id
+
+      return this.playId
     }
   }
 
   seek (val) {
     if (this._checkInit()) {
-      if (this._checkType(val, 'number', true)) {
+      if (this._checkType(val, 'number')) {
         // IE cannot set currentTime when the metaData is loading
         if (isIE && !this.metaDataLoaded) {
           this.seekValue = val
@@ -119,7 +126,7 @@ export class AudioH5 {
 
   rate (val) {
     if (this._checkInit()) {
-      if (this._checkType(val, 'number', true)) {
+      if (this._checkType(val, 'number')) {
         if (val > 2) val = 2
         if (val < 0.5) val = 0.5
         this.audioH5.playbackRate = val
@@ -132,7 +139,7 @@ export class AudioH5 {
 
   volume (val) {
     if (this._checkInit()) {
-      if (this._checkType(val, 'number', true)) {
+      if (this._checkType(val, 'number')) {
         if (val > 1) val = 1
         if (val < 0) val = 0
         this.audioH5.muted = false
@@ -145,11 +152,11 @@ export class AudioH5 {
   }
 
   muted (bool) {
-    if (this._checkInit() && this._checkType(bool, 'boolean')) {
+    if (this._checkInit() && this._checkType(bool, 'boolean', true)) {
       this.audioH5.muted = bool
       this._updateConfig({muted: bool})
 
-      return this.playList[this.playIndex] && this.playList[this.playIndex].id
+      return this.playId
     }
   }
 
@@ -159,11 +166,10 @@ export class AudioH5 {
       this.audioH5.currentTime = 0
       this.audioH5.pause()
 
-      const id = this.playList[this.playIndex] && this.playList[this.playIndex].id
       this._setPlayState(playStateSet[3])
-      this._fireEventQueue(id, 'onstop')
+      this._fireEventQueue(this.playId, 'onstop')
 
-      return id
+      return this.playId
     }
   }
 
@@ -178,7 +184,7 @@ export class AudioH5 {
   /* set play model */
   model (modelIndex) {
     if (this._checkInit()) {
-      if (this._checkType(modelIndex, 'number', true)) {
+      if (this._checkType(modelIndex, 'number')) {
         // model contain: list-once(0), list-random(1), list-loop(2), single-once(3), single-loop(4)
         this.playModel = playModelSet[modelIndex] || this.playModel
       } else {
@@ -189,7 +195,7 @@ export class AudioH5 {
 
   /* add event to events queue */
   on (event, cb) {
-    if (this._checkType(event, 'string') && this._checkType(cb, 'function')) {
+    if (this._checkType(event, 'string', true) && this._checkType(cb, 'function', true)) {
       const queueName = event.indexOf('on') === 0 ? event : `on${event}`
       this._onEvent(queueName, cb)
     }
@@ -197,7 +203,7 @@ export class AudioH5 {
 
   /* remove event from events queue */
   off (event, cb) {
-    if (this._checkType(event, 'string')) {
+    if (this._checkType(event, 'string', true)) {
       const queueName = event.indexOf('on') === 0 ? event : `on${event}`
       this._offEvent(queueName, cb)
     }
@@ -205,7 +211,7 @@ export class AudioH5 {
 
   /* fire only one time */
   once (event, cb) {
-    if (this._checkType(event, 'string') && this._checkType(cb, 'function')) {
+    if (this._checkType(event, 'string', true) && this._checkType(cb, 'function', true)) {
       const queueName = event.indexOf('on') === 0 ? event : `on${event}`
       const funcName = `EASE_AUDIO_${queueName.toUpperCase()}_ONCE_CALLBACK`
       const once = e => {
@@ -216,6 +222,15 @@ export class AudioH5 {
     }
   }
 
+  /* set play list */
+  playlist ({action, list, playId}) {
+    if (this._checkType(action, 'string', true) && (!list || this._checkType(list, 'array', true)) && (!playId || this._checkType(playId, 'number', true))) {
+      this._updatePlayList({action, list, playId})
+
+      return {playId: this.playId, playList: this.playList}
+    }
+  }
+
   /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
   _initial (config) {
@@ -223,6 +238,7 @@ export class AudioH5 {
     this.playState = null
     this.debug = config.debug || false
     this.logLevel = (logLevel.indexOf(config.logLevel) !== -1 && config.logLevel) || logLevel[3]
+    this.idCounter = 1000
     this.playId = 1000
     this.playModel = playModelSet[(config.playModel && this._checkType(config.playModel, 'number') && config.playModel) || (config.loop && 3) || 0]
     this.playIndex = 0
@@ -231,48 +247,36 @@ export class AudioH5 {
     this.eventController = new Array(0)
     this.eventMethods = {}
 
+    // deploy playlist
+    if (config.playlist && this._checkType(config.playlist, 'array')) {
+      this.playlist({action: 'add', list: config.playlist})
+      this.config.src = config.playlist[0].src
+    } else if (config.src) {
+      if (this._checkType(config.src, 'array')) {
+        this.playlist({action: 'add', list: config.src.map(v => ({src: v}))})
+        this.config.src = config.src[0]
+      } else if (this._checkType(config.src, 'string')) {
+        this.playlist({action: 'add', list: [{src: config.src}]})
+      }
+    }
+
     // create Audio Object
-    this._createAudio(config)
+    this._createAudio(this.config)
   }
 
   _createAudio (config) {
-    this._updatePlayList({type: 'add', list: [...this._srcAssem(config.src)]})
+    this.isInit = true
 
     this.audioH5 = new window.Audio()
     this.audioH5.autoplay = config.autoplay || false
     this.audioH5.loop = config.loop || false
-    this.audioH5.src = this.playList[this.playIndex].src
+    this.audioH5.src = config.src && this._checkType(config.src, 'string') ? config.src : defaultSrc
     this.audioH5.preload = config.preload || false
     this.audioH5.volume = config.volume || (config.volume === 0 ? 0 : 1)
     this.audioH5.muted = config.muted || false
     this.audioH5.playbackRate = config.rate || config.playbackRate || 1
     this.audioH5.currentTime = config.seek || config.currentTime || 0
     this.audioH5.controls = false
-
-    this.isInit = true
-  }
-
-  /* assemble src and playId */
-  _srcAssem (srcs) {
-    const srcArr = srcs
-    ? this._checkType(srcs, 'array', true)
-      ? [...srcs.map(v => {
-        const data = {id: this.playId, src: v}
-        this.playId++
-        return data
-      })]
-      : [...[srcs].map(v => {
-        const data = {id: this.playId, src: v}
-        this.playId++
-        return data
-      })]
-    : [...[defaultSrc].map(v => {
-      const data = {id: this.playId, src: v}
-      this.playId++
-      return data
-    })]
-
-    return srcArr
   }
 
   _updateConfig (params) {
@@ -281,7 +285,7 @@ export class AudioH5 {
 
   /* set play state */
   _setPlayState (state) {
-    if (this._checkType(state, 'string') && this.playState !== state) {
+    if (this._checkType(state, 'string', true) && this.playState !== state) {
       const readyState = this.audioH5.readyState
       const paused = this.audioH5.paused
       const ended = this.audioH5.ended
@@ -337,7 +341,8 @@ export class AudioH5 {
         this.playIndex = index || this.playIndex
     }
 
-    this._logInfo(`setPlayIndex - ${this.playIndex}`)
+    this._log(`setPlayIndex - ${this.playIndex}`)
+    this.playId = (this.playList[this.playIndex] && this.playList[this.playIndex].playId) || this.playId
     return this.playIndex
   }
 
@@ -348,13 +353,25 @@ export class AudioH5 {
   }
 
   /* update play list */
-  _updatePlayList ({type, list, index}) {
-    switch (type) {
+  _updatePlayList ({action, list, playId}) {
+    switch (action) {
       case 'add':
-        this.playList = [...this.playList, ...list]
+        this.playList = [...this.playList, ...list.map(v => {
+          if (this._checkType(v, 'object')) {
+            v.playId = this.idCounter
+            this.idCounter++
+            return v
+          }
+        })]
         break
       case 'delete':
-        this.playList.splice(index, 1)
+        if (playId) {
+          for (let i = 0; i < this.playList.length; i++) {
+            if (this.playList[i].playId === playId) {
+              return this.playList.splice(i, 1)
+            }
+          }
+        }
         break
       case 'reset':
         this._resetPlayList()
@@ -365,16 +382,16 @@ export class AudioH5 {
   }
 
   /* cut audio */
-  _cut ({src, autoCut}) {
+  _cut (onEndCut) {
     // can't cut audio if the playModel is single-once
     if (this._checkInit() && this.playModel !== 'single-once') {
       this.metaDataLoaded = false
       this.seekValue = null
-      this._setPlayIndex(src && this.playList.length)
-      if (!src && !this.playList[this.playIndex]) return this._setPlayState(playStateSet[4])
-      const nextSrc = src || this.playList[this.playIndex].src
+      this._setPlayIndex()
+      if (!this.playList[this.playIndex]) return this.stop()
+      const nextSrc = this.playList[this.playIndex].src
 
-      if (autoCut) {
+      if (onEndCut) {
         // resolve the IOS auto play problem
         this.stop()
         this.audioH5.src = nextSrc
@@ -384,13 +401,14 @@ export class AudioH5 {
         const config = {...this.config, src: nextSrc}
         this._createAudio(config)
         this._registerEvent(config)
+        this.playId = (this.playList[this.playIndex] && this.playList[this.playIndex].playId) || this.playId
         this.play()
       }
 
       return this._setPlayState(playStateSet[1])
     }
 
-    return this._setPlayState(playStateSet[4])
+    return this.stop()
   }
 
   /* generate received event callback queue */
@@ -459,7 +477,7 @@ export class AudioH5 {
           this.isEnd = false
         } else {
           this.isEnd = true
-          this._cut({autoCut: true})
+          this._cut(true)
           this._fireEventQueue(e, 'onend')
         }
       },
@@ -517,7 +535,7 @@ export class AudioH5 {
             this.isEnd = false
           } else {
             this.isEnd = true
-            this._cut({autoCut: true})
+            this._cut(true)
             this._fireEventQueue(e, 'onend')
           }
         }
@@ -564,7 +582,7 @@ export class AudioH5 {
   /* not remove but block event callback */
   _blockEvent ({event, block}) {
     if (this._checkInit()) {
-      if (event && this._checkType(event, 'string', true)) {
+      if (event && this._checkType(event, 'string')) {
         this.eventController[event] = !block
       } else {
         for (let k in this.eventMethods) {
@@ -584,21 +602,21 @@ export class AudioH5 {
 
   /* bind event */
   _bindEvent (cb, event) {
-    if (!this._checkType(event, 'string', true)) return this._logErr(`bindEvent - bind event name is not string`)
-    this._checkType(cb, 'function') && addListener(event, cb, this.audioH5)
+    if (!this._checkType(event, 'string')) return this._logErr(`bindEvent - bind event name is not string`)
+    this._checkType(cb, 'function', true) && addListener(event, cb, this.audioH5)
   }
 
   /* remove event */
   _removeEvent (cb, event) {
-    if (!this._checkType(event, 'string', true)) return this._logErr(`removeEvent - unbind event name is not string`)
-    this._checkType(cb, 'function') && removeListener(event, cb, this.audioH5)
+    if (!this._checkType(event, 'string')) return this._logErr(`removeEvent - unbind event name is not string`)
+    this._checkType(cb, 'function', true) && removeListener(event, cb, this.audioH5)
   }
 
   /* check type */
-  _checkType (element, type, closeLogger) {
+  _checkType (element, type, logErr) {
     if (typeof type !== 'string') return this._logWarn('checkType - The type must be string')
     if (getType(element) !== type) {
-      !closeLogger && this._logErr(`Your parameter(${element}) type is ${getType(element)}, please pass the ${type} type`)
+      logErr && this._logErr(`Your parameter(${element}) type is ${getType(element)}, please pass the ${type} type`)
       return false
     }
     return true
