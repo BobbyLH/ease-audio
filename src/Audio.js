@@ -21,7 +21,6 @@ export class EaseAudio {
     this.off = this.audio.off
     this.once = this.audio.once
     this.model = this.audio.model
-    this.playlist = this.audio.playlist
   }
 
   get duration () {
@@ -40,7 +39,11 @@ export class EaseAudio {
     return this.audio.playList[this.audio.playIndex]
   }
 
-  get playList () {
+  set playlist (params) {
+    this.audio.playlist(params)
+  }
+
+  get playlist () {
     return this.audio.playList
   }
 

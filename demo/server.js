@@ -2,14 +2,18 @@ const path = require('path')
 const express = require('express')
 const webpack = require('webpack')
 const middleware = require('webpack-dev-middleware')
+const hotModule = require('webpack-hot-middleware')
 const config = require('./config')
 const compiler = webpack(config)
 const app = express()
 
 app.use(middleware(compiler, {
-  publicPath: '/',
-  logLevel: 'debug'
+  publicPath: config.output.publicPath,
+  logLevel: 'debug',
+  hot: true
 }))
+
+app.use(hotModule(compiler))
 
 app.use('*', function (req, res, next) {
   var filename = path.join(compiler.outputPath, 'index.html')

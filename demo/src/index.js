@@ -8,7 +8,8 @@ const playBtn = document.createElement('button')
 const seekBtn = document.createElement('button')
 const volumeBtn = document.createElement('button')
 const muteBtn = document.createElement('button')
-const playlistBtn = document.createElement('button')
+const setPlaylistBtn = document.createElement('button')
+const getPlaylistBtn = document.createElement('button')
 const cutBtn = document.createElement('button')
 const getIdBtn = document.createElement('button')
 const stopBtn = document.createElement('button')
@@ -42,9 +43,13 @@ muteBtn.innerText = '静音'
 muteBtn.onclick = muted
 rootDom.appendChild(muteBtn)
 
-playlistBtn.innerText = '播放列表'
-playlistBtn.onclick = playlist
-rootDom.appendChild(playlistBtn)
+setPlaylistBtn.innerText = '设置播放列表'
+setPlaylistBtn.onclick = setPlaylist
+rootDom.appendChild(setPlaylistBtn)
+
+getPlaylistBtn.innerText = '获取播放列表'
+getPlaylistBtn.onclick = getPlaylist
+rootDom.appendChild(getPlaylistBtn)
 
 cutBtn.innerText = '切歌'
 cutBtn.onclick = cut
@@ -74,7 +79,7 @@ onceBtn.innerText = 'once'
 onceBtn.onclick = once
 rootDom.appendChild(onceBtn)
 
-pickBtn.innerText = 'pick'
+pickBtn.innerText = 'pick 选歌'
 pickBtn.onclick = pick
 rootDom.appendChild(pickBtn)
 
@@ -126,15 +131,19 @@ function muted () {
   audio.muted(true)
 }
 
-function playlist () {
-  const res = audio.playlist({
+function setPlaylist () {
+  const res = audio.playlist = {
     action: 'add',
     list: [
       {src: 'http://audio.xmcdn.com/group36/M0A/28/2C/wKgJUloyLSPzMzrUAA_CiRLIGrE559.m4a'},
       {src: 'http://audio.xmcdn.com/group21/M0B/2E/08/wKgJLVrpYaLCVIMPABFX6j5WjMk013.m4a'}
     ]
-  })
+  }
   console.log('playlist res', res)
+}
+
+function getPlaylist () {
+  console.log('getPlaylistBtn', audio.playlist)
 }
 
 function cut () {

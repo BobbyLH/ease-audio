@@ -269,21 +269,22 @@ export class AudioH5 {
     this.eventController = new Array(0)
     this.eventMethods = {}
 
-    // deploy playlist
+    // playlist convert to src
+    let src
     if (config.playlist && this._checkType(config.playlist, 'array')) {
       this.playlist({action: 'add', list: config.playlist})
-      this.config.src = config.playlist[0].src
-    } else if (config.src) {
-      if (this._checkType(config.src, 'array')) {
-        this.playlist({action: 'add', list: config.src.map(v => ({src: v}))})
-        this.config.src = config.src[0]
-      } else if (this._checkType(config.src, 'string')) {
-        this.playlist({action: 'add', list: [{src: config.src}]})
+      src = config.playlist[0].src
+      if (!src || !this._checkType(src, 'string')) {
+        src = defaultSrc
+        this._logErr('The src property is necessary and must be string!')
       }
+    } else {
+      this._logErr('Please pass correct playlist parameters!')
+      src = defaultSrc
     }
 
     // create Audio Object
-    this._createAudio(this.config)
+    this._createAudio({...config, src})
   }
 
   _createAudio (config) {
@@ -292,13 +293,20 @@ export class AudioH5 {
     this.audioH5 = new window.Audio()
     this.audioH5.autoplay = config.autoplay || false
     this.audioH5.loop = config.loop || false
-    this.audioH5.src = config.src && this._checkType(config.src, 'string') ? config.src : defaultSrc
+    this.audioH5.src = this._srcAssemble(config.src)
     this.audioH5.preload = config.preload || false
     this.audioH5.volume = config.volume || (config.volume === 0 ? 0 : 1)
     this.audioH5.muted = config.muted || false
     this.audioH5.playbackRate = config.rate || config.playbackRate || 1
     this.audioH5.currentTime = config.seek || config.currentTime || 0
     this.audioH5.controls = false
+  }
+
+  _srcAssemble (src) {
+    if (src && this._checkType(src, 'string')) {
+      return src
+    }
+    return defaultSrc
   }
 
   _updateConfig (params) {
@@ -391,6 +399,15 @@ export class AudioH5 {
           for (let i = 0; i < this.playList.length; i++) {
             if (this.playList[i].playId === playId) {
               return this.playList.splice(i, 1)
+            }
+          }
+        }
+        break
+      case 'insert':
+        if (playId && list) {
+          for (let i = 0; i < this.playList.length; i++) {
+            if (this.playList[i].playId === playId) {
+              return this.playList.splice(i, 0, ...list)
             }
           }
         }
