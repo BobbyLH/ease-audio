@@ -29,7 +29,7 @@ In the browser:
 ### Most basic:
 ```javascript
 var sound = new EaseAudio({
-  src: 'sound.mp3'
+  playlist: [{src: 'sound.mp3'}]
 });
 
 sound.play();
@@ -38,7 +38,10 @@ sound.play();
 ### More options:
 ```javascript
 var sound = new EaseAudio({
-  playlist: ['sound1.mp3', 'sound2.mp3'],
+  playlist: [
+    {src: 'sound1.mp3'}, 
+    {src: 'sound2.mp3'}
+  ],
   volume: 1,
   playModel: 'list-once',
   preload: true,
@@ -72,7 +75,7 @@ var sound = new EaseAudio({
 ### Listen for events:
 ```javascript
 var sound = new EaseAudio({
-  src: 'sound.mp3'
+  playlist: [{src: 'sound.mp3'}]
 });
 
 // Clear listener after first call.
@@ -93,7 +96,7 @@ import EaseAudio from 'ease-audio';
 
 // Setup the new Howl.
 const sound = new EaseAudio({
-  src: 'sound.mp3'
+  playlist: [{src: 'sound.mp3'}]
 });
 
 // load the sound.
@@ -111,10 +114,8 @@ sound.volume(0.5)
 ## API
 
 ### Options
-#### src `Array/String` `[]`
-The sources to the track(s) to be loaded for the sound (URLs or base64 data URIs).
-#### playlist `Array` `[]`
-The play list for list model, the src property is *`required`*.
+#### playlist `Array` `[]` *`required`*
+The play list for list model, the src(`The sources to the track to be loaded for the sound`) property is *`required`*.
 #### volume `Number` `1.0`
 The volume of the specific track, from `0.0` to `1.0`.
 #### loop `Boolean` `false`
@@ -154,64 +155,88 @@ Fires when the sound has been seeked. The first parameter is the event object.
 
 
 ### Methods
+#### init()
+
 #### play()
-Begins playback of a sound. Returns the sound id to be used with other methods. Only method that can't be chained.
+Begin playback of sound.
 
 #### pause()
-Pauses playback of sound or group, saving the `seek` of playback.
+Pause playback of sound.
+
+#### toggle()
+Auto switch to play or pause according current play state.
+
+#### cut()
+According to play model auto cut playback for sound.
+
+#### pick(playId)
+According to play id pick playback for sound.This method necessarily takes 1 arguments.
+* **playId**: `Number` *`required`* The playId which from playlist.
+
+#### load()
+If you set `preload` to false, you must call `load` before you can play any sounds.
+
+#### seek([seek])
+Get/set the position of playback for sound. This method optionally takes 0 or 1 arguments.
+* **seek**: `Number` `optional` The position to move current playback to (in seconds).
+
+#### rate([rate])
+Get/set the rate of playback for sound. This method optionally takes 0 or 1 arguments.
+* **rate**: `Number` `optional` The rate of playback. 0.5 to 4.0, with 1.0 being normal speed.
+
+#### volume([volume])
+Get/set volume of sound. This method optionally takes 0 or 1 arguments.
+* **volume**: `Number` `optional` Volume from `0.0` to `1.0`.
+
+#### mute(muted)
+Mutes the sound, but doesn't pause the playback.
+* **muted**: `Boolean` True to mute and false to unmute.
 
 #### stop()
 Stops playback of sound, resetting `seek` to `0`.
 
-#### toggle()
-
-#### cut()
-
-#### pick(id)
-
-#### playlist(params)
-
-#### mute([muted])
-Mutes the sound, but doesn't pause the playback.
-* **muted**: `Boolean` `optional` True to mute and false to unmute.
-
-#### volume([volume])
-Get/set volume of this sound or the group. This method optionally takes 0, 1 or 2 arguments.
-* **volume**: `Number` `optional` Volume from `0.0` to `1.0`.
-
-#### rate([rate])
-Get/set the rate of playback for a sound. This method optionally takes 0, 1 or 2 arguments.
-* **rate**: `Number` `optional` The rate of playback. 0.5 to 4.0, with 1.0 being normal speed.
-
-#### seek([seek])
-Get/set the position of playback for a sound. This method optionally takes 0, 1 or 2 arguments.
-* **seek**: `Number` `optional` The position to move current playback to (in seconds).
+#### unload()
+Unload and destroy the EaseAudio object. This will immediately stop and remove it from the cache.
 
 #### on(event, function)
 Listen for events. Multiple events can be added by calling this multiple times.
-* **event**: `String` Name of event to fire/set (`load`, `canplay`, `loaderror`, `playerror`, `play`, `end`, `pause`, `stop`, `mute`, `volume`, `rate`, `seek`, `fade`, `unlock`).
+* **event**: `String` Name of event to fire/set (`play`, `pause`, `stop`, `end`, `load`, `canplay`, `progress`, `volume`, `seek`, `rate`, `timeupdate`, `loaderror`, `playerror`).
 * **function**: `Function` Define function to fire on event.
 
 #### once(event, function)
 Same as `on`, but it removes itself after the callback is fired.
-* **event**: `String` Name of event to fire/set (`load`, `canplay`, `loaderror`, `playerror`, `play`, `end`, `pause`, `stop`, `mute`, `volume`, `rate`, `seek`, `fade`, `unlock`).
+* **event**: `String` Name of event to fire/set (`play`, `pause`, `stop`, `end`, `load`, `canplay`, `progress`, `volume`, `seek`, `rate`, `timeupdate`, `loaderror`, `playerror`).
 * **function**: `Function` Define function to fire on event.
 
 #### off(event, [function])
 Remove event listener that you've set. Call without parameters to remove all events.
-* **event**: `String` Name of event (`load`,`canplay`, `loaderror`, `playerror`, `play`, `end`, `pause`, `stop`, `mute`, `volume`, `rate`, `seek`, `fade`, `unlock`).
+* **event**: `String` Name of event (`play`, `pause`, `stop`, `end`, `load`, `canplay`, `progress`, `volume`, `seek`, `rate`, `timeupdate`, `loaderror`, `playerror`).
 * **function**: `Function` `optional` The listener to remove. Omit this to remove all events of type.
-
-#### load()
-This is called by default, but if you set `preload` to false, you must call `load` before you can play any sounds.
-
-#### unload()
-Unload and destroy the EaseAudio object. This will immediately stop all sounds attached to this sound and remove it from the cache.
-
 
 ### Properties
 #### duration `Number`
 Return the track duration property.
+
+#### playState `String`
+Return the play state.
+
+#### playId `Number`
+Return the current playing id.
+
+#### playingData `Object`
+Return the current playing item data.
+
+#### playlist `Array`
+Return the playlist.
+
+#### playlist = `{action, list, playId}`
+Set the playlist according to `action` and `playId` arguments.
+* **action**: `String` Action of setting (`add`, `delete`, `insert`, `reset`).
+* **list**: `Array` `optional` Add/insert list to playlist when the action is `add` or `insert`.
+* **playId**: `Array` `optional` Delete a item according to playId.
+
+#### networkState `String`
+Return the track network state.
 
 
 
