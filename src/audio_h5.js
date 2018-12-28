@@ -4,7 +4,7 @@ const playStateSet = [
   'loading',
   'playing',
   'paused',
-  'stoped',
+  'stopped',
   'ended',
   'loaderror',
   'playerror'
@@ -82,7 +82,7 @@ export class AudioH5 {
   }
 
   toggle () {
-    if (this._checkInit() && this.playState !== 'stoped' && this.playState !== 'ended' && this.playState !== 'loaderror' && this.playState !== 'playerror') {
+    if (this._checkInit() && this.playState !== 'stopped' && this.playState !== 'ended' && this.playState !== 'loaderror' && this.playState !== 'playerror') {
       this.playState === null || this.playState === 'paused' ? this.play() : this.pause()
 
       return this.playId

@@ -155,7 +155,8 @@ Fires when the sound has been seeked. The first parameter is the event object.
 
 
 ### Methods
-#### init()
+#### init(config)
+If without config when new EaseAudio, you still can call this method with some configurations to construction.
 
 #### play()
 Begin playback of sound.

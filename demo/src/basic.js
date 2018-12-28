@@ -6,8 +6,11 @@ function init () {
   const config = {
     debug: true,
     logLevel: 'detail',
-    // autoplay: true,
-    src: 'http://audio.xmcdn.com/group29/M01/AA/71/wKgJXVrpaoXApbrYABINQqa4hlE219.m4a',
+    playlist: [
+      {src: 'http://audio.xmcdn.com/group29/M01/AA/71/wKgJXVrpaoXApbrYABINQqa4hlE219.m4a'},
+      {src: 'http://audio.xmcdn.com/group36/M0A/28/2C/wKgJUloyLSPzMzrUAA_CiRLIGrE559.m4a'},
+      {src: 'http://audio.xmcdn.com/group21/M0B/2E/08/wKgJLVrpYaLCVIMPABFX6j5WjMk013.m4a'}
+    ],
     onplay: e => console.log('onplay:', e),
     onpause: e => console.log('onpause:', e),
     onstop: id => console.log('onstop', id),
