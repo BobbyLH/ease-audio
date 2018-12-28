@@ -60,7 +60,7 @@ export class AudioH5 {
       this._initial(config)
       this._registerEvent(config)
 
-      return {playId: this.playId, playing: this.playList[this.playIndex], playList: this.playList}
+      return this._returnParams()
     }
   }
 
@@ -89,12 +89,11 @@ export class AudioH5 {
     }
   }
 
-  cut (params) {
-    if (this._checkType(params, 'object')) this._updateConfig(params)
-    if (this.playList[this.playIndex]) {
+  cut () {
+    if (this._checkInit()) {
       this._cut()
 
-      return {playId: this.playId, playing: this.playList[this.playIndex], playList: this.playList}
+      return this._returnParams()
     }
   }
 
@@ -111,10 +110,11 @@ export class AudioH5 {
           this._createAudio(config)
           this._registerEvent(config)
           this.play()
+          break
         }
       }
 
-      return {playId: this.playId, playing: this.playList[this.playIndex], playList: this.playList}
+      return this._returnParams()
     }
   }
 
@@ -174,11 +174,13 @@ export class AudioH5 {
   }
 
   muted (bool) {
-    if (this._checkInit() && this._checkType(bool, 'boolean', true)) {
-      this.audioH5.muted = bool
-      this._updateConfig({muted: bool})
-
-      return this.playId
+    if (this._checkInit()) {
+      if (this._checkType(bool, 'boolean', true)) {
+        this.audioH5.muted = bool
+        this._updateConfig({muted: bool})
+      } else {
+        return this.audioH5.muted
+      }
     }
   }
 
@@ -249,7 +251,7 @@ export class AudioH5 {
     if (this._checkType(action, 'string', true) && (!list || this._checkType(list, 'array', true)) && (!playId || this._checkType(playId, 'number', true))) {
       this._updatePlayList({action, list, playId})
 
-      return {playId: this.playId, playing: this.playList[this.playIndex], playList: this.playList}
+      return this._returnParams()
     }
   }
 
@@ -294,11 +296,10 @@ export class AudioH5 {
     this.audioH5.autoplay = config.autoplay || false
     this.audioH5.loop = config.loop || false
     this.audioH5.src = this._srcAssemble(config.src)
-    this.audioH5.preload = config.preload || false
+    this.audioH5.preload = config.preload || true
     this.audioH5.volume = config.volume || (config.volume === 0 ? 0 : 1)
     this.audioH5.muted = config.muted || false
     this.audioH5.playbackRate = config.rate || config.playbackRate || 1
-    this.audioH5.currentTime = config.seek || config.currentTime || 0
     this.audioH5.controls = false
   }
 
@@ -311,6 +312,10 @@ export class AudioH5 {
 
   _updateConfig (params) {
     this.config = {...this.config, ...params}
+  }
+
+  _returnParams () {
+    return {playId: this.playId, playingData: this.playList[this.playIndex], playlist: this.playList}
   }
 
   /* set play state */
@@ -371,8 +376,9 @@ export class AudioH5 {
         this.playIndex = index || this.playIndex
     }
 
-    this._log(`setPlayIndex - ${this.playIndex}`)
     this.playId = (this.playList[this.playIndex] && this.playList[this.playIndex].playId) || this.playId
+
+    this._log(`setPlayIndex - playIndex: ${this.playIndex}  playId: ${this.playId}`)
     return this.playIndex
   }
 
