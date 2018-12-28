@@ -113,9 +113,19 @@ sound.volume(0.5)
 
 ## API
 
+
 ### Options
 #### playlist `Array` `[]` *`required`*
 The play list for list model, the src(`The sources to the track to be loaded for the sound`) property is *`required`*.
+#### endAutoCut `bool`
+Set to `true` the EaseAudio going to play next track(according to playModel) when the current will have finished.
+#### playModel `string` `list-once`
+This property defines the play model that when `cut` or `end auto cut` sound will be comply. Valid levels include(If set the `loop` to `true` without set playModel property, then the play model will be `single-once`):<br>
+- `list-once`
+- `list-random`
+- `list-loop`
+- `single-once`
+- `single-loop`
 #### volume `Number` `1.0`
 The volume of the specific track, from `0.0` to `1.0`.
 #### loop `Boolean` `false`
@@ -152,6 +162,15 @@ Fires when the sound's playback rate has changed. The first parameter is the eve
 Fires when the sound has been seeked. The first parameter is the event object.
 #### usingWebAudio `Boolean`
 `true` if the Web Audio API is available.
+#### debug `Boolean` `false`
+Set to `true` will log the debug information.
+#### logLevel `string` `error`
+This property defines the level of messages that the EaseAudio will log. Valid levels include:<br>
+- `detail`
+- `info`
+- `warn`
+- `error`
+- `silent`
 
 
 ### Methods
@@ -213,6 +232,7 @@ Same as `on`, but it removes itself after the callback is fired.
 Remove event listener that you've set. Call without parameters to remove all events.
 * **event**: `String` Name of event (`play`, `pause`, `stop`, `end`, `load`, `canplay`, `progress`, `volume`, `seek`, `rate`, `timeupdate`, `loaderror`, `playerror`).
 * **function**: `Function` `optional` The listener to remove. Omit this to remove all events of type.
+
 
 ### Properties
 #### duration `Number`
