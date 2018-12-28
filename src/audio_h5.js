@@ -353,6 +353,7 @@ export class AudioH5 {
 
     if (index === 0) {
       this.playIndex = 0
+      this.playId = (this.playList[0] && this.playList[0].playId) || this.playId
       return
     }
 
