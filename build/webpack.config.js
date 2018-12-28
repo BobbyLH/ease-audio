@@ -3,12 +3,12 @@ const webpack = require('webpack')
 
 module.exports = {
   entry: {
-    index: './src/index.js',
-    audio: './src/EaseAudio.js'
+    index: './src/index.js'
   },
   output: {
-    filename: '[name].js',
+    filename: 'ease-audio.js',
     path: path.resolve(__dirname, '../dist'),
+    library: 'EaseAudio',
     libraryTarget: 'umd'
   },
   module: {

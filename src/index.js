@@ -9,5 +9,5 @@
  */
 import { EaseAudio } from './Audio'
 
-export { EaseAudio }
+export { EaseAudio } from './Audio'
 export default EaseAudio
