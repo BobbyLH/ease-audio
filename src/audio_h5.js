@@ -89,9 +89,9 @@ export class AudioH5 {
     }
   }
 
-  cut () {
+  cut (endCut) {
     if (this._checkInit()) {
-      this._cut()
+      this._cut(endCut)
 
       return this._returnParams()
     }
@@ -206,11 +206,11 @@ export class AudioH5 {
   }
 
   /* set play model */
-  model (modelIndex) {
+  model (model) {
     if (this._checkInit()) {
-      if (this._checkType(modelIndex, 'number')) {
-        // model contain: list-once(0), list-random(1), list-loop(2), single-once(3), single-loop(4)
-        this.playModel = playModelSet[modelIndex] || this.playModel
+      if (playModelSet.indexOf(model) !== -1) {
+        // model contain: list-once, list-random, list-loop, single-once, single-loop
+        this.playModel = model
       } else {
         return this.playModel
       }
@@ -264,7 +264,7 @@ export class AudioH5 {
     this.logLevel = (logLevel.indexOf(config.logLevel) !== -1 && config.logLevel) || logLevel[3]
     this.idCounter = 1000
     this.playId = 1000
-    this.playModel = playModelSet[(config.playModel && this._checkType(config.playModel, 'number') && config.playModel) || (config.loop && 3) || 0]
+    this.playModel = (playModelSet.indexOf(config.playModel) !== -1 && config.playModel) || (config.loop && playModelSet[3]) || playModelSet[0]
     this.playIndex = 0
     this.playList = new Array(0)
     this.buffered = new Array(0)
@@ -428,7 +428,7 @@ export class AudioH5 {
   }
 
   /* cut audio */
-  _cut (onEndCut) {
+  _cut (endCut) {
     this.stop()
     // can't cut audio if the playModel is single-once
     if (this._checkInit() && this.playModel !== 'single-once') {
@@ -438,7 +438,7 @@ export class AudioH5 {
       if (!this.playList[this.playIndex]) return
       const src = this.playList[this.playIndex].src
 
-      if (onEndCut) {
+      if (endCut) {
         // resolve the IOS auto play problem
         this.audioH5.src = src
       } else {
@@ -519,7 +519,7 @@ export class AudioH5 {
           this.isEnd = false
         } else {
           this.isEnd = true
-          this._cut(true)
+          this.config.endAutoCut && this._cut(true)
           this._fireEventQueue(e, 'onend')
         }
       },
@@ -577,7 +577,7 @@ export class AudioH5 {
             this.isEnd = false
           } else {
             this.isEnd = true
-            this._cut(true)
+            this.config.endAutoCut && this._cut(true)
             this._fireEventQueue(e, 'onend')
           }
         }
