@@ -474,7 +474,7 @@ export class AudioH5 {
   _fireEventQueue (e, eventQueue) {
     if (this[eventQueue]) {
       for (let k in this[eventQueue]) {
-        this[eventQueue][k](e)
+        this[eventQueue][k] && this[eventQueue][k](e)
       }
     }
   }
@@ -608,9 +608,10 @@ export class AudioH5 {
     }
 
     for (let k in this.eventMethods) {
-      this._blockEvent({block: false})
       this._bindEvent(this.eventMethods[k], k)
     }
+
+    this._blockEvent({block: false})
   }
 
   /* unregister Audio Event */
