@@ -89,9 +89,9 @@ export class AudioH5 {
     }
   }
 
-  cut (endCut) {
+  cut () {
     if (this._checkInit()) {
-      this._cut(endCut)
+      this._cut()
 
       return this._returnParams()
     }
@@ -441,6 +441,7 @@ export class AudioH5 {
       if (endCut) {
         // resolve the IOS auto play problem
         this.audioH5.src = src
+        this.load()
       } else {
         this.unload()
         const config = {...this.config, src}
