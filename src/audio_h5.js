@@ -275,7 +275,7 @@ export class AudioH5 {
     let src
     if (config.playlist && this._checkType(config.playlist, 'array')) {
       this.playlist({action: 'add', list: config.playlist})
-      src = config.playlist[0].src
+      src = config.playlist[0] && config.playlist[0].src
       if (!src || !this._checkType(src, 'string')) {
         src = defaultSrc
         this._logErr('The src property is necessary and must be string!')
