@@ -275,7 +275,7 @@ export class AudioH5 {
     let src
     if (config.playlist && this._checkType(config.playlist, 'array')) {
       this.playlist({action: 'add', list: config.playlist})
-      src = config.playlist[0].src
+      src = config.playlist[0] && config.playlist[0].src
       if (!src || !this._checkType(src, 'string')) {
         src = defaultSrc
         this._logErr('The src property is necessary and must be string!')
@@ -474,7 +474,7 @@ export class AudioH5 {
   _fireEventQueue (e, eventQueue) {
     if (this[eventQueue]) {
       for (let k in this[eventQueue]) {
-        this[eventQueue][k](e)
+        this[eventQueue][k] && this[eventQueue][k](e)
       }
     }
   }
@@ -608,9 +608,10 @@ export class AudioH5 {
     }
 
     for (let k in this.eventMethods) {
-      this._blockEvent({block: false})
       this._bindEvent(this.eventMethods[k], k)
     }
+
+    this._blockEvent({block: false})
   }
 
   /* unregister Audio Event */
