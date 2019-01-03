@@ -523,8 +523,8 @@ export class AudioH5 {
           this.isEnd = false
         } else {
           this.isEnd = true
-          this.config.endAutoCut && this._cut(true)
           this._fireEventQueue(e, 'onend')
+          this.config.endAutoCut && this._cut(true)
         }
       },
       // loaderror state
@@ -581,8 +581,8 @@ export class AudioH5 {
             this.isEnd = false
           } else {
             this.isEnd = true
-            this.config.endAutoCut && this._cut(true)
             this._fireEventQueue(e, 'onend')
+            this.config.endAutoCut && this._cut(true)
           }
         }
 
