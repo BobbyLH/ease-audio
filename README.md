@@ -160,6 +160,10 @@ Fires when the sound's volume has changed. The first parameter is the event obje
 Fires when the sound's playback rate has changed. The first parameter is the event object.
 #### onseek `Function`
 Fires when the sound has been seeked. The first parameter is the event object.
+#### oncut `Function`
+Fires when the sound has been cutted. The first parameter is the ID of the sound.
+#### onpick `Function`
+Fires when the sound has been picked. The first parameter is the ID of the sound.
 #### usingWebAudio `Boolean`
 `true` if the Web Audio API is available.
 #### debug `Boolean` `false`
