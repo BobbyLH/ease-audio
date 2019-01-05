@@ -324,6 +324,7 @@ export class AudioH5 {
   _setPlayState (state) {
     if (this._checkType(state, 'string', true) && this.playState !== state) {
       const readyState = this.audioH5.readyState
+      const isReady = readyState > 2
       const paused = this.audioH5.paused
       const ended = this.audioH5.ended
       const seeking = this.audioH5.seeking
@@ -332,12 +333,14 @@ export class AudioH5 {
       switch (state) {
         case playStateSet[0]:
           // loading
-          if (paused || ended || readyState === 4) return false
+          if (paused || ended || isReady) return false
           break
         case playStateSet[1]:
-          if (paused || ended || seeking || readyState !== 4) return false
+          // playing
+          if (paused || ended || seeking || !isReady) return false
           break
         case playStateSet[2]:
+          // paused
           if (ended) return false
           break
       }
