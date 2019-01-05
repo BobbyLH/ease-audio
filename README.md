@@ -272,6 +272,6 @@ Return the track network state.
 
 ## License
 
-Copyright (c) 2018-2018 Bobby.li
+Copyright (c) 2018-2019 Bobby.li
 
 Released under the MIT License
