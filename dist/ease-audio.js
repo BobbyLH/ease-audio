@@ -1,208 +1,1213 @@
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory();
-	else if(typeof define === 'function' && define.amd)
-		define([], factory);
-	else if(typeof exports === 'object')
-		exports["EaseAudio"] = factory();
-	else
-		root["EaseAudio"] = factory();
-})(window, function() {
-return /******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// define __esModule on exports
-/******/ 	__webpack_require__.r = function(exports) {
-/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 		}
-/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 	};
-/******/
-/******/ 	// create a fake namespace object
-/******/ 	// mode & 1: value is a module id, require it
-/******/ 	// mode & 2: merge all properties of value into the ns
-/******/ 	// mode & 4: return value when already ns object
-/******/ 	// mode & 8|1: behave like require
-/******/ 	__webpack_require__.t = function(value, mode) {
-/******/ 		if(mode & 1) value = __webpack_require__(value);
-/******/ 		if(mode & 8) return value;
-/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
-/******/ 		var ns = Object.create(null);
-/******/ 		__webpack_require__.r(ns);
-/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
-/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
-/******/ 		return ns;
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-/******/
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/index.js");
-/******/ })
-/************************************************************************/
-/******/ ({
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+  typeof define === 'function' && define.amd ? define(['exports'], factory) :
+  (global = global || self, factory(global.EaseAudio = {}));
+}(this, function (exports) { 'use strict';
 
-/***/ "./src/Audio.js":
-/*!**********************!*\
-  !*** ./src/Audio.js ***!
-  \**********************/
-/*! exports provided: EaseAudio, default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+  function _typeof(obj) {
+    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
+      _typeof = function (obj) {
+        return typeof obj;
+      };
+    } else {
+      _typeof = function (obj) {
+        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+      };
+    }
 
-"use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"EaseAudio\", function() { return EaseAudio; });\n/* harmony import */ var _audio_ctx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./audio_ctx */ \"./src/audio_ctx.js\");\n/* harmony import */ var _audio_h5__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./audio_h5 */ \"./src/audio_h5.js\");\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nfunction _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }\n\nfunction _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }\n\n\n\nvar EaseAudio =\n/*#__PURE__*/\nfunction () {\n  function EaseAudio(config) {\n    _classCallCheck(this, EaseAudio);\n\n    this.audio = this._createAudio(config);\n    this.init = this.audio.init;\n    this.play = this.audio.play;\n    this.pause = this.audio.pause;\n    this.toggle = this.audio.toggle;\n    this.cut = this.audio.cut;\n    this.pick = this.audio.pick;\n    this.load = this.audio.load;\n    this.seek = this.audio.seek;\n    this.volume = this.audio.volume;\n    this.muted = this.audio.muted;\n    this.stop = this.audio.stop;\n    this.unload = this.audio.unload;\n    this.on = this.audio.on;\n    this.off = this.audio.off;\n    this.once = this.audio.once;\n    this.model = this.audio.model;\n  }\n\n  _createClass(EaseAudio, [{\n    key: \"_createAudio\",\n    value: function _createAudio(config) {\n      var audio = {\n        init: initFunc,\n        play: initFunc,\n        pause: initFunc,\n        toggle: initFunc,\n        load: initFunc,\n        seek: initFunc,\n        volume: initFunc,\n        muted: initFunc,\n        stop: initFunc,\n        unload: initFunc,\n        on: initFunc,\n        off: initFunc,\n        once: initFunc\n      };\n\n      var _ref = config || {},\n          usingWebAudio = _ref.usingWebAudio;\n\n      try {\n        if (usingWebAudio && (window.AudioContext || window.webkitAudioContext)) {\n          audio = new _audio_ctx__WEBPACK_IMPORTED_MODULE_0__[\"default\"](config);\n        } else if (window.Audio) {\n          audio = new _audio_h5__WEBPACK_IMPORTED_MODULE_1__[\"default\"](config);\n        }\n      } catch (err) {\n        console.error('[EASE_AUDIO ERROR]:', err);\n      }\n\n      return audio;\n    }\n  }, {\n    key: \"duration\",\n    get: function get() {\n      return this.audio.duration;\n    }\n  }, {\n    key: \"playState\",\n    get: function get() {\n      return this.audio.playState;\n    }\n  }, {\n    key: \"playId\",\n    get: function get() {\n      return this.audio.playId;\n    }\n  }, {\n    key: \"playingData\",\n    get: function get() {\n      return this.audio.playList[this.audio.playIndex];\n    }\n  }, {\n    key: \"playlist\",\n    set: function set(params) {\n      this.audio.playlist(params);\n    },\n    get: function get() {\n      return this.audio.playList;\n    }\n  }, {\n    key: \"networkState\",\n    get: function get() {\n      return this.audio.networkState;\n    }\n  }]);\n\n  return EaseAudio;\n}();\n\nfunction initFunc() {\n  return console.error('[EASE_AUDIO ERROR]: Initialize failed');\n}\n\n/* harmony default export */ __webpack_exports__[\"default\"] = (EaseAudio);\n\n//# sourceURL=webpack://EaseAudio/./src/Audio.js?");
+    return _typeof(obj);
+  }
 
-/***/ }),
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
 
-/***/ "./src/audio_ctx.js":
-/*!**************************!*\
-  !*** ./src/audio_ctx.js ***!
-  \**************************/
-/*! exports provided: AudioCtx, default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+  function _defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
 
-"use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"AudioCtx\", function() { return AudioCtx; });\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nfunction _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }\n\nfunction _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }\n\nvar AudioCtx =\n/*#__PURE__*/\nfunction () {\n  function AudioCtx() {\n    _classCallCheck(this, AudioCtx);\n\n    this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();\n    this.audioDom = new window.Audio();\n    this.audio = this.audioCtx.createMediaElementSource(this.audioDom);\n  }\n\n  _createClass(AudioCtx, [{\n    key: \"play\",\n    value: function play() {}\n  }, {\n    key: \"pause\",\n    value: function pause() {}\n  }, {\n    key: \"stop\",\n    value: function stop() {}\n  }, {\n    key: \"unload\",\n    value: function unload() {}\n  }, {\n    key: \"seek\",\n    value: function seek() {}\n  }]);\n\n  return AudioCtx;\n}();\n/* harmony default export */ __webpack_exports__[\"default\"] = (AudioCtx);\n\n//# sourceURL=webpack://EaseAudio/./src/audio_ctx.js?");
+  function _createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) _defineProperties(Constructor, staticProps);
+    return Constructor;
+  }
 
-/***/ }),
+  function _defineProperty(obj, key, value) {
+    if (key in obj) {
+      Object.defineProperty(obj, key, {
+        value: value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    } else {
+      obj[key] = value;
+    }
 
-/***/ "./src/audio_h5.js":
-/*!*************************!*\
-  !*** ./src/audio_h5.js ***!
-  \*************************/
-/*! exports provided: AudioH5, default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+    return obj;
+  }
 
-"use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"AudioH5\", function() { return AudioH5; });\n/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils */ \"./utils/index.js\");\nfunction _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }\n\nfunction _nonIterableSpread() { throw new TypeError(\"Invalid attempt to spread non-iterable instance\"); }\n\nfunction _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === \"[object Arguments]\") return Array.from(iter); }\n\nfunction _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }\n\nfunction _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }\n\nfunction _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nfunction _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }\n\nfunction _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }\n\n\nvar playStateSet = ['loading', 'playing', 'paused', 'stopped', 'ended', 'loaderror', 'playerror'];\nvar playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 'single-loop'];\nvar supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onload', 'oncanplay', 'onprogress', 'onvolume', 'onseek', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick'];\nvar logLevel = ['detail', 'info', 'warn', 'error', 'silent'];\nvar defaultSrc = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';\nvar AudioH5 =\n/*#__PURE__*/\nfunction () {\n  function AudioH5(config) {\n    _classCallCheck(this, AudioH5);\n\n    this.isInit = false;\n    this.init = this.init.bind(this);\n    this.play = this.play.bind(this);\n    this.pause = this.pause.bind(this);\n    this.toggle = this.toggle.bind(this);\n    this.cut = this.cut.bind(this);\n    this.pick = this.pick.bind(this);\n    this.load = this.load.bind(this);\n    this.seek = this.seek.bind(this);\n    this.rate = this.rate.bind(this);\n    this.volume = this.volume.bind(this);\n    this.muted = this.muted.bind(this);\n    this.stop = this.stop.bind(this);\n    this.unload = this.unload.bind(this);\n    this.model = this.model.bind(this);\n    this.on = this.on.bind(this);\n    this.off = this.off.bind(this);\n    this.once = this.once.bind(this);\n    this.playlist = this.playlist.bind(this);\n    this.init(config);\n  }\n\n  _createClass(AudioH5, [{\n    key: \"init\",\n    value: function init(config) {\n      if (!this.isInit && config && this._checkType(config, 'object') && JSON.stringify(config) !== '{}') {\n        this._initial(config);\n\n        this._registerEvent(config);\n\n        return this._returnParams();\n      }\n    }\n  }, {\n    key: \"play\",\n    value: function play() {\n      if (this._checkInit()) {\n        this._blockEvent({\n          block: false\n        });\n\n        this.audioH5.play();\n        return this.playId;\n      }\n    }\n  }, {\n    key: \"pause\",\n    value: function pause() {\n      if (this._checkInit()) {\n        this.audioH5.pause();\n        return this.playId;\n      }\n    }\n  }, {\n    key: \"toggle\",\n    value: function toggle() {\n      if (this._checkInit() && this.playState !== 'stopped' && this.playState !== 'ended' && this.playState !== 'loaderror' && this.playState !== 'playerror') {\n        this.playState === null || this.playState === 'paused' ? this.play() : this.pause();\n        return this.playId;\n      }\n    }\n  }, {\n    key: \"cut\",\n    value: function cut() {\n      if (this._checkInit()) {\n        this._cut();\n\n        return this._returnParams();\n      }\n    }\n  }, {\n    key: \"pick\",\n    value: function pick(playId) {\n      if (this._checkInit() && this._checkType(playId, 'number', true)) {\n        for (var i = 0; i < this.playList.length; i++) {\n          if (this.playList[i].playId === playId) {\n            this.unload();\n\n            this._setPlayIndex(i);\n\n            var src = this.playList[this.playIndex].src;\n\n            var config = _objectSpread({}, this.config, {\n              src: src\n            });\n\n            this._createAudio(config);\n\n            this._registerEvent(config);\n\n            this._fireEventQueue(this.playId, 'onpick');\n\n            this.play();\n            break;\n          }\n        }\n\n        return this._returnParams();\n      }\n    }\n  }, {\n    key: \"load\",\n    value: function load() {\n      if (this._checkInit()) {\n        this.audioH5.load();\n        return this.playId;\n      }\n    }\n  }, {\n    key: \"seek\",\n    value: function seek(val) {\n      if (this._checkInit()) {\n        if (this._checkType(val, 'number')) {\n          // IE cannot set currentTime when the metaData is loading\n          if (_utils__WEBPACK_IMPORTED_MODULE_0__[\"isIE\"] && !this.metaDataLoaded) {\n            this.seekValue = val;\n            return;\n          }\n\n          var duration = this.audioH5.duration;\n          if (val > duration) val = duration;\n          if (val < 0) val = 0;\n          this.seekValue = null;\n          this.audioH5.currentTime = val;\n        } else {\n          return this.audioH5.currentTime;\n        }\n      }\n    }\n  }, {\n    key: \"rate\",\n    value: function rate(val) {\n      if (this._checkInit()) {\n        if (this._checkType(val, 'number')) {\n          if (val > 2) val = 2;\n          if (val < 0.5) val = 0.5;\n          this.audioH5.playbackRate = val;\n\n          this._updateConfig({\n            rate: val\n          });\n        } else {\n          return this.audioH5.playbackRate;\n        }\n      }\n    }\n  }, {\n    key: \"volume\",\n    value: function volume(val) {\n      if (this._checkInit()) {\n        if (this._checkType(val, 'number')) {\n          if (val > 1) val = 1;\n          if (val < 0) val = 0;\n          this.audioH5.muted = false;\n          this.audioH5.volume = val;\n\n          this._updateConfig({\n            volume: val\n          });\n        } else {\n          return this.audioH5.volume;\n        }\n      }\n    }\n  }, {\n    key: \"muted\",\n    value: function muted(bool) {\n      if (this._checkInit()) {\n        if (this._checkType(bool, 'boolean', true)) {\n          this.audioH5.muted = bool;\n\n          this._updateConfig({\n            muted: bool\n          });\n        } else {\n          return this.audioH5.muted;\n        }\n      }\n    }\n  }, {\n    key: \"stop\",\n    value: function stop() {\n      if (this._checkInit() && this.playState !== playStateSet[3]) {\n        this._blockEvent({\n          block: true\n        });\n\n        this.audioH5.currentTime = 0;\n        this.audioH5.pause();\n\n        this._setPlayState(playStateSet[3]);\n\n        this._fireEventQueue(this.playId, 'onstop');\n\n        return this.playId;\n      }\n    }\n  }, {\n    key: \"unload\",\n    value: function unload() {\n      this.stop();\n\n      this._unregisterEvent();\n\n      this.audioH5.src = defaultSrc;\n      this.audioH5 = null;\n      this.isInit = false;\n    }\n    /* set play model */\n\n  }, {\n    key: \"model\",\n    value: function model(_model) {\n      if (this._checkInit()) {\n        if (playModelSet.indexOf(_model) !== -1) {\n          // model contain: list-once, list-random, list-loop, single-once, single-loop\n          this.playModel = _model;\n        } else {\n          return this.playModel;\n        }\n      }\n    }\n    /* add event to events queue */\n\n  }, {\n    key: \"on\",\n    value: function on(event, cb) {\n      if (this._checkType(event, 'string', true) && this._checkType(cb, 'function', true)) {\n        var queueName = event.indexOf('on') === 0 ? event : \"on\".concat(event);\n\n        this._onEvent(queueName, cb);\n      }\n    }\n    /* remove event from events queue */\n\n  }, {\n    key: \"off\",\n    value: function off(event, cb) {\n      if (this._checkType(event, 'string', true)) {\n        var queueName = event.indexOf('on') === 0 ? event : \"on\".concat(event);\n\n        this._offEvent(queueName, cb);\n      }\n    }\n    /* fire only one time */\n\n  }, {\n    key: \"once\",\n    value: function once(event, cb) {\n      var _this = this;\n\n      if (this._checkType(event, 'string', true) && this._checkType(cb, 'function', true)) {\n        var queueName = event.indexOf('on') === 0 ? event : \"on\".concat(event);\n        var funcName = \"EASE_AUDIO_\".concat(queueName.toUpperCase(), \"_ONCE_CALLBACK\");\n\n        var once = function once(e) {\n          cb && cb(e);\n\n          _this._offEvent(queueName, once, funcName);\n        };\n\n        this._onEvent(queueName, once, funcName);\n      }\n    }\n    /* set play list */\n\n  }, {\n    key: \"playlist\",\n    value: function playlist(_ref) {\n      var action = _ref.action,\n          list = _ref.list,\n          playId = _ref.playId;\n\n      if (this._checkType(action, 'string', true) && (!list || this._checkType(list, 'array', true)) && (!playId || this._checkType(playId, 'number', true))) {\n        this._updatePlayList({\n          action: action,\n          list: list,\n          playId: playId\n        });\n\n        return this._returnParams();\n      }\n    }\n    /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */\n\n  }, {\n    key: \"_initial\",\n    value: function _initial(config) {\n      this.config = config; // preserve initial config\n\n      this.playState = null;\n      this.debug = config.debug || false;\n      this.logLevel = logLevel.indexOf(config.logLevel) !== -1 && config.logLevel || logLevel[3];\n      this.idCounter = 1000;\n      this.playId = 1000;\n      this.playModel = playModelSet.indexOf(config.playModel) !== -1 && config.playModel || config.loop && playModelSet[3] || playModelSet[0];\n      this.playIndex = 0;\n      this.playList = new Array(0);\n      this.buffered = new Array(0);\n      this.eventController = new Array(0);\n      this.eventMethods = {}; // playlist convert to src\n\n      var src;\n\n      if (config.playlist && this._checkType(config.playlist, 'array')) {\n        this.playlist({\n          action: 'add',\n          list: config.playlist\n        });\n        src = config.playlist[0] && config.playlist[0].src;\n\n        if (!src || !this._checkType(src, 'string')) {\n          src = defaultSrc;\n\n          this._logErr('The src property is necessary and must be string!');\n        }\n      } else {\n        this._logErr('Please pass correct playlist parameters!');\n\n        src = defaultSrc;\n      } // create Audio Object\n\n\n      this._createAudio(_objectSpread({}, config, {\n        src: src\n      }));\n    }\n  }, {\n    key: \"_createAudio\",\n    value: function _createAudio(config) {\n      this.isInit = true;\n      this.audioH5 = new window.Audio();\n      this.audioH5.autoplay = config.autoplay || false;\n      this.audioH5.loop = config.loop || false;\n      this.audioH5.src = this._srcAssemble(config.src);\n      this.audioH5.preload = config.preload || true;\n      this.audioH5.volume = config.volume || (config.volume === 0 ? 0 : 1);\n      this.audioH5.muted = config.muted || false;\n      this.audioH5.playbackRate = config.rate || config.playbackRate || 1;\n      this.audioH5.controls = false;\n    }\n  }, {\n    key: \"_srcAssemble\",\n    value: function _srcAssemble(src) {\n      if (src && this._checkType(src, 'string')) {\n        return src;\n      }\n\n      return defaultSrc;\n    }\n  }, {\n    key: \"_updateConfig\",\n    value: function _updateConfig(params) {\n      this.config = _objectSpread({}, this.config, params);\n    }\n  }, {\n    key: \"_returnParams\",\n    value: function _returnParams() {\n      return {\n        playId: this.playId,\n        playingData: this.playList[this.playIndex],\n        playlist: this.playList\n      };\n    }\n    /* set play state */\n\n  }, {\n    key: \"_setPlayState\",\n    value: function _setPlayState(state) {\n      if (this._checkType(state, 'string', true) && this.playState !== state) {\n        var readyState = this.audioH5.readyState;\n        var isReady = readyState > 2;\n        var paused = this.audioH5.paused;\n        var ended = this.audioH5.ended;\n        var seeking = this.audioH5.seeking; // filter impossible state\n\n        switch (state) {\n          case playStateSet[0]:\n            // loading\n            if (paused || ended || isReady) return false;\n            break;\n\n          case playStateSet[1]:\n            // playing\n            if (paused || ended || seeking || !isReady) return false;\n            break;\n\n          case playStateSet[2]:\n            // paused\n            if (ended) return false;\n            break;\n        }\n\n        this._logInfo(\"setPlayState - \".concat(state));\n\n        this.playState = state;\n        return this.playState;\n      }\n    }\n    /* set play index */\n\n  }, {\n    key: \"_setPlayIndex\",\n    value: function _setPlayIndex(index) {\n      var playModel = this.playModel;\n      var maxIndex = this.playList.length - 1;\n\n      if (index === 0) {\n        this.playIndex = 0;\n        this.playId = this.playList[0] && this.playList[0].playId || this.playId;\n        return;\n      }\n\n      switch (playModel) {\n        case 'list-once':\n          this.playIndex = index || (maxIndex >= this.playIndex ? ++this.playIndex : this.playIndex);\n          break;\n\n        case 'list-random':\n          this.playIndex = index || Math.round(Math.random() * maxIndex);\n          break;\n\n        case 'list-loop':\n          this.playIndex = index || (maxIndex > this.playIndex ? ++this.playIndex : 0);\n          break;\n\n        case 'single-once':\n          this.playIndex = index || this.playIndex;\n          break;\n\n        case 'single-loop':\n          this.playIndex = index || this.playIndex;\n          break;\n\n        default:\n          this.playIndex = index || this.playIndex;\n      }\n\n      this.playId = this.playList[this.playIndex] && this.playList[this.playIndex].playId || this.playId;\n\n      this._log(\"setPlayIndex - playIndex: \".concat(this.playIndex, \"  playId: \").concat(this.playId));\n\n      return this.playIndex;\n    }\n    /* reset play list */\n\n  }, {\n    key: \"_resetPlayList\",\n    value: function _resetPlayList() {\n      this.playList = [];\n\n      this._setPlayIndex(0);\n    }\n    /* update play list */\n\n  }, {\n    key: \"_updatePlayList\",\n    value: function _updatePlayList(_ref2) {\n      var _this2 = this;\n\n      var action = _ref2.action,\n          list = _ref2.list,\n          playId = _ref2.playId;\n\n      switch (action) {\n        case 'add':\n          this.playList = [].concat(_toConsumableArray(this.playList), _toConsumableArray(list.map(function (v) {\n            if (_this2._checkType(v, 'object')) {\n              v.playId = _this2.idCounter;\n              _this2.idCounter++;\n              return v;\n            }\n          })));\n          break;\n\n        case 'delete':\n          if (playId) {\n            for (var i = 0; i < this.playList.length; i++) {\n              if (this.playList[i].playId === playId) {\n                return this.playList.splice(i, 1);\n              }\n            }\n          }\n\n          break;\n\n        case 'insert':\n          if (playId && list) {\n            for (var _i = 0; _i < this.playList.length; _i++) {\n              if (this.playList[_i].playId === playId) {\n                var _this$playList;\n\n                return (_this$playList = this.playList).splice.apply(_this$playList, [_i, 0].concat(_toConsumableArray(list)));\n              }\n            }\n          }\n\n          break;\n\n        case 'reset':\n          this._resetPlayList();\n\n          break;\n\n        default:\n          this._resetPlayList();\n\n      }\n    }\n    /* cut audio */\n\n  }, {\n    key: \"_cut\",\n    value: function _cut(endCut) {\n      this.stop(); // can't cut audio if the playModel is single-once\n\n      if (this._checkInit() && this.playModel !== 'single-once') {\n        this.metaDataLoaded = false;\n        this.seekValue = null;\n\n        this._setPlayIndex();\n\n        if (!this.playList[this.playIndex]) return;\n        var src = this.playList[this.playIndex].src;\n\n        if (endCut) {\n          // resolve the IOS auto play problem\n          this.audioH5.src = src;\n          this.load();\n        } else {\n          this.unload();\n\n          var config = _objectSpread({}, this.config, {\n            src: src\n          });\n\n          this._createAudio(config);\n\n          this._registerEvent(config);\n        }\n\n        this._fireEventQueue(this.playId, 'oncut');\n\n        this.play();\n        return this._setPlayState(playStateSet[1]);\n      }\n    }\n    /* generate received event callback queue */\n\n  }, {\n    key: \"_onEvent\",\n    value: function _onEvent(event, cb, name) {\n      if (supportEvents.indexOf(event) !== -1) {\n        if (!this[event]) this[event] = {};\n        this[event][name || cb.name || \"anonymous-\".concat(new Date().getTime())] = cb;\n      }\n    }\n    /* delete received event callback queue */\n\n  }, {\n    key: \"_offEvent\",\n    value: function _offEvent(event, cb, name) {\n      if (supportEvents.indexOf(event) !== -1) {\n        if (!cb) this[event] = null;else if (name || cb.name) delete this[event][name || cb.name];\n      }\n    }\n    /* fire event callback queue */\n\n  }, {\n    key: \"_fireEventQueue\",\n    value: function _fireEventQueue(e, eventQueue) {\n      if (this[eventQueue]) {\n        for (var k in this[eventQueue]) {\n          this[eventQueue][k] && this[eventQueue][k](e);\n        }\n      }\n    }\n    /* register Audio Event */\n\n  }, {\n    key: \"_registerEvent\",\n    value: function _registerEvent(config) {\n      var _this3 = this;\n\n      var curry = function curry(cb, eventName) {\n        return function (e) {\n          if (!_this3._triggerEventController(eventName)) return;\n          return cb && cb(e);\n        };\n      };\n      /* bindind received event callbacks */\n\n\n      var configKeys = Object.keys(config);\n      configKeys.forEach(function (v) {\n        if (v.indexOf('on') === 0) {\n          var funcName = \"EASE_AUDIO_\".concat(v.toUpperCase(), \"_INITIAL_CALLBACK\");\n\n          _this3._onEvent(v, config[v], funcName);\n        }\n      });\n      this.eventMethods = {\n        // loading state\n        loadstart: function loadstart(e) {\n          _this3.playState === playStateSet[1] && _this3._setPlayState(playStateSet[0]);\n\n          _this3._fireEventQueue(e, 'onload');\n        },\n        // playing state\n        playing: function playing(e) {\n          _this3._setPlayState(playStateSet[1]);\n\n          _this3._fireEventQueue(e, 'onplay');\n        },\n        canplaythrough: function canplaythrough(e) {\n          _this3.playState === playStateSet[0] && _this3._setPlayState(playStateSet[1]);\n        },\n        // paused state\n        pause: function pause(e) {\n          _this3._setPlayState(playStateSet[2]);\n\n          _this3._fireEventQueue(e, 'onpause');\n        },\n        // ended state\n        ended: function ended(e) {\n          if (_this3.isEnd) {\n            _this3.isEnd = false;\n          } else {\n            _this3.isEnd = true;\n\n            _this3._fireEventQueue(e, 'onend');\n\n            _this3.config.endAutoCut && _this3._cut(true);\n          }\n        },\n        // loaderror state\n        error: function error(e) {\n          _this3._setPlayState(playStateSet[5]);\n\n          _this3._fireEventQueue(e, 'onloaderror');\n        },\n        // playerror state\n        stalled: function stalled(e) {\n          _this3._setPlayState(playStateSet[6]);\n\n          _this3._fireEventQueue(e, 'onplayerror');\n        },\n        // others\n        progress: function progress(e) {\n          var ranges = e.target.buffered;\n          var total = e.total || 1;\n          var buffered = 0;\n          var loaded = e.loaded || 0;\n          var progress = loaded / total;\n\n          if (ranges && ranges.length) {\n            for (var i = 0, j = ranges.length; i < j; i++) {\n              _this3.buffered.push({\n                'start': ranges.start(i) * 1000,\n                'end': ranges.end(i) * 1000\n              });\n            }\n\n            buffered = (ranges.end(0) - ranges.start(0)) * 1000;\n            loaded = Math.min(1, buffered / (e.target.duration * 1000));\n            progress = loaded / total;\n          }\n\n          _this3._fireEventQueue({\n            e: e,\n            progress: progress\n          }, 'onprogress');\n        },\n        durationchange: function durationchange(e) {},\n        loadedmetadata: function loadedmetadata(e) {\n          _this3.metaDataLoaded = true;\n          _this3.seekValue && _this3.seek(_this3.seekValue);\n        },\n        loadeddata: function loadeddata(e) {},\n        timeupdate: function timeupdate(e) {\n          // playState is loading but actually is playing\n          if (_this3.playState === playStateSet[0]) {\n            _this3._logInfo(\"timeupdate's playing\");\n\n            _this3._setPlayState(playStateSet[1]);\n\n            _this3._fireEventQueue(e, 'onplay');\n          } // Depending on currentTime and duration to mimic end event\n\n\n          var isEnd = _this3.audioH5.duration && _this3.audioH5.currentTime === _this3.audioH5.duration;\n\n          if (isEnd) {\n            _this3._logInfo(\"timeupdate's ended\");\n\n            if (_this3.isEnd) {\n              _this3.isEnd = false;\n            } else {\n              _this3.isEnd = true;\n\n              _this3._fireEventQueue(e, 'onend');\n\n              _this3.config.endAutoCut && _this3._cut(true);\n            }\n          }\n\n          _this3._fireEventQueue(e, 'ontimeupdate');\n        },\n        canplay: function canplay(e) {\n          _this3._fireEventQueue(e, 'oncanplay');\n        },\n        seeking: function seeking(e) {\n          _this3._fireEventQueue(e, 'onseek');\n        },\n        seeked: function seeked(e) {},\n        play: function play(e) {},\n        volumechange: function volumechange(e) {\n          _this3._fireEventQueue(e, 'onvolume');\n        },\n        ratechange: function ratechange(e) {\n          _this3._fireEventQueue(e, 'onrate');\n        },\n        abort: function abort(e) {},\n        suspend: function suspend(e) {}\n      };\n\n      for (var k in this.eventMethods) {\n        this.eventMethods[k] = curry(this.eventMethods[k], k);\n      }\n\n      for (var _k in this.eventMethods) {\n        this._bindEvent(this.eventMethods[_k], _k);\n      }\n\n      this._blockEvent({\n        block: false\n      });\n    }\n    /* unregister Audio Event */\n\n  }, {\n    key: \"_unregisterEvent\",\n    value: function _unregisterEvent() {\n      if (this._checkInit()) {\n        for (var k in this.eventMethods) {\n          this._removeEvent(this.eventMethods[k], k);\n        }\n      }\n    }\n    /* not remove but block event callback */\n\n  }, {\n    key: \"_blockEvent\",\n    value: function _blockEvent(_ref3) {\n      var event = _ref3.event,\n          block = _ref3.block;\n\n      if (this._checkInit()) {\n        if (event && this._checkType(event, 'string')) {\n          this.eventController[event] = !block;\n        } else {\n          for (var k in this.eventMethods) {\n            this.eventController[k] = !block;\n          }\n        }\n      }\n    }\n    /* whether or not trigger event callback */\n\n  }, {\n    key: \"_triggerEventController\",\n    value: function _triggerEventController(event) {\n      if (!this.eventController[event]) return false;\n\n      this._log(\"trigger \".concat(event, \" event\"));\n\n      return true;\n    }\n    /* bind event */\n\n  }, {\n    key: \"_bindEvent\",\n    value: function _bindEvent(cb, event) {\n      if (!this._checkType(event, 'string')) return this._logErr(\"bindEvent - bind event name is not string\");\n      this._checkType(cb, 'function', true) && Object(_utils__WEBPACK_IMPORTED_MODULE_0__[\"addListener\"])(event, cb, this.audioH5);\n    }\n    /* remove event */\n\n  }, {\n    key: \"_removeEvent\",\n    value: function _removeEvent(cb, event) {\n      if (!this._checkType(event, 'string')) return this._logErr(\"removeEvent - unbind event name is not string\");\n      this._checkType(cb, 'function', true) && Object(_utils__WEBPACK_IMPORTED_MODULE_0__[\"removeListener\"])(event, cb, this.audioH5);\n    }\n    /* check type */\n\n  }, {\n    key: \"_checkType\",\n    value: function _checkType(element, type, logErr) {\n      if (typeof type !== 'string') return this._logWarn('checkType - The type must be string');\n\n      if (Object(_utils__WEBPACK_IMPORTED_MODULE_0__[\"getType\"])(element) !== type) {\n        logErr && this._logErr(\"Your parameter(\".concat(element, \") type is \").concat(Object(_utils__WEBPACK_IMPORTED_MODULE_0__[\"getType\"])(element), \", please pass the \").concat(type, \" type\"));\n        return false;\n      }\n\n      return true;\n    }\n    /* check whether or not init Audio */\n\n  }, {\n    key: \"_checkInit\",\n    value: function _checkInit() {\n      if (!this.isInit) {\n        this._logWarn(\"checkInit - The Audio haven't been initiated\");\n\n        return false;\n      }\n\n      return true;\n    }\n    /* detail logger */\n\n  }, {\n    key: \"_log\",\n    value: function _log(detail) {\n      var canLog = this.logLevel !== 'silent' && this.logLevel === 'detail';\n      return canLog && this.debug && console.log('[EASE_AUDIO_H5 DETAIL]:', detail);\n    }\n    /* info logger */\n\n  }, {\n    key: \"_logInfo\",\n    value: function _logInfo(info) {\n      var canLog = this.logLevel !== 'silent' && this.logLevel !== 'error' && this.logLevel !== 'warn';\n      return canLog && this.debug && console.info('[EASE_AUDIO_H5 INFO]:', info);\n    }\n    /* warn logger */\n\n  }, {\n    key: \"_logWarn\",\n    value: function _logWarn(warn) {\n      var canLog = this.logLevel !== 'silent' && this.logLevel !== 'error';\n      return canLog && this.debug && console.warn('[EASE_AUDIO_H5 WARN]:', warn);\n    }\n    /* error logger */\n\n  }, {\n    key: \"_logErr\",\n    value: function _logErr(err) {\n      var canLog = this.logLevel !== 'silent';\n      return canLog && this.debug && console.error('[EASE_AUDIO_H5 ERROR]:', err);\n    }\n  }, {\n    key: \"duration\",\n    get: function get() {\n      return this.audioH5.duration;\n    }\n  }, {\n    key: \"setProps\",\n    set: function set(_ref4) {\n      var prop = _ref4.prop,\n          value = _ref4.value;\n\n      if (this.audioH5[prop] && !this._checkType(this.audioH5[prop], 'function')) {\n        this.audioH5[prop] = value;\n\n        this._updateConfig({\n          prop: value\n        });\n      }\n    }\n  }]);\n\n  return AudioH5;\n}();\n/* harmony default export */ __webpack_exports__[\"default\"] = (AudioH5);\n\n//# sourceURL=webpack://EaseAudio/./src/audio_h5.js?");
+  function _objectSpread(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i] != null ? arguments[i] : {};
+      var ownKeys = Object.keys(source);
 
-/***/ }),
+      if (typeof Object.getOwnPropertySymbols === 'function') {
+        ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
+          return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+        }));
+      }
 
-/***/ "./src/index.js":
-/*!**********************!*\
-  !*** ./src/index.js ***!
-  \**********************/
-/*! exports provided: EaseAudio, default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+      ownKeys.forEach(function (key) {
+        _defineProperty(target, key, source[key]);
+      });
+    }
 
-"use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _Audio__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Audio */ \"./src/Audio.js\");\n/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, \"EaseAudio\", function() { return _Audio__WEBPACK_IMPORTED_MODULE_0__[\"EaseAudio\"]; });\n\n/*!\n *  himalaya player v0.0.1\n *  player.himalaya.com\n *\n *  (c) 2017-2018, Bobby Li of Himalaya Corp\n *  himalaya.com\n *\n *  MIT License\n */\n\n\n/* harmony default export */ __webpack_exports__[\"default\"] = (_Audio__WEBPACK_IMPORTED_MODULE_0__[\"EaseAudio\"]);\n\n//# sourceURL=webpack://EaseAudio/./src/index.js?");
+    return target;
+  }
 
-/***/ }),
+  function _toConsumableArray(arr) {
+    return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
+  }
 
-/***/ "./utils/IE.js":
-/*!*********************!*\
-  !*** ./utils/IE.js ***!
-  \*********************/
-/*! exports provided: isIE, isEdge */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+  function _arrayWithoutHoles(arr) {
+    if (Array.isArray(arr)) {
+      for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
 
-"use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"isIE\", function() { return isIE; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"isEdge\", function() { return isEdge; });\n/* harmony import */ var _handleUA__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./handleUA */ \"./utils/handleUA.js\");\n\n\n\nvar ua;\n\ntry {\n  ua = window && window.navigator && window.navigator.userAgent;\n} catch (error) {\n  console.error(\"[isIE]: \".concat(error));\n}\n\nvar isIE = ua ? Object(_handleUA__WEBPACK_IMPORTED_MODULE_0__[\"default\"])(ua).trident : false;\nvar isEdge = ua ? Object(_handleUA__WEBPACK_IMPORTED_MODULE_0__[\"default\"])(ua).edge : false;\n\n//# sourceURL=webpack://EaseAudio/./utils/IE.js?");
+      return arr2;
+    }
+  }
 
-/***/ }),
+  function _iterableToArray(iter) {
+    if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
+  }
 
-/***/ "./utils/eventBind.js":
-/*!****************************!*\
-  !*** ./utils/eventBind.js ***!
-  \****************************/
-/*! exports provided: addListener, removeListener, preventEvent, stopEvent */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+  function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance");
+  }
 
-"use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"addListener\", function() { return addListener; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"removeListener\", function() { return removeListener; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"preventEvent\", function() { return preventEvent; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"stopEvent\", function() { return stopEvent; });\n // adapt IE add event\n\nvar addListener = function addListener(event, fn, dom) {\n  if (!window) return false;\n  var eventDOM = dom || window;\n\n  if (window.addEventListener) {\n    eventDOM.addEventListener(event, fn, false);\n  } else {\n    eventDOM.attachEvent(\"on\".concat(event), fn);\n  }\n}; // adapt IE remove event\n\nvar removeListener = function removeListener(event, fn, dom) {\n  if (!window) return false;\n  var eventDOM = dom || window;\n\n  if (window.removeEventListener) {\n    eventDOM.removeEventListener(event, fn, false);\n  } else {\n    eventDOM.detachEvent(\"on\".concat(event), fn);\n  }\n}; // prevent default\n\nvar preventEvent = function preventEvent(event) {\n  var e = event || window.event;\n\n  if (e && e.preventDefault) {\n    e.cancelable && !e.defaultPrevented && e.preventDefault();\n  } else {\n    e.returnValue = false;\n  }\n\n  return false;\n}; // stop propagat\n\nvar stopEvent = function stopEvent(event) {\n  var e = event || window.event;\n\n  if (e && e.stopPropagation) {\n    e.stopPropagation();\n  } else {\n    e.cancelBubble = true;\n  }\n};\n\n//# sourceURL=webpack://EaseAudio/./utils/eventBind.js?");
+  var AudioCtx =
+  /*#__PURE__*/
+  function () {
+    function AudioCtx() {
+      _classCallCheck(this, AudioCtx);
 
-/***/ }),
+      this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      this.audioDom = new window.Audio();
+      this.audio = this.audioCtx.createMediaElementSource(this.audioDom);
+    }
 
-/***/ "./utils/handleUA.js":
-/*!***************************!*\
-  !*** ./utils/handleUA.js ***!
-  \***************************/
-/*! exports provided: getUA, default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+    _createClass(AudioCtx, [{
+      key: "play",
+      value: function play() {}
+    }, {
+      key: "pause",
+      value: function pause() {}
+    }, {
+      key: "stop",
+      value: function stop() {}
+    }, {
+      key: "unload",
+      value: function unload() {}
+    }, {
+      key: "seek",
+      value: function seek() {}
+    }]);
 
-"use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"getUA\", function() { return getUA; });\n\n\nfunction getUA(u) {\n  if (!u) return false; // console.log(u)\n\n  var obj = {\n    edge: u.indexOf('Edge') > -1,\n    // Edge内核\n    trident: u.indexOf('Trident') > -1,\n    // IE内核\n    presto: u.indexOf('Presto') > -1,\n    // opera内核\n    webKit: u.indexOf('AppleWebKit') > -1,\n    // 苹果、谷歌内核\n    gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') === -1,\n    // 火狐内核\n    mobile: !!u.match(/AppleWebKit.*Mobile.*/) || !!u.match(/Mobile/g),\n    // 是否为移动终端\n    ios: !!u.match(/\\(i[^;]+;( U;)? CPU.+Mac OS X/),\n    // ios终端\n    android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1,\n    // android终端或者uc浏览器\n    iPhone: u.indexOf('iPhone') > -1,\n    // 是否为iPhone或者QQHD浏览器\n    iPad: u.indexOf('iPad') > -1,\n    // 是否iPad\n    webApp: u.indexOf('Safari') === -1,\n    // 是否web程序，没有头部与底部\n    weixin: u.indexOf('MicroMessenger') > -1,\n    // 是否微信\n    weibo: u.indexOf('Weibo') > -1,\n    // 是否微博\n    facebook: u.indexOf('FBAN') > -1,\n    // 是否facebook\n    twitter: u.indexOf('FBAN') > -1,\n    // 是否twitter\n    qq: u.match(/\\sQQ/i) === ' qq',\n    // 是否QQ\n    hmlyApp: /himalaya/i.test(u) // 是否在 himalaya app\n\n  };\n  return obj;\n}\n/* harmony default export */ __webpack_exports__[\"default\"] = (getUA);\n\n//# sourceURL=webpack://EaseAudio/./utils/handleUA.js?");
+    return AudioCtx;
+  }();
 
-/***/ }),
+  function getUA(u) {
+    if (!u) return false; // console.log(u)
 
-/***/ "./utils/index.js":
-/*!************************!*\
-  !*** ./utils/index.js ***!
-  \************************/
-/*! exports provided: getUA, isIE, isEdge, addListener, removeListener, preventEvent, stopEvent, getType */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+    var obj = {
+      edge: u.indexOf('Edge') > -1,
+      // Edge内核
+      trident: u.indexOf('Trident') > -1,
+      // IE内核
+      presto: u.indexOf('Presto') > -1,
+      // opera内核
+      webKit: u.indexOf('AppleWebKit') > -1,
+      // 苹果、谷歌内核
+      gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') === -1,
+      // 火狐内核
+      mobile: !!u.match(/AppleWebKit.*Mobile.*/) || !!u.match(/Mobile/g),
+      // 是否为移动终端
+      ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/),
+      // ios终端
+      android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1,
+      // android终端或者uc浏览器
+      iPhone: u.indexOf('iPhone') > -1,
+      // 是否为iPhone或者QQHD浏览器
+      iPad: u.indexOf('iPad') > -1,
+      // 是否iPad
+      webApp: u.indexOf('Safari') === -1,
+      // 是否web程序，没有头部与底部
+      weixin: u.indexOf('MicroMessenger') > -1,
+      // 是否微信
+      weibo: u.indexOf('Weibo') > -1,
+      // 是否微博
+      facebook: u.indexOf('FBAN') > -1,
+      // 是否facebook
+      twitter: u.indexOf('FBAN') > -1,
+      // 是否twitter
+      qq: u.match(/\sQQ/i) === ' qq',
+      // 是否QQ
+      hmlyApp: /himalaya/i.test(u) // 是否在 himalaya app
 
-"use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _handleUA_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./handleUA.js */ \"./utils/handleUA.js\");\n/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, \"getUA\", function() { return _handleUA_js__WEBPACK_IMPORTED_MODULE_0__[\"getUA\"]; });\n\n/* harmony import */ var _IE_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./IE.js */ \"./utils/IE.js\");\n/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, \"isIE\", function() { return _IE_js__WEBPACK_IMPORTED_MODULE_1__[\"isIE\"]; });\n\n/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, \"isEdge\", function() { return _IE_js__WEBPACK_IMPORTED_MODULE_1__[\"isEdge\"]; });\n\n/* harmony import */ var _eventBind__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./eventBind */ \"./utils/eventBind.js\");\n/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, \"addListener\", function() { return _eventBind__WEBPACK_IMPORTED_MODULE_2__[\"addListener\"]; });\n\n/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, \"removeListener\", function() { return _eventBind__WEBPACK_IMPORTED_MODULE_2__[\"removeListener\"]; });\n\n/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, \"preventEvent\", function() { return _eventBind__WEBPACK_IMPORTED_MODULE_2__[\"preventEvent\"]; });\n\n/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, \"stopEvent\", function() { return _eventBind__WEBPACK_IMPORTED_MODULE_2__[\"stopEvent\"]; });\n\n/* harmony import */ var _type__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./type */ \"./utils/type.js\");\n/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, \"getType\", function() { return _type__WEBPACK_IMPORTED_MODULE_3__[\"getType\"]; });\n\n\n\n\n\n\n//# sourceURL=webpack://EaseAudio/./utils/index.js?");
+    };
+    return obj;
+  }
 
-/***/ }),
+  var ua;
 
-/***/ "./utils/type.js":
-/*!***********************!*\
-  !*** ./utils/type.js ***!
-  \***********************/
-/*! exports provided: getType */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+  try {
+    ua = window && window.navigator && window.navigator.userAgent;
+  } catch (error) {
+    console.error("[isIE]: ".concat(error));
+  }
 
-"use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"getType\", function() { return getType; });\n\n\nfunction _typeof(obj) { if (typeof Symbol === \"function\" && typeof Symbol.iterator === \"symbol\") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === \"function\" && obj.constructor === Symbol && obj !== Symbol.prototype ? \"symbol\" : typeof obj; }; } return _typeof(obj); }\n\nvar getType = function getType(obj) {\n  if (_typeof(obj) !== 'object') return _typeof(obj);\n  var len = Object.prototype.toString.call(obj).length - 1;\n  return Object.prototype.toString.call(obj).slice(8, len).toLowerCase();\n};\n\n//# sourceURL=webpack://EaseAudio/./utils/type.js?");
+  var isIE = ua ? getUA(ua).trident : false;
+  var isEdge = ua ? getUA(ua).edge : false;
 
-/***/ })
+  var addListener = function addListener(event, fn, dom) {
+    if (!window) return false;
+    var eventDOM = dom || window;
 
-/******/ });
-});
+    if (window.addEventListener) {
+      eventDOM.addEventListener(event, fn, false);
+    } else {
+      eventDOM.attachEvent("on".concat(event), fn);
+    }
+  }; // adapt IE remove event
+
+  var removeListener = function removeListener(event, fn, dom) {
+    if (!window) return false;
+    var eventDOM = dom || window;
+
+    if (window.removeEventListener) {
+      eventDOM.removeEventListener(event, fn, false);
+    } else {
+      eventDOM.detachEvent("on".concat(event), fn);
+    }
+  }; // prevent default
+
+  var getType = function getType(obj) {
+    if (_typeof(obj) !== 'object') return _typeof(obj);
+    var len = Object.prototype.toString.call(obj).length - 1;
+    return Object.prototype.toString.call(obj).slice(8, len).toLowerCase();
+  };
+
+  var playStateSet = ['loading', 'playing', 'paused', 'stopped', 'ended', 'loaderror', 'playerror'];
+  var playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 'single-loop'];
+  var supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onload', 'oncanplay', 'onprogress', 'onvolume', 'onseek', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick'];
+  var logLevel = ['detail', 'info', 'warn', 'error', 'silent'];
+  var defaultSrc = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+  var AudioH5 =
+  /*#__PURE__*/
+  function () {
+    function AudioH5(config) {
+      _classCallCheck(this, AudioH5);
+
+      this.isInit = false;
+      this.init = this.init.bind(this);
+      this.play = this.play.bind(this);
+      this.pause = this.pause.bind(this);
+      this.toggle = this.toggle.bind(this);
+      this.cut = this.cut.bind(this);
+      this.pick = this.pick.bind(this);
+      this.load = this.load.bind(this);
+      this.seek = this.seek.bind(this);
+      this.rate = this.rate.bind(this);
+      this.volume = this.volume.bind(this);
+      this.muted = this.muted.bind(this);
+      this.stop = this.stop.bind(this);
+      this.unload = this.unload.bind(this);
+      this.model = this.model.bind(this);
+      this.on = this.on.bind(this);
+      this.off = this.off.bind(this);
+      this.once = this.once.bind(this);
+      this.playlist = this.playlist.bind(this);
+      this.init(config);
+    }
+
+    _createClass(AudioH5, [{
+      key: "init",
+      value: function init(config) {
+        if (!this.isInit && config && this._checkType(config, 'object') && JSON.stringify(config) !== '{}') {
+          this._initial(config);
+
+          this._registerEvent(config);
+
+          return this._returnParams();
+        }
+      }
+    }, {
+      key: "play",
+      value: function play() {
+        if (this._checkInit()) {
+          this._blockEvent({
+            block: false
+          });
+
+          this.audioH5.play();
+          return this.playId;
+        }
+      }
+    }, {
+      key: "pause",
+      value: function pause() {
+        if (this._checkInit()) {
+          this.audioH5.pause();
+          return this.playId;
+        }
+      }
+    }, {
+      key: "toggle",
+      value: function toggle() {
+        if (this._checkInit() && this.playState !== 'stopped' && this.playState !== 'ended' && this.playState !== 'loaderror' && this.playState !== 'playerror') {
+          this.playState === null || this.playState === 'paused' ? this.play() : this.pause();
+          return this.playId;
+        }
+      }
+    }, {
+      key: "cut",
+      value: function cut() {
+        if (this._checkInit()) {
+          this._cut();
+
+          return this._returnParams();
+        }
+      }
+    }, {
+      key: "pick",
+      value: function pick(playId) {
+        if (this._checkInit() && this._checkType(playId, 'number', true)) {
+          for (var i = 0; i < this.playList.length; i++) {
+            if (this.playList[i].playId === playId) {
+              this.unload();
+
+              this._setPlayIndex(i);
+
+              var src = this.playList[this.playIndex].src;
+
+              var config = _objectSpread({}, this.config, {
+                src: src
+              });
+
+              this._createAudio(config);
+
+              this._registerEvent(config);
+
+              this._fireEventQueue(this.playId, 'onpick');
+
+              this.play();
+              break;
+            }
+          }
+
+          return this._returnParams();
+        }
+      }
+    }, {
+      key: "load",
+      value: function load() {
+        if (this._checkInit()) {
+          this.audioH5.load();
+          return this.playId;
+        }
+      }
+    }, {
+      key: "seek",
+      value: function seek(val) {
+        if (this._checkInit()) {
+          if (this._checkType(val, 'number')) {
+            // IE cannot set currentTime when the metaData is loading
+            if (isIE && !this.metaDataLoaded) {
+              this.seekValue = val;
+              return;
+            }
+
+            var duration = this.audioH5.duration;
+            if (val > duration) val = duration;
+            if (val < 0) val = 0;
+            this.seekValue = null;
+            this.audioH5.currentTime = val;
+          } else {
+            return this.audioH5.currentTime;
+          }
+        }
+      }
+    }, {
+      key: "rate",
+      value: function rate(val) {
+        if (this._checkInit()) {
+          if (this._checkType(val, 'number')) {
+            if (val > 2) val = 2;
+            if (val < 0.5) val = 0.5;
+            this.audioH5.playbackRate = val;
+
+            this._updateConfig({
+              rate: val
+            });
+          } else {
+            return this.audioH5.playbackRate;
+          }
+        }
+      }
+    }, {
+      key: "volume",
+      value: function volume(val) {
+        if (this._checkInit()) {
+          if (this._checkType(val, 'number')) {
+            if (val > 1) val = 1;
+            if (val < 0) val = 0;
+            this.audioH5.muted = false;
+            this.audioH5.volume = val;
+
+            this._updateConfig({
+              volume: val
+            });
+          } else {
+            return this.audioH5.volume;
+          }
+        }
+      }
+    }, {
+      key: "muted",
+      value: function muted(bool) {
+        if (this._checkInit()) {
+          if (this._checkType(bool, 'boolean', true)) {
+            this.audioH5.muted = bool;
+
+            this._updateConfig({
+              muted: bool
+            });
+          } else {
+            return this.audioH5.muted;
+          }
+        }
+      }
+    }, {
+      key: "stop",
+      value: function stop() {
+        if (this._checkInit() && this.playState !== playStateSet[3]) {
+          this._blockEvent({
+            block: true
+          });
+
+          this.audioH5.currentTime = 0;
+          this.audioH5.pause();
+
+          this._setPlayState(playStateSet[3]);
+
+          this._fireEventQueue(this.playId, 'onstop');
+
+          return this.playId;
+        }
+      }
+    }, {
+      key: "unload",
+      value: function unload() {
+        this.stop();
+
+        this._unregisterEvent();
+
+        this.audioH5.src = defaultSrc;
+        this.audioH5 = null;
+        this.isInit = false;
+      }
+      /* set play model */
+
+    }, {
+      key: "model",
+      value: function model(_model) {
+        if (this._checkInit()) {
+          if (playModelSet.indexOf(_model) !== -1) {
+            // model contain: list-once, list-random, list-loop, single-once, single-loop
+            this.playModel = _model;
+          } else {
+            return this.playModel;
+          }
+        }
+      }
+      /* add event to events queue */
+
+    }, {
+      key: "on",
+      value: function on(event, cb) {
+        if (this._checkType(event, 'string', true) && this._checkType(cb, 'function', true)) {
+          var queueName = event.indexOf('on') === 0 ? event : "on".concat(event);
+
+          this._onEvent(queueName, cb);
+        }
+      }
+      /* remove event from events queue */
+
+    }, {
+      key: "off",
+      value: function off(event, cb) {
+        if (this._checkType(event, 'string', true)) {
+          var queueName = event.indexOf('on') === 0 ? event : "on".concat(event);
+
+          this._offEvent(queueName, cb);
+        }
+      }
+      /* fire only one time */
+
+    }, {
+      key: "once",
+      value: function once(event, cb) {
+        var _this = this;
+
+        if (this._checkType(event, 'string', true) && this._checkType(cb, 'function', true)) {
+          var queueName = event.indexOf('on') === 0 ? event : "on".concat(event);
+          var funcName = "EASE_AUDIO_".concat(queueName.toUpperCase(), "_ONCE_CALLBACK");
+
+          var once = function once(e) {
+            cb && cb(e);
+
+            _this._offEvent(queueName, once, funcName);
+          };
+
+          this._onEvent(queueName, once, funcName);
+        }
+      }
+      /* set play list */
+
+    }, {
+      key: "playlist",
+      value: function playlist(_ref) {
+        var action = _ref.action,
+            list = _ref.list,
+            playId = _ref.playId;
+
+        if (this._checkType(action, 'string', true) && (!list || this._checkType(list, 'array', true)) && (!playId || this._checkType(playId, 'number', true))) {
+          this._updatePlayList({
+            action: action,
+            list: list,
+            playId: playId
+          });
+
+          return this._returnParams();
+        }
+      }
+      /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+    }, {
+      key: "_initial",
+      value: function _initial(config) {
+        this.config = config; // preserve initial config
+
+        this.playState = null;
+        this.debug = config.debug || false;
+        this.logLevel = logLevel.indexOf(config.logLevel) !== -1 && config.logLevel || logLevel[3];
+        this.idCounter = 1000;
+        this.playId = 1000;
+        this.playModel = playModelSet.indexOf(config.playModel) !== -1 && config.playModel || config.loop && playModelSet[3] || playModelSet[0];
+        this.playIndex = 0;
+        this.playList = new Array(0);
+        this.buffered = new Array(0);
+        this.eventController = new Array(0);
+        this.eventMethods = {}; // playlist convert to src
+
+        var src;
+
+        if (config.playlist && this._checkType(config.playlist, 'array')) {
+          this.playlist({
+            action: 'add',
+            list: config.playlist
+          });
+          src = config.playlist[0] && config.playlist[0].src;
+
+          if (!src || !this._checkType(src, 'string')) {
+            src = defaultSrc;
+
+            this._logErr('The src property is necessary and must be string!');
+          }
+        } else {
+          this._logErr('Please pass correct playlist parameters!');
+
+          src = defaultSrc;
+        } // create Audio Object
+
+
+        this._createAudio(_objectSpread({}, config, {
+          src: src
+        }));
+      }
+    }, {
+      key: "_createAudio",
+      value: function _createAudio(config) {
+        this.isInit = true;
+        this.audioH5 = new window.Audio();
+        this.audioH5.autoplay = config.autoplay || false;
+        this.audioH5.loop = config.loop || false;
+        this.audioH5.src = this._srcAssemble(config.src);
+        this.audioH5.preload = config.preload || true;
+        this.audioH5.volume = config.volume || (config.volume === 0 ? 0 : 1);
+        this.audioH5.muted = config.muted || false;
+        this.audioH5.playbackRate = config.rate || config.playbackRate || 1;
+        this.audioH5.controls = false;
+      }
+    }, {
+      key: "_srcAssemble",
+      value: function _srcAssemble(src) {
+        if (src && this._checkType(src, 'string')) {
+          return src;
+        }
+
+        return defaultSrc;
+      }
+    }, {
+      key: "_updateConfig",
+      value: function _updateConfig(params) {
+        this.config = _objectSpread({}, this.config, params);
+      }
+    }, {
+      key: "_returnParams",
+      value: function _returnParams() {
+        return {
+          playId: this.playId,
+          playingData: this.playList[this.playIndex],
+          playlist: this.playList
+        };
+      }
+      /* set play state */
+
+    }, {
+      key: "_setPlayState",
+      value: function _setPlayState(state) {
+        if (this._checkType(state, 'string', true) && this.playState !== state) {
+          var readyState = this.audioH5.readyState;
+          var isReady = readyState > 2;
+          var paused = this.audioH5.paused;
+          var ended = this.audioH5.ended;
+          var seeking = this.audioH5.seeking; // filter impossible state
+
+          switch (state) {
+            case playStateSet[0]:
+              // loading
+              if (paused || ended || isReady) return false;
+              break;
+
+            case playStateSet[1]:
+              // playing
+              if (paused || ended || seeking || !isReady) return false;
+              break;
+
+            case playStateSet[2]:
+              // paused
+              if (ended) return false;
+              break;
+          }
+
+          this._logInfo("setPlayState - ".concat(state));
+
+          this.playState = state;
+          return this.playState;
+        }
+      }
+      /* set play index */
+
+    }, {
+      key: "_setPlayIndex",
+      value: function _setPlayIndex(index) {
+        var playModel = this.playModel;
+        var maxIndex = this.playList.length - 1;
+
+        if (index === 0) {
+          this.playIndex = 0;
+          this.playId = this.playList[0] && this.playList[0].playId || this.playId;
+          return;
+        }
+
+        switch (playModel) {
+          case 'list-once':
+            this.playIndex = index || (maxIndex >= this.playIndex ? ++this.playIndex : this.playIndex);
+            break;
+
+          case 'list-random':
+            this.playIndex = index || Math.round(Math.random() * maxIndex);
+            break;
+
+          case 'list-loop':
+            this.playIndex = index || (maxIndex > this.playIndex ? ++this.playIndex : 0);
+            break;
+
+          case 'single-once':
+            this.playIndex = index || this.playIndex;
+            break;
+
+          case 'single-loop':
+            this.playIndex = index || this.playIndex;
+            break;
+
+          default:
+            this.playIndex = index || this.playIndex;
+        }
+
+        this.playId = this.playList[this.playIndex] && this.playList[this.playIndex].playId || this.playId;
+
+        this._log("setPlayIndex - playIndex: ".concat(this.playIndex, "  playId: ").concat(this.playId));
+
+        return this.playIndex;
+      }
+      /* reset play list */
+
+    }, {
+      key: "_resetPlayList",
+      value: function _resetPlayList() {
+        this.playList = [];
+
+        this._setPlayIndex(0);
+      }
+      /* update play list */
+
+    }, {
+      key: "_updatePlayList",
+      value: function _updatePlayList(_ref2) {
+        var _this2 = this;
+
+        var action = _ref2.action,
+            list = _ref2.list,
+            playId = _ref2.playId;
+
+        switch (action) {
+          case 'add':
+            this.playList = [].concat(_toConsumableArray(this.playList), _toConsumableArray(list.map(function (v) {
+              if (_this2._checkType(v, 'object')) {
+                v.playId = _this2.idCounter;
+                _this2.idCounter++;
+                return v;
+              }
+            })));
+            break;
+
+          case 'delete':
+            if (playId) {
+              for (var i = 0; i < this.playList.length; i++) {
+                if (this.playList[i].playId === playId) {
+                  return this.playList.splice(i, 1);
+                }
+              }
+            }
+
+            break;
+
+          case 'insert':
+            if (playId && list) {
+              for (var _i = 0; _i < this.playList.length; _i++) {
+                if (this.playList[_i].playId === playId) {
+                  var _this$playList;
+
+                  return (_this$playList = this.playList).splice.apply(_this$playList, [_i, 0].concat(_toConsumableArray(list)));
+                }
+              }
+            }
+
+            break;
+
+          case 'reset':
+            this._resetPlayList();
+
+            break;
+
+          default:
+            this._resetPlayList();
+
+        }
+      }
+      /* cut audio */
+
+    }, {
+      key: "_cut",
+      value: function _cut(endCut) {
+        this.stop(); // can't cut audio if the playModel is single-once
+
+        if (this._checkInit() && this.playModel !== 'single-once') {
+          this.metaDataLoaded = false;
+          this.seekValue = null;
+
+          this._setPlayIndex();
+
+          if (!this.playList[this.playIndex]) return;
+          var src = this.playList[this.playIndex].src;
+
+          if (endCut) {
+            // resolve the IOS auto play problem
+            this.audioH5.src = src;
+            this.load();
+          } else {
+            this.unload();
+
+            var config = _objectSpread({}, this.config, {
+              src: src
+            });
+
+            this._createAudio(config);
+
+            this._registerEvent(config);
+          }
+
+          this._fireEventQueue(this.playId, 'oncut');
+
+          this.play();
+          return this._setPlayState(playStateSet[1]);
+        }
+      }
+      /* generate received event callback queue */
+
+    }, {
+      key: "_onEvent",
+      value: function _onEvent(event, cb, name) {
+        if (supportEvents.indexOf(event) !== -1) {
+          if (!this[event]) this[event] = {};
+          this[event][name || cb.name || "anonymous-".concat(new Date().getTime())] = cb;
+        }
+      }
+      /* delete received event callback queue */
+
+    }, {
+      key: "_offEvent",
+      value: function _offEvent(event, cb, name) {
+        if (supportEvents.indexOf(event) !== -1) {
+          if (!cb) this[event] = null;else if (name || cb.name) delete this[event][name || cb.name];
+        }
+      }
+      /* fire event callback queue */
+
+    }, {
+      key: "_fireEventQueue",
+      value: function _fireEventQueue(e, eventQueue) {
+        if (this[eventQueue]) {
+          for (var k in this[eventQueue]) {
+            this[eventQueue][k] && this[eventQueue][k](e);
+          }
+        }
+      }
+      /* register Audio Event */
+
+    }, {
+      key: "_registerEvent",
+      value: function _registerEvent(config) {
+        var _this3 = this;
+
+        var curry = function curry(cb, eventName) {
+          return function (e) {
+            if (!_this3._triggerEventController(eventName)) return;
+            return cb && cb(e);
+          };
+        };
+        /* bindind received event callbacks */
+
+
+        var configKeys = Object.keys(config);
+        configKeys.forEach(function (v) {
+          if (v.indexOf('on') === 0) {
+            var funcName = "EASE_AUDIO_".concat(v.toUpperCase(), "_INITIAL_CALLBACK");
+
+            _this3._onEvent(v, config[v], funcName);
+          }
+        });
+        this.eventMethods = {
+          // loading state
+          loadstart: function loadstart(e) {
+            _this3.playState === playStateSet[1] && _this3._setPlayState(playStateSet[0]);
+
+            _this3._fireEventQueue(e, 'onload');
+          },
+          // playing state
+          playing: function playing(e) {
+            _this3._setPlayState(playStateSet[1]);
+
+            _this3._fireEventQueue(e, 'onplay');
+          },
+          canplaythrough: function canplaythrough(e) {
+            _this3.playState === playStateSet[0] && _this3._setPlayState(playStateSet[1]);
+          },
+          // paused state
+          pause: function pause(e) {
+            _this3._setPlayState(playStateSet[2]);
+
+            _this3._fireEventQueue(e, 'onpause');
+          },
+          // ended state
+          ended: function ended(e) {
+            if (_this3.isEnd) {
+              _this3.isEnd = false;
+            } else {
+              _this3.isEnd = true;
+
+              _this3._fireEventQueue(e, 'onend');
+
+              _this3.config.endAutoCut && _this3._cut(true);
+            }
+          },
+          // loaderror state
+          error: function error(e) {
+            _this3._setPlayState(playStateSet[5]);
+
+            _this3._fireEventQueue(e, 'onloaderror');
+          },
+          // playerror state
+          stalled: function stalled(e) {
+            _this3._setPlayState(playStateSet[6]);
+
+            _this3._fireEventQueue(e, 'onplayerror');
+          },
+          // others
+          progress: function progress(e) {
+            var ranges = e.target.buffered;
+            var total = e.total || 1;
+            var buffered = 0;
+            var loaded = e.loaded || 0;
+            var progress = loaded / total;
+
+            if (ranges && ranges.length) {
+              for (var i = 0, j = ranges.length; i < j; i++) {
+                _this3.buffered.push({
+                  'start': ranges.start(i) * 1000,
+                  'end': ranges.end(i) * 1000
+                });
+              }
+
+              buffered = (ranges.end(0) - ranges.start(0)) * 1000;
+              loaded = Math.min(1, buffered / (e.target.duration * 1000));
+              progress = loaded / total;
+            }
+
+            _this3._fireEventQueue({
+              e: e,
+              progress: progress
+            }, 'onprogress');
+          },
+          durationchange: function durationchange(e) {},
+          loadedmetadata: function loadedmetadata(e) {
+            _this3.metaDataLoaded = true;
+            _this3.seekValue && _this3.seek(_this3.seekValue);
+          },
+          loadeddata: function loadeddata(e) {},
+          timeupdate: function timeupdate(e) {
+            // playState is loading but actually is playing
+            if (_this3.playState === playStateSet[0]) {
+              _this3._logInfo("timeupdate's playing");
+
+              _this3._setPlayState(playStateSet[1]);
+
+              _this3._fireEventQueue(e, 'onplay');
+            } // Depending on currentTime and duration to mimic end event
+
+
+            var isEnd = _this3.audioH5.duration && _this3.audioH5.currentTime === _this3.audioH5.duration;
+
+            if (isEnd) {
+              _this3._logInfo("timeupdate's ended");
+
+              if (_this3.isEnd) {
+                _this3.isEnd = false;
+              } else {
+                _this3.isEnd = true;
+
+                _this3._fireEventQueue(e, 'onend');
+
+                _this3.config.endAutoCut && _this3._cut(true);
+              }
+            }
+
+            _this3._fireEventQueue(e, 'ontimeupdate');
+          },
+          canplay: function canplay(e) {
+            _this3._fireEventQueue(e, 'oncanplay');
+          },
+          seeking: function seeking(e) {
+            _this3._fireEventQueue(e, 'onseek');
+          },
+          seeked: function seeked(e) {},
+          play: function play(e) {},
+          volumechange: function volumechange(e) {
+            _this3._fireEventQueue(e, 'onvolume');
+          },
+          ratechange: function ratechange(e) {
+            _this3._fireEventQueue(e, 'onrate');
+          },
+          abort: function abort(e) {},
+          suspend: function suspend(e) {}
+        };
+
+        for (var k in this.eventMethods) {
+          this.eventMethods[k] = curry(this.eventMethods[k], k);
+        }
+
+        for (var _k in this.eventMethods) {
+          this._bindEvent(this.eventMethods[_k], _k);
+        }
+
+        this._blockEvent({
+          block: false
+        });
+      }
+      /* unregister Audio Event */
+
+    }, {
+      key: "_unregisterEvent",
+      value: function _unregisterEvent() {
+        if (this._checkInit()) {
+          for (var k in this.eventMethods) {
+            this._removeEvent(this.eventMethods[k], k);
+          }
+        }
+      }
+      /* not remove but block event callback */
+
+    }, {
+      key: "_blockEvent",
+      value: function _blockEvent(_ref3) {
+        var event = _ref3.event,
+            block = _ref3.block;
+
+        if (this._checkInit()) {
+          if (event && this._checkType(event, 'string')) {
+            this.eventController[event] = !block;
+          } else {
+            for (var k in this.eventMethods) {
+              this.eventController[k] = !block;
+            }
+          }
+        }
+      }
+      /* whether or not trigger event callback */
+
+    }, {
+      key: "_triggerEventController",
+      value: function _triggerEventController(event) {
+        if (!this.eventController[event]) return false;
+
+        this._log("trigger ".concat(event, " event"));
+
+        return true;
+      }
+      /* bind event */
+
+    }, {
+      key: "_bindEvent",
+      value: function _bindEvent(cb, event) {
+        if (!this._checkType(event, 'string')) return this._logErr("bindEvent - bind event name is not string");
+        this._checkType(cb, 'function', true) && addListener(event, cb, this.audioH5);
+      }
+      /* remove event */
+
+    }, {
+      key: "_removeEvent",
+      value: function _removeEvent(cb, event) {
+        if (!this._checkType(event, 'string')) return this._logErr("removeEvent - unbind event name is not string");
+        this._checkType(cb, 'function', true) && removeListener(event, cb, this.audioH5);
+      }
+      /* check type */
+
+    }, {
+      key: "_checkType",
+      value: function _checkType(element, type, logErr) {
+        if (typeof type !== 'string') return this._logWarn('checkType - The type must be string');
+
+        if (getType(element) !== type) {
+          logErr && this._logErr("Your parameter(".concat(element, ") type is ").concat(getType(element), ", please pass the ").concat(type, " type"));
+          return false;
+        }
+
+        return true;
+      }
+      /* check whether or not init Audio */
+
+    }, {
+      key: "_checkInit",
+      value: function _checkInit() {
+        if (!this.isInit) {
+          this._logWarn("checkInit - The Audio haven't been initiated");
+
+          return false;
+        }
+
+        return true;
+      }
+      /* detail logger */
+
+    }, {
+      key: "_log",
+      value: function _log(detail) {
+        var canLog = this.logLevel !== 'silent' && this.logLevel === 'detail';
+        return canLog && this.debug && console.log('[EASE_AUDIO_H5 DETAIL]:', detail);
+      }
+      /* info logger */
+
+    }, {
+      key: "_logInfo",
+      value: function _logInfo(info) {
+        var canLog = this.logLevel !== 'silent' && this.logLevel !== 'error' && this.logLevel !== 'warn';
+        return canLog && this.debug && console.info('[EASE_AUDIO_H5 INFO]:', info);
+      }
+      /* warn logger */
+
+    }, {
+      key: "_logWarn",
+      value: function _logWarn(warn) {
+        var canLog = this.logLevel !== 'silent' && this.logLevel !== 'error';
+        return canLog && this.debug && console.warn('[EASE_AUDIO_H5 WARN]:', warn);
+      }
+      /* error logger */
+
+    }, {
+      key: "_logErr",
+      value: function _logErr(err) {
+        var canLog = this.logLevel !== 'silent';
+        return canLog && this.debug && console.error('[EASE_AUDIO_H5 ERROR]:', err);
+      }
+    }, {
+      key: "duration",
+      get: function get() {
+        return this.audioH5.duration;
+      }
+    }, {
+      key: "setProps",
+      set: function set(_ref4) {
+        var prop = _ref4.prop,
+            value = _ref4.value;
+
+        if (this.audioH5[prop] && !this._checkType(this.audioH5[prop], 'function')) {
+          this.audioH5[prop] = value;
+
+          this._updateConfig({
+            prop: value
+          });
+        }
+      }
+    }]);
+
+    return AudioH5;
+  }();
+
+  var EaseAudio =
+  /*#__PURE__*/
+  function () {
+    function EaseAudio(config) {
+      _classCallCheck(this, EaseAudio);
+
+      this.audio = this._createAudio(config);
+      this.init = this.audio.init;
+      this.play = this.audio.play;
+      this.pause = this.audio.pause;
+      this.toggle = this.audio.toggle;
+      this.cut = this.audio.cut;
+      this.pick = this.audio.pick;
+      this.load = this.audio.load;
+      this.seek = this.audio.seek;
+      this.volume = this.audio.volume;
+      this.muted = this.audio.muted;
+      this.stop = this.audio.stop;
+      this.unload = this.audio.unload;
+      this.on = this.audio.on;
+      this.off = this.audio.off;
+      this.once = this.audio.once;
+      this.model = this.audio.model;
+    }
+
+    _createClass(EaseAudio, [{
+      key: "_createAudio",
+      value: function _createAudio(config) {
+        var audio = {
+          init: initFunc,
+          play: initFunc,
+          pause: initFunc,
+          toggle: initFunc,
+          load: initFunc,
+          seek: initFunc,
+          volume: initFunc,
+          muted: initFunc,
+          stop: initFunc,
+          unload: initFunc,
+          on: initFunc,
+          off: initFunc,
+          once: initFunc
+        };
+
+        var _ref = config || {},
+            usingWebAudio = _ref.usingWebAudio;
+
+        try {
+          if (usingWebAudio && (window.AudioContext || window.webkitAudioContext)) {
+            audio = new AudioCtx(config);
+          } else if (window.Audio) {
+            audio = new AudioH5(config);
+          }
+        } catch (err) {
+          console.error('[EASE_AUDIO ERROR]:', err);
+        }
+
+        return audio;
+      }
+    }, {
+      key: "duration",
+      get: function get() {
+        return this.audio.duration;
+      }
+    }, {
+      key: "playState",
+      get: function get() {
+        return this.audio.playState;
+      }
+    }, {
+      key: "playId",
+      get: function get() {
+        return this.audio.playId;
+      }
+    }, {
+      key: "playingData",
+      get: function get() {
+        return this.audio.playList[this.audio.playIndex];
+      }
+    }, {
+      key: "playlist",
+      set: function set(params) {
+        this.audio.playlist(params);
+      },
+      get: function get() {
+        return this.audio.playList;
+      }
+    }, {
+      key: "networkState",
+      get: function get() {
+        return this.audio.networkState;
+      }
+    }]);
+
+    return EaseAudio;
+  }();
+
+  function initFunc() {
+    return console.error('[EASE_AUDIO ERROR]: Initialize failed');
+  }
+
+  /*!
+   *  himalaya player v0.0.1
+   *  player.himalaya.com
+   *
+   *  (c) 2017-2018, Bobby Li of Himalaya Corp
+   *  himalaya.com
+   *
+   *  MIT License
+   */
+
+  exports.default = EaseAudio;
+  exports.EaseAudio = EaseAudio;
+
+  Object.defineProperty(exports, '__esModule', { value: true });
+
+}));
