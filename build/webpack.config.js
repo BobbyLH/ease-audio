@@ -26,29 +26,4 @@ module.exports = [{
   plugins: [
     new webpack.ProgressPlugin()
   ]
-}, {
-  entry: {
-    index: './src/index.js'
-  },
-  output: {
-    filename: 'ease-audio.js',
-    path: path.resolve(__dirname, '../dist'),
-    library: 'EaseAudio',
-    libraryTarget: 'umd'
-  },
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: [
-          {loader: 'babel-loader'}
-        ]
-      }
-    ]
-  },
-  mode: 'development',
-  plugins: [
-    new webpack.ProgressPlugin()
-  ]
 }]
