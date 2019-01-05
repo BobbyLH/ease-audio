@@ -16,6 +16,7 @@ In the browser:
 ```html
 <script src='pathTo/dist/audio.js' ></script>
 <script>
+    const EaseAudio = window.EaseAudio.default
     var sound = new EaseAudio({
       src: 'sound.mp3'
     });
@@ -94,7 +95,11 @@ sound.on('end', function(){
 ```javascript
 import EaseAudio from 'ease-audio';
 
-// Setup the new Howl.
+// or const EaseAudio = require('ease-audio').default
+
+// or const { EaseAudio } = require('ease-audio')
+
+// Setup the new EaseAudio.
 const sound = new EaseAudio({
   playlist: [{src: 'sound.mp3'}]
 });
