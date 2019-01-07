@@ -16,7 +16,7 @@
   "main": "dist/ease-audio.js",
   "scripts": {
     "dev": "webpack-dashboard -p 3300 -- node demo/server.js",
-    "static": "webpack --config build/webpack.config.js --watch",
+    "static": "rollup -c build/rollup.config.js --watch",
     "build": "npm run build_branch && npm run build_rollup && npm run build_webpack && npm run build_version && npm run build_git",
     "build_branch": "node build/branch",
     "build_version": "node build/version",
