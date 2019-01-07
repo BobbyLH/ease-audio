@@ -1,3 +1,4 @@
+/* ease-audio */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1196,19 +1197,12 @@
     return console.error('[EASE_AUDIO ERROR]: Initialize failed');
   }
 
-  /*!
-   *  himalaya player v0.0.1
-   *  player.himalaya.com
-   *
-   *  (c) 2017-2018, Bobby Li of Himalaya Corp
-   *  himalaya.com
-   *
-   *  MIT License
-   */
-
   exports.default = EaseAudio;
   exports.EaseAudio = EaseAudio;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
+/* Copyright (c) 2018-2019 Bobby.li 
+* MIT License 
+*/
