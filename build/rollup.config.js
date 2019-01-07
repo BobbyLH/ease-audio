@@ -8,8 +8,9 @@ module.exports = {
     file: 'dist/ease-audio.js',
     format: 'umd',
     name: 'EaseAudio',
+    exports: 'named',
     banner: '/* ease-audio */',
-    footer: '/* Copyright (c) 2018-2019 Bobby.li \n MIT License */'
+    footer: '/* Copyright (c) 2018-2019 Bobby.li \n* MIT License \n*/'
   },
   plugins: [
     resolve(),

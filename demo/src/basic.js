@@ -18,6 +18,7 @@ function init () {
     onprogress: e => console.log('onprogress:', e)
   }
   audio.init(config)
+  console.log(audio, 'audio was inited')
 }
 
 function load () {

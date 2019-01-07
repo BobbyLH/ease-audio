@@ -1,4 +1,5 @@
 import EaseAudio from '../../src/index'
+// import EaseAudio from '../../dist/ease-audio'
 
 const audio = new EaseAudio()
 const rootDom = document.getElementById('app')
@@ -100,7 +101,7 @@ function init () {
       {src: 'http://audio.xmcdn.com/group21/M0B/2E/08/wKgJLVrpYaLCVIMPABFX6j5WjMk013.m4a'}
     ]
   }
-  console.log('res init', audio.init(config))
+  console.log('res init', audio.init(config), audio)
 }
 
 function load () {
