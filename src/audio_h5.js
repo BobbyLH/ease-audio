@@ -66,9 +66,26 @@ export class AudioH5 {
 
   play () {
     if (this._checkInit()) {
-      this._blockEvent({block: false})
-      this.audioH5.play()
+      try {
+        this._blockEvent({block: false})
+        let play = this.audioH5.play()
 
+        if (play && typeof Promise !== 'undefined' && (play instanceof Promise || typeof play.then === 'function')) {
+          play.catch(err => {
+            this._setPlayState(playStateSet[6])
+            this._fireEventQueue(err, 'onplayerror')
+          })
+        }
+
+        // If the sound is still paused, then we can assume there was a playback issue.
+        if (this.audioH5.paused) {
+          this._setPlayState(playStateSet[6])
+          this._fireEventQueue(this.playId, 'onplayerror')
+        }
+      } catch (err) {
+        this._setPlayState(playStateSet[6])
+        this._fireEventQueue(err, 'onplayerror')
+      }
       return this.playId
     }
   }
@@ -534,11 +551,6 @@ export class AudioH5 {
       error: e => {
         this._setPlayState(playStateSet[5])
         this._fireEventQueue(e, 'onloaderror')
-      },
-      // playerror state
-      stalled: e => {
-        this._setPlayState(playStateSet[6])
-        this._fireEventQueue(e, 'onplayerror')
       },
       // others
       progress: e => {
