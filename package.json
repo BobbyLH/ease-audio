@@ -13,7 +13,7 @@
     "html5",
     "html5 audio"
   ],
-  "main": "dist/ease-audio.js",
+  "main": "dist/ease-audio.min.js",
   "scripts": {
     "dev": "webpack-dashboard -p 3300 -- node demo/server.js",
     "static": "webpack --config build/webpack.config.js --watch",
