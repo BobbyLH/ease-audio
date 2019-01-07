@@ -178,6 +178,7 @@
   var isIE = ua ? getUA(ua).trident : false;
   var isEdge = ua ? getUA(ua).edge : false;
 
+  // adapt IE add event
   var addListener = function addListener(event, fn, dom) {
     if (!window) return false;
     var eventDOM = dom || window;
