@@ -1,4 +1,3 @@
-'use strict'
 // adapt IE add event
 export const addListener = (event, fn, dom) => {
   if (!window) return false

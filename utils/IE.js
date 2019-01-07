@@ -1,5 +1,3 @@
-'use strict'
-
 import getUA from './handleUA'
 
 let ua
