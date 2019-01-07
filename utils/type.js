@@ -1,4 +1,3 @@
-'use strict'
 export const getType = (obj) => {
   if (typeof obj !== 'object') return typeof obj
   const len = Object.prototype.toString.call(obj).length - 1

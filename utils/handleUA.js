@@ -1,4 +1,3 @@
-'use strict'
 export function getUA (u) {
   if (!u) return false
   // console.log(u)
