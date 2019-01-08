@@ -268,7 +268,16 @@ Set the playlist according to `action` and `playId` arguments.
 #### networkState `String`
 Return the track network state.
 
-
+### Browser Compatibility
+* Google Chrome 50+
+* Internet Explorer 9.0+
+* Firefox 40+
+* Safari 8+
+* Opera 50.0+
+* Microsoft Edge 12+
+* Android WebView 4+
+* Samsung 4+
+* IOS 8+
 
 ## License
 
