@@ -1,5 +1,5 @@
 .browserslistrc
-babal.config.js
+babel.config.js
 .gitignore
 yarn.lock
 node_modules
