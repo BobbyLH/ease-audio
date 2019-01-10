@@ -2035,17 +2035,14 @@
 
     }, {
       key: "playlist",
-      value: function playlist(_ref) {
-        var action = _ref.action,
-            list = _ref.list,
-            playId = _ref.playId;
+      value: function playlist(data) {
+        var action = data.action,
+            list = data.list,
+            playId = data.playId,
+            params = data.params;
 
-        if (this._checkInit() && this._checkType(action, 'string', true) && (!list || this._checkType(list, 'array', true)) && (!playId || this._checkType(playId, 'number', true))) {
-          this._handlePlayList({
-            action: action,
-            list: list,
-            playId: playId
-          });
+        if (this._checkInit() && this._checkType(action, 'string', true) && (!list || this._checkType(list, 'array', true)) && (!playId || this._checkType(playId, 'number', true)) && (!params || this._checkType(params, 'object', true))) {
+          this._handlePlayList(data);
 
           return this._returnParams();
         }
@@ -2237,13 +2234,13 @@
 
     }, {
       key: "_handlePlayList",
-      value: function _handlePlayList(_ref2) {
+      value: function _handlePlayList(_ref) {
         var _this3 = this;
 
-        var action = _ref2.action,
-            list = _ref2.list,
-            playId = _ref2.playId,
-            params = _ref2.params;
+        var action = _ref.action,
+            list = _ref.list,
+            playId = _ref.playId,
+            params = _ref.params;
 
         switch (action) {
           case 'add':
@@ -2562,9 +2559,9 @@
 
     }, {
       key: "_blockEvent",
-      value: function _blockEvent(_ref3) {
-        var event = _ref3.event,
-            block = _ref3.block;
+      value: function _blockEvent(_ref2) {
+        var event = _ref2.event,
+            block = _ref2.block;
 
         if (this._checkInit()) {
           if (event && this._checkType(event, 'string')) {
@@ -2669,9 +2666,9 @@
       }
     }, {
       key: "setProps",
-      set: function set(_ref4) {
-        var prop = _ref4.prop,
-            value = _ref4.value;
+      set: function set(_ref3) {
+        var prop = _ref3.prop,
+            value = _ref3.value;
 
         if (this.audioH5[prop] && !this._checkType(this.audioH5[prop], 'function')) {
           this.audioH5[prop] = value;
