@@ -2041,7 +2041,7 @@
             playId = _ref.playId;
 
         if (this._checkInit() && this._checkType(action, 'string', true) && (!list || this._checkType(list, 'array', true)) && (!playId || this._checkType(playId, 'number', true))) {
-          this._updatePlayList({
+          this._handlePlayList({
             action: action,
             list: list,
             playId: playId
@@ -2067,15 +2067,28 @@
         this.playList = new Array(0);
         this.buffered = new Array(0);
         this.eventController = new Array(0);
-        this.eventMethods = {}; // playlist convert to src
+        this.eventMethods = Object.create(null); // playlist convert to src
 
         var src;
 
         if (config.playlist && this._checkType(config.playlist, 'array')) {
-          this.playlist({
+          for (var i = 0; i < config.playlist.length; i++) {
+            if (this._checkType(config.playlist[i], 'object')) continue;
+            config.playlist[i] = Object.create(null, {
+              src: {
+                writable: true,
+                enumerable: true,
+                configurable: true,
+                value: config.playlist[i]
+              }
+            });
+          }
+
+          this._handlePlayList({
             action: 'add',
             list: config.playlist
           });
+
           src = config.playlist[0] && config.playlist[0].src;
 
           if (!src || !this._checkType(src, 'string')) {
@@ -2220,16 +2233,17 @@
 
         this._setPlayIndex(0);
       }
-      /* update play list */
+      /* handle play list */
 
     }, {
-      key: "_updatePlayList",
-      value: function _updatePlayList(_ref2) {
+      key: "_handlePlayList",
+      value: function _handlePlayList(_ref2) {
         var _this3 = this;
 
         var action = _ref2.action,
             list = _ref2.list,
-            playId = _ref2.playId;
+            playId = _ref2.playId,
+            params = _ref2.params;
 
         switch (action) {
           case 'add':
@@ -2281,6 +2295,19 @@
                     _this3.idCounter++;
                     return v;
                   }))));
+                }
+              }
+            }
+
+            break;
+
+          case 'update':
+            if (playId && list) {
+              for (var _i3 = 0; _i3 < this.playList.length; _i3++) {
+                if (this.playList[_i3].playId === playId) {
+                  var newData = _objectSpread({}, this.playList[_i3], params);
+
+                  return this.playList.splice(_i3, 1, newData);
                 }
               }
             }
