@@ -473,7 +473,7 @@ export class AudioH5 {
         }
         break
       case 'update':
-        if (playId && list) {
+        if (playId && params) {
           for (let i = 0; i < this.playList.length; i++) {
             if (this.playList[i].playId === playId) {
               const newData = {...this.playList[i], ...params}
