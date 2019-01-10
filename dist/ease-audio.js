@@ -2302,7 +2302,7 @@
             break;
 
           case 'update':
-            if (playId && list) {
+            if (playId && params) {
               for (var _i3 = 0; _i3 < this.playList.length; _i3++) {
                 if (this.playList[_i3].playId === playId) {
                   var newData = _objectSpread({}, this.playList[_i3], params);
