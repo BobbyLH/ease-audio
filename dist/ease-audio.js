@@ -1965,13 +1965,15 @@
     }, {
       key: "unload",
       value: function unload() {
-        this.stop();
+        if (this._checkInit()) {
+          this.stop();
 
-        this._unregisterEvent();
+          this._unregisterEvent();
 
-        this.audioH5.src = defaultSrc;
-        this.audioH5 = null;
-        this.isInit = false;
+          this.audioH5.src = defaultSrc;
+          this.audioH5 = null;
+          this.isInit = false;
+        }
       }
       /* set play model */
 
@@ -1992,7 +1994,7 @@
     }, {
       key: "on",
       value: function on(event, cb) {
-        if (this._checkType(event, 'string', true) && this._checkType(cb, 'function', true)) {
+        if (this._checkInit() && this._checkType(event, 'string', true) && this._checkType(cb, 'function', true)) {
           var queueName = event.indexOf('on') === 0 ? event : "on".concat(event);
 
           this._onEvent(queueName, cb);
@@ -2003,7 +2005,7 @@
     }, {
       key: "off",
       value: function off(event, cb) {
-        if (this._checkType(event, 'string', true)) {
+        if (this._checkInit() && this._checkType(event, 'string', true)) {
           var queueName = event.indexOf('on') === 0 ? event : "on".concat(event);
 
           this._offEvent(queueName, cb);
@@ -2016,7 +2018,7 @@
       value: function once(event, cb) {
         var _this2 = this;
 
-        if (this._checkType(event, 'string', true) && this._checkType(cb, 'function', true)) {
+        if (this._checkInit() && this._checkType(event, 'string', true) && this._checkType(cb, 'function', true)) {
           var queueName = event.indexOf('on') === 0 ? event : "on".concat(event);
           var funcName = "EASE_AUDIO_".concat(queueName.toUpperCase(), "_ONCE_CALLBACK");
 
@@ -2038,7 +2040,7 @@
             list = _ref.list,
             playId = _ref.playId;
 
-        if (this._checkType(action, 'string', true) && (!list || this._checkType(list, 'array', true)) && (!playId || this._checkType(playId, 'number', true))) {
+        if (this._checkInit() && this._checkType(action, 'string', true) && (!list || this._checkType(list, 'array', true)) && (!playId || this._checkType(playId, 'number', true))) {
           this._updatePlayList({
             action: action,
             list: list,
@@ -2257,7 +2259,28 @@
                 if (this.playList[_i].playId === playId) {
                   var _this$playList;
 
-                  return (_this$playList = this.playList).splice.apply(_this$playList, [_i, 0].concat(_toConsumableArray(list)));
+                  return (_this$playList = this.playList).splice.apply(_this$playList, [_i, 0].concat(_toConsumableArray(list.map(function (v) {
+                    v.playId = _this3.idCounter;
+                    _this3.idCounter++;
+                    return v;
+                  }))));
+                }
+              }
+            }
+
+            break;
+
+          case 'replace':
+            if (playId && list) {
+              for (var _i2 = 0; _i2 < this.playList.length; _i2++) {
+                if (this.playList[_i2].playId === playId) {
+                  var _this$playList2;
+
+                  return (_this$playList2 = this.playList).splice.apply(_this$playList2, [_i2, 1].concat(_toConsumableArray(list.map(function (v) {
+                    v.playId = _this3.idCounter;
+                    _this3.idCounter++;
+                    return v;
+                  }))));
                 }
               }
             }
