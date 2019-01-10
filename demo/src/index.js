@@ -19,6 +19,7 @@ const onBtn = document.createElement('button')
 const offBtn = document.createElement('button')
 const onceBtn = document.createElement('button')
 const pickBtn = document.createElement('button')
+const replaceListBtn = document.createElement('button')
 
 initBtn.innerText = '初始化'
 initBtn.onclick = init
@@ -83,6 +84,10 @@ rootDom.appendChild(onceBtn)
 pickBtn.innerText = 'pick 选歌'
 pickBtn.onclick = pick
 rootDom.appendChild(pickBtn)
+
+replaceListBtn.innerText = '替换list的某个item'
+replaceListBtn.onclick = replace
+rootDom.appendChild(replaceListBtn)
 
 function init () {
   const config = {
@@ -179,4 +184,16 @@ function once () {
 
 function pick () {
   audio.pick(1002)
+}
+
+function replace () {
+  console.log('before', audio.playlist)
+  setTimeout(() => {
+    audio.playlist = {
+      action: 'replace',
+      list: [{src: 'http://audio.xmcdn.com/group21/M0B/2E/08/wKgJLVrpYaLCVIMPABFX6j5WjMk013.m4a', tag: 'this is new item'}],
+      playId: 1001
+    }
+    console.log('after', audio.playlist)
+  }, 1000)
 }
