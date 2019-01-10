@@ -217,11 +217,13 @@ export class AudioH5 {
   }
 
   unload () {
-    this.stop()
-    this._unregisterEvent()
-    this.audioH5.src = defaultSrc
-    this.audioH5 = null
-    this.isInit = false
+    if (this._checkInit()) {
+      this.stop()
+      this._unregisterEvent()
+      this.audioH5.src = defaultSrc
+      this.audioH5 = null
+      this.isInit = false
+    }
   }
 
   /* set play model */
@@ -238,7 +240,7 @@ export class AudioH5 {
 
   /* add event to events queue */
   on (event, cb) {
-    if (this._checkType(event, 'string', true) && this._checkType(cb, 'function', true)) {
+    if (this._checkInit() && this._checkType(event, 'string', true) && this._checkType(cb, 'function', true)) {
       const queueName = event.indexOf('on') === 0 ? event : `on${event}`
       this._onEvent(queueName, cb)
     }
@@ -246,7 +248,7 @@ export class AudioH5 {
 
   /* remove event from events queue */
   off (event, cb) {
-    if (this._checkType(event, 'string', true)) {
+    if (this._checkInit() && this._checkType(event, 'string', true)) {
       const queueName = event.indexOf('on') === 0 ? event : `on${event}`
       this._offEvent(queueName, cb)
     }
@@ -254,7 +256,7 @@ export class AudioH5 {
 
   /* fire only one time */
   once (event, cb) {
-    if (this._checkType(event, 'string', true) && this._checkType(cb, 'function', true)) {
+    if (this._checkInit() && this._checkType(event, 'string', true) && this._checkType(cb, 'function', true)) {
       const queueName = event.indexOf('on') === 0 ? event : `on${event}`
       const funcName = `EASE_AUDIO_${queueName.toUpperCase()}_ONCE_CALLBACK`
       const once = e => {
@@ -267,7 +269,7 @@ export class AudioH5 {
 
   /* set play list */
   playlist ({action, list, playId}) {
-    if (this._checkType(action, 'string', true) && (!list || this._checkType(list, 'array', true)) && (!playId || this._checkType(playId, 'number', true))) {
+    if (this._checkInit() && this._checkType(action, 'string', true) && (!list || this._checkType(list, 'array', true)) && (!playId || this._checkType(playId, 'number', true))) {
       this._updatePlayList({action, list, playId})
 
       return this._returnParams()
@@ -436,7 +438,24 @@ export class AudioH5 {
         if (playId && list) {
           for (let i = 0; i < this.playList.length; i++) {
             if (this.playList[i].playId === playId) {
-              return this.playList.splice(i, 0, ...list)
+              return this.playList.splice(i, 0, ...list.map(v => {
+                v.playId = this.idCounter
+                this.idCounter++
+                return v
+              }))
+            }
+          }
+        }
+        break
+      case 'replace':
+        if (playId && list) {
+          for (let i = 0; i < this.playList.length; i++) {
+            if (this.playList[i].playId === playId) {
+              return this.playList.splice(i, 1, ...list.map(v => {
+                v.playId = this.idCounter
+                this.idCounter++
+                return v
+              }))
             }
           }
         }
