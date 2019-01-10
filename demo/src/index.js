@@ -20,6 +20,7 @@ const offBtn = document.createElement('button')
 const onceBtn = document.createElement('button')
 const pickBtn = document.createElement('button')
 const replaceListBtn = document.createElement('button')
+const updateListBtn = document.createElement('button')
 
 initBtn.innerText = '初始化'
 initBtn.onclick = init
@@ -88,6 +89,10 @@ rootDom.appendChild(pickBtn)
 replaceListBtn.innerText = '替换list的某个item'
 replaceListBtn.onclick = replace
 rootDom.appendChild(replaceListBtn)
+
+updateListBtn.innerText = '更新list的某个item'
+updateListBtn.onclick = update
+rootDom.appendChild(updateListBtn)
 
 function init () {
   const config = {
@@ -192,6 +197,18 @@ function replace () {
     audio.playlist = {
       action: 'replace',
       list: [{src: 'http://audio.xmcdn.com/group21/M0B/2E/08/wKgJLVrpYaLCVIMPABFX6j5WjMk013.m4a', tag: 'this is new item'}],
+      playId: 1001
+    }
+    console.log('after', audio.playlist)
+  }, 2000)
+}
+
+function update () {
+  console.log('before', audio.playlist)
+  setTimeout(() => {
+    audio.playlist = {
+      action: 'update',
+      params: {src: 'http://audio.xmcdn.com/group21/M0B/2E/08/wKgJLVrpYaLCVIMPABFX6j5WjMk013.m4a', tag: 'this is update item'},
       playId: 1001
     }
     console.log('after', audio.playlist)

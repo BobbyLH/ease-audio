@@ -268,9 +268,10 @@ export class AudioH5 {
   }
 
   /* set play list */
-  playlist ({action, list, playId}) {
-    if (this._checkInit() && this._checkType(action, 'string', true) && (!list || this._checkType(list, 'array', true)) && (!playId || this._checkType(playId, 'number', true))) {
-      this._handlePlayList({action, list, playId})
+  playlist (data) {
+    const {action, list, playId, params} = data
+    if (this._checkInit() && this._checkType(action, 'string', true) && (!list || this._checkType(list, 'array', true)) && (!playId || this._checkType(playId, 'number', true)) && (!params || this._checkType(params, 'object', true))) {
+      this._handlePlayList(data)
 
       return this._returnParams()
     }
