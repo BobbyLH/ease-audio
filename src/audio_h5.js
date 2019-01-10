@@ -270,7 +270,7 @@ export class AudioH5 {
   /* set play list */
   playlist ({action, list, playId}) {
     if (this._checkInit() && this._checkType(action, 'string', true) && (!list || this._checkType(list, 'array', true)) && (!playId || this._checkType(playId, 'number', true))) {
-      this._updatePlayList({action, list, playId})
+      this._handlePlayList({action, list, playId})
 
       return this._returnParams()
     }
@@ -290,12 +290,24 @@ export class AudioH5 {
     this.playList = new Array(0)
     this.buffered = new Array(0)
     this.eventController = new Array(0)
-    this.eventMethods = {}
+    this.eventMethods = Object.create(null)
 
     // playlist convert to src
     let src
     if (config.playlist && this._checkType(config.playlist, 'array')) {
-      this.playlist({action: 'add', list: config.playlist})
+      for (let i = 0; i < config.playlist.length; i++) {
+        if (this._checkType(config.playlist[i], 'object')) continue
+        config.playlist[i] = Object.create(null, {
+          src: {
+            writable: true,
+            enumerable: true,
+            configurable: true,
+            value: config.playlist[i]
+          }
+        })
+      }
+      this._handlePlayList({action: 'add', list: config.playlist})
+
       src = config.playlist[0] && config.playlist[0].src
       if (!src || !this._checkType(src, 'string')) {
         src = defaultSrc
@@ -413,8 +425,8 @@ export class AudioH5 {
     this._setPlayIndex(0)
   }
 
-  /* update play list */
-  _updatePlayList ({action, list, playId}) {
+  /* handle play list */
+  _handlePlayList ({action, list, playId, params}) {
     switch (action) {
       case 'add':
         this.playList = [...this.playList, ...list.map(v => {
@@ -456,6 +468,16 @@ export class AudioH5 {
                 this.idCounter++
                 return v
               }))
+            }
+          }
+        }
+        break
+      case 'update':
+        if (playId && list) {
+          for (let i = 0; i < this.playList.length; i++) {
+            if (this.playList[i].playId === playId) {
+              const newData = {...this.playList[i], ...params}
+              return this.playList.splice(i, 1, newData)
             }
           }
         }

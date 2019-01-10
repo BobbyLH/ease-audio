@@ -18,7 +18,7 @@ In the browser:
 <script>
     const EaseAudio = window.EaseAudio.default
     var sound = new EaseAudio({
-      src: 'sound.mp3'
+      playlist: ['sound.mp3']
     });
 </script>
 ```
@@ -30,7 +30,7 @@ In the browser:
 ### Most basic:
 ```javascript
 var sound = new EaseAudio({
-  playlist: [{src: 'sound.mp3'}]
+  playlist: ['sound.mp3', 'sound2.mp3']
 });
 
 sound.play();
@@ -40,8 +40,8 @@ sound.play();
 ```javascript
 var sound = new EaseAudio({
   playlist: [
-    {src: 'sound1.mp3'}, 
-    {src: 'sound2.mp3'}
+    {src: 'sound1.mp3', tag: 'your tag'}, 
+    {src: 'sound2.mp3', tag: 'your tag'}
   ],
   volume: 1,
   playModel: 'list-once',
@@ -76,7 +76,7 @@ var sound = new EaseAudio({
 ### Listen for events:
 ```javascript
 var sound = new EaseAudio({
-  playlist: [{src: 'sound.mp3'}]
+  playlist: ['sound.mp3']
 });
 
 // Clear listener after first call.
@@ -101,7 +101,7 @@ import EaseAudio from 'ease-audio';
 
 // Setup the new EaseAudio.
 const sound = new EaseAudio({
-  playlist: [{src: 'sound.mp3'}]
+  playlist: ['sound.mp3']
 });
 
 // load the sound.
@@ -259,11 +259,12 @@ Return the current playing item data.
 #### playlist `Array`
 Return the playlist.
 
-#### playlist = `{action, list, playId}`
+#### playlist = `{action, list, playId, params}`
 Set the playlist according to `action` and `playId` arguments.
-* **action**: `String` Action of setting (`add`, `delete`, `insert`, `reset`).
-* **list**: `Array` `optional` Add/insert list to playlist when the action is `add` or `insert`.
-* **playId**: `Array` `optional` Delete a item according to playId.
+* **action**: `String` Action of setting (`add`, `delete`, `insert`, `replace`, `update`,  `reset`).
+* **list**: `Array` `optional` Add/insert/replace the list to playlist when the action is `add`, `insert`, `replace`.
+* **playId**: `Array` `optional` Delete/insert/replace/update a item according to playId.
+* **params**: `Object` `optional` Update a item  from params according to playId.
 
 #### networkState `String`
 Return the track network state.

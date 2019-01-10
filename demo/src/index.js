@@ -102,7 +102,7 @@ function init () {
     onprogress: e => console.log('onprogress:', e),
     playlist: [
       {src: 'http://audio.xmcdn.com/group29/M01/AA/71/wKgJXVrpaoXApbrYABINQqa4hlE219.m4a'},
-      {src: 'http://audio.xmcdn.com/group36/M0A/28/2C/wKgJUloyLSPzMzrUAA_CiRLIGrE559.m4a'},
+      'http://audio.xmcdn.com/group36/M0A/28/2C/wKgJUloyLSPzMzrUAA_CiRLIGrE559.m4a',
       {src: 'http://audio.xmcdn.com/group21/M0B/2E/08/wKgJLVrpYaLCVIMPABFX6j5WjMk013.m4a'}
     ]
   }
@@ -195,5 +195,5 @@ function replace () {
       playId: 1001
     }
     console.log('after', audio.playlist)
-  }, 1000)
+  }, 2000)
 }
