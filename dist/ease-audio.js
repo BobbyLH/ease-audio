@@ -607,7 +607,7 @@
         // Set @@toStringTag to native iterators
         _setToStringTag(IteratorPrototype, TAG, true);
         // fix for some old engines
-        if (!_library && typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
+        if (typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
       }
     }
     // fix Array#{values, @@iterator}.name in V8 / FF
@@ -616,7 +616,7 @@
       $default = function values() { return $native.call(this); };
     }
     // Define iterator
-    if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+    if (BUGGY || VALUES_BUG || !proto[ITERATOR]) {
       _hide(proto, ITERATOR, $default);
     }
     // Plug for library
@@ -1732,7 +1732,7 @@
 
   var playStateSet = ['loading', 'playing', 'paused', 'stopped', 'ended', 'loaderror', 'playerror'];
   var playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 'single-loop'];
-  var supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onload', 'oncanplay', 'onprogress', 'onvolume', 'onseek', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick'];
+  var supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onload', 'oncanplay', 'onprogress', 'onvolume', 'onseeking', 'onseeked', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick'];
   var logLevel = ['detail', 'info', 'warn', 'error', 'silent'];
   var defaultSrc = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
   var AudioH5 =
@@ -2518,9 +2518,11 @@
             _this4._fireEventQueue(e, 'oncanplay');
           },
           seeking: function seeking(e) {
-            _this4._fireEventQueue(e, 'onseek');
+            _this4._fireEventQueue(e, 'onseeking');
           },
-          seeked: function seeked(e) {},
+          seeked: function seeked(e) {
+            _this4._fireEventQueue(e, 'onseeked');
+          },
           play: function play(e) {},
           volumechange: function volumechange(e) {
             _this4._fireEventQueue(e, 'onvolume');
