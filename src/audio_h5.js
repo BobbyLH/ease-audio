@@ -12,7 +12,7 @@ const playStateSet = [
 
 const playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 'single-loop']
 
-const supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onload', 'oncanplay', 'onprogress', 'onvolume', 'onseek', 'onseeked', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick']
+const supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onload', 'oncanplay', 'onprogress', 'onvolume', 'onseeking', 'onseeked', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick']
 
 const logLevel = ['detail', 'info', 'warn', 'error', 'silent']
 
@@ -649,7 +649,7 @@ export class AudioH5 {
         this._fireEventQueue(e, 'oncanplay')
       },
       seeking: e => {
-        this._fireEventQueue(e, 'onseek')
+        this._fireEventQueue(e, 'onseeking')
       },
       seeked: e => {
         this._fireEventQueue(e, 'onseeked')
