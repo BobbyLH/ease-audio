@@ -1797,9 +1797,11 @@
 
 
             if (this.audioH5.paused) {
+              var err = "Playback was unable to start. This is most commonly an issue on mobile devices and Chrome where playback was not within a user interaction.";
+
               this._setPlayState(playStateSet[6]);
 
-              this._fireEventQueue(this.playId, 'onplayerror');
+              this._fireEventQueue(err, 'onplayerror');
             }
           } catch (err) {
             this._setPlayState(playStateSet[6]);
