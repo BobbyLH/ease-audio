@@ -163,7 +163,9 @@ Fires when the sound has been muted/unmuted. The first parameter is the event ob
 Fires when the sound's volume has changed. The first parameter is the event object.
 #### onrate `Function`
 Fires when the sound's playback rate has changed. The first parameter is the event object.
-#### onseek `Function`
+#### onseeking `Function`
+Fires when the sound start seeking. The first parameter is the event object.
+#### onseeked `Function`
 Fires when the sound has been seeked. The first parameter is the event object.
 #### oncut `Function`
 Fires when the sound has been cutted. The first parameter is the ID of the sound.
