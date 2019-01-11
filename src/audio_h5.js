@@ -79,8 +79,10 @@ export class AudioH5 {
 
         // If the sound is still paused, then we can assume there was a playback issue.
         if (this.audioH5.paused) {
+          const err = `Playback was unable to start. This is most commonly an issue on mobile devices and Chrome where playback was not within a user interaction.`
+
           this._setPlayState(playStateSet[6])
-          this._fireEventQueue(this.playId, 'onplayerror')
+          this._fireEventQueue(err, 'onplayerror')
         }
       } catch (err) {
         this._setPlayState(playStateSet[6])

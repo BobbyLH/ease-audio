@@ -145,10 +145,6 @@ Set to `true` to load the audio muted.
 The rate of playback. 0.5 to 2.0, with 1.0 being normal speed.
 #### onload `Function`
 Fires when the sound is start loading.
-#### onloaderror `Function`
-Fires when the sound is unable to load. The first parameter is the event object.
-#### onplayerror `Function`
-Fires when the sound is unable to play. The first parameter is the event object.
 #### onplay `Function`
 Fires when the sound begins playing. The first parameter is the event object.
 #### onend `Function`
@@ -171,6 +167,10 @@ Fires when the sound has been seeked. The first parameter is the event object.
 Fires when the sound has been cutted. The first parameter is the ID of the sound.
 #### onpick `Function`
 Fires when the sound has been picked. The first parameter is the ID of the sound.
+#### onloaderror `Function`
+Fires when the sound is unable to load. The first parameter is the event object.
+#### onplayerror `Function`
+Fires when the sound is unable to play. The first parameter is the error message.
 #### usingWebAudio `Boolean`
 `true` if the Web Audio API is available.
 #### debug `Boolean` `false`
