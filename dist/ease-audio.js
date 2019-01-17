@@ -664,6 +664,44 @@
   _addToUnscopables('values');
   _addToUnscopables('entries');
 
+  // most Object methods by ES6 should accept primitives
+
+
+
+  var _objectSap = function (KEY, exec) {
+    var fn = (_core.Object || {})[KEY] || Object[KEY];
+    var exp = {};
+    exp[KEY] = exec(fn);
+    _export(_export.S + _export.F * _fails(function () { fn(1); }), 'Object', exp);
+  };
+
+  // 19.1.2.14 Object.keys(O)
+
+
+
+  _objectSap('keys', function () {
+    return function keys(it) {
+      return _objectKeys(_toObject(it));
+    };
+  });
+
+  var dP$1 = _objectDp.f;
+  var FProto = Function.prototype;
+  var nameRE = /^\s*function ([^ (]*)/;
+  var NAME = 'name';
+
+  // 19.2.4.2 name
+  NAME in FProto || _descriptors && dP$1(FProto, NAME, {
+    configurable: true,
+    get: function () {
+      try {
+        return ('' + this).match(nameRE)[1];
+      } catch (e) {
+        return '';
+      }
+    }
+  });
+
   var ITERATOR$1 = _wks('iterator');
   var TO_STRING_TAG = _wks('toStringTag');
   var ArrayValues = _iterators.Array;
@@ -703,56 +741,18 @@
   };
 
   for (var collections = _objectKeys(DOMIterables), i = 0; i < collections.length; i++) {
-    var NAME = collections[i];
-    var explicit = DOMIterables[NAME];
-    var Collection = _global[NAME];
+    var NAME$1 = collections[i];
+    var explicit = DOMIterables[NAME$1];
+    var Collection = _global[NAME$1];
     var proto = Collection && Collection.prototype;
     var key;
     if (proto) {
       if (!proto[ITERATOR$1]) _hide(proto, ITERATOR$1, ArrayValues);
-      if (!proto[TO_STRING_TAG]) _hide(proto, TO_STRING_TAG, NAME);
-      _iterators[NAME] = ArrayValues;
+      if (!proto[TO_STRING_TAG]) _hide(proto, TO_STRING_TAG, NAME$1);
+      _iterators[NAME$1] = ArrayValues;
       if (explicit) for (key in es6_array_iterator) if (!proto[key]) _redefine(proto, key, es6_array_iterator[key], true);
     }
   }
-
-  // most Object methods by ES6 should accept primitives
-
-
-
-  var _objectSap = function (KEY, exec) {
-    var fn = (_core.Object || {})[KEY] || Object[KEY];
-    var exp = {};
-    exp[KEY] = exec(fn);
-    _export(_export.S + _export.F * _fails(function () { fn(1); }), 'Object', exp);
-  };
-
-  // 19.1.2.14 Object.keys(O)
-
-
-
-  _objectSap('keys', function () {
-    return function keys(it) {
-      return _objectKeys(_toObject(it));
-    };
-  });
-
-  var dP$1 = _objectDp.f;
-  var FProto = Function.prototype;
-  var nameRE = /^\s*function ([^ (]*)/;
-  var NAME$1 = 'name';
-
-  // 19.2.4.2 name
-  NAME$1 in FProto || _descriptors && dP$1(FProto, NAME$1, {
-    configurable: true,
-    get: function () {
-      try {
-        return ('' + this).match(nameRE)[1];
-      } catch (e) {
-        return '';
-      }
-    }
-  });
 
   // getting tag from 19.1.3.6 Object.prototype.toString()
 
@@ -1788,7 +1788,18 @@
             var play = this.audioH5.play();
 
             if (play && typeof Promise !== 'undefined' && (play instanceof Promise || typeof play.then === 'function')) {
-              play.catch(function (err) {
+              this.playLocker = true;
+              play.then(function () {
+                _this.playLocker = false;
+
+                _this.lockQueue.forEach(function (v) {
+                  return v && v();
+                });
+
+                _this.lockQueue.splice(0);
+              }).catch(function (err) {
+                _this.playLocker = false;
+
                 _this._setPlayState(playStateSet[6]);
 
                 _this._fireEventQueue(err, 'onplayerror');
@@ -1815,8 +1826,13 @@
     }, {
       key: "pause",
       value: function pause() {
+        var _this2 = this;
+
         if (this._checkInit()) {
-          this.audioH5.pause();
+          this._playLockQueue(function () {
+            return _this2.audioH5.pause();
+          });
+
           return this.playId;
         }
       }
@@ -1878,6 +1894,8 @@
     }, {
       key: "seek",
       value: function seek(val) {
+        var _this3 = this;
+
         if (this._checkInit()) {
           if (this._checkType(val, 'number')) {
             // IE cannot set currentTime when the metaData is loading
@@ -1890,7 +1908,10 @@
             if (val > duration) val = duration;
             if (val < 0) val = 0;
             this.seekValue = null;
-            this.audioH5.currentTime = val;
+
+            this._playLockQueue(function () {
+              return _this3.audioH5.currentTime = val;
+            });
           } else {
             return this.audioH5.currentTime;
           }
@@ -1899,11 +1920,16 @@
     }, {
       key: "rate",
       value: function rate(val) {
+        var _this4 = this;
+
         if (this._checkInit()) {
           if (this._checkType(val, 'number')) {
             if (val > 2) val = 2;
             if (val < 0.5) val = 0.5;
-            this.audioH5.playbackRate = val;
+
+            this._playLockQueue(function () {
+              return _this4.audioH5.playbackRate = val;
+            });
 
             this._updateConfig({
               rate: val
@@ -1916,12 +1942,17 @@
     }, {
       key: "volume",
       value: function volume(val) {
+        var _this5 = this;
+
         if (this._checkInit()) {
           if (this._checkType(val, 'number')) {
             if (val > 1) val = 1;
             if (val < 0) val = 0;
-            this.audioH5.muted = false;
-            this.audioH5.volume = val;
+
+            this._playLockQueue(function () {
+              _this5.audioH5.muted = false;
+              _this5.audioH5.volume = val;
+            });
 
             this._updateConfig({
               volume: val
@@ -1934,9 +1965,13 @@
     }, {
       key: "muted",
       value: function muted(bool) {
+        var _this6 = this;
+
         if (this._checkInit()) {
           if (this._checkType(bool, 'boolean', true)) {
-            this.audioH5.muted = bool;
+            this._playLockQueue(function () {
+              return _this6.audioH5.muted = bool;
+            });
 
             this._updateConfig({
               muted: bool
@@ -2018,7 +2053,7 @@
     }, {
       key: "once",
       value: function once(event, cb) {
-        var _this2 = this;
+        var _this7 = this;
 
         if (this._checkInit() && this._checkType(event, 'string', true) && this._checkType(cb, 'function', true)) {
           var queueName = event.indexOf('on') === 0 ? event : "on".concat(event);
@@ -2027,7 +2062,7 @@
           var once = function once(e) {
             cb && cb(e);
 
-            _this2._offEvent(queueName, once, funcName);
+            _this7._offEvent(queueName, once, funcName);
           };
 
           this._onEvent(queueName, once, funcName);
@@ -2060,6 +2095,8 @@
         this.debug = config.debug || false;
         this.logLevel = logLevel.indexOf(config.logLevel) !== -1 && config.logLevel || logLevel[3];
         this.idCounter = 1000;
+        this.lockQueue = new Array(0);
+        this.playLocker = false;
         this.playId = 1000;
         this.playModel = playModelSet.indexOf(config.playModel) !== -1 && config.playModel || config.loop && playModelSet[3] || playModelSet[0];
         this.playIndex = 0;
@@ -2237,7 +2274,7 @@
     }, {
       key: "_handlePlayList",
       value: function _handlePlayList(_ref) {
-        var _this3 = this;
+        var _this8 = this;
 
         var action = _ref.action,
             list = _ref.list,
@@ -2247,9 +2284,9 @@
         switch (action) {
           case 'add':
             this.playList = [].concat(_toConsumableArray(this.playList), _toConsumableArray(list.map(function (v) {
-              if (_this3._checkType(v, 'object')) {
-                v.playId = _this3.idCounter;
-                _this3.idCounter++;
+              if (_this8._checkType(v, 'object')) {
+                v.playId = _this8.idCounter;
+                _this8.idCounter++;
                 return v;
               }
             })));
@@ -2273,8 +2310,8 @@
                   var _this$playList;
 
                   return (_this$playList = this.playList).splice.apply(_this$playList, [_i, 0].concat(_toConsumableArray(list.map(function (v) {
-                    v.playId = _this3.idCounter;
-                    _this3.idCounter++;
+                    v.playId = _this8.idCounter;
+                    _this8.idCounter++;
                     return v;
                   }))));
                 }
@@ -2290,8 +2327,8 @@
                   var _this$playList2;
 
                   return (_this$playList2 = this.playList).splice.apply(_this$playList2, [_i2, 1].concat(_toConsumableArray(list.map(function (v) {
-                    v.playId = _this3.idCounter;
-                    _this3.idCounter++;
+                    v.playId = _this8.idCounter;
+                    _this8.idCounter++;
                     return v;
                   }))));
                 }
@@ -2396,11 +2433,11 @@
     }, {
       key: "_registerEvent",
       value: function _registerEvent(config) {
-        var _this4 = this;
+        var _this9 = this;
 
         var curry = function curry(cb, eventName) {
           return function (e) {
-            if (!_this4._triggerEventController(eventName)) return;
+            if (!_this9._triggerEventController(eventName)) return;
             return cb && cb(e);
           };
         };
@@ -2412,48 +2449,48 @@
           if (v.indexOf('on') === 0) {
             var funcName = "EASE_AUDIO_".concat(v.toUpperCase(), "_INITIAL_CALLBACK");
 
-            _this4._onEvent(v, config[v], funcName);
+            _this9._onEvent(v, config[v], funcName);
           }
         });
         this.eventMethods = {
           // loading state
           loadstart: function loadstart(e) {
-            _this4.playState === playStateSet[1] && _this4._setPlayState(playStateSet[0]);
+            _this9.playState === playStateSet[1] && _this9._setPlayState(playStateSet[0]);
 
-            _this4._fireEventQueue(e, 'onload');
+            _this9._fireEventQueue(e, 'onload');
           },
           // playing state
           playing: function playing(e) {
-            _this4._setPlayState(playStateSet[1]);
+            _this9._setPlayState(playStateSet[1]);
 
-            _this4._fireEventQueue(e, 'onplay');
+            _this9._fireEventQueue(e, 'onplay');
           },
           canplaythrough: function canplaythrough(e) {
-            _this4.playState === playStateSet[0] && _this4._setPlayState(playStateSet[1]);
+            _this9.playState === playStateSet[0] && _this9._setPlayState(playStateSet[1]);
           },
           // paused state
           pause: function pause(e) {
-            _this4._setPlayState(playStateSet[2]);
+            _this9._setPlayState(playStateSet[2]);
 
-            _this4._fireEventQueue(e, 'onpause');
+            _this9._fireEventQueue(e, 'onpause');
           },
           // ended state
           ended: function ended(e) {
-            if (_this4.isEnd) {
-              _this4.isEnd = false;
+            if (_this9.isEnd) {
+              _this9.isEnd = false;
             } else {
-              _this4.isEnd = true;
+              _this9.isEnd = true;
 
-              _this4._fireEventQueue(e, 'onend');
+              _this9._fireEventQueue(e, 'onend');
 
-              _this4.config.endAutoCut && _this4._cut(true);
+              _this9.config.endAutoCut && _this9._cut(true);
             }
           },
           // loaderror state
           error: function error(e) {
-            _this4._setPlayState(playStateSet[5]);
+            _this9._setPlayState(playStateSet[5]);
 
-            _this4._fireEventQueue(e, 'onloaderror');
+            _this9._fireEventQueue(e, 'onloaderror');
           },
           // others
           progress: function progress(e) {
@@ -2465,7 +2502,7 @@
 
             if (ranges && ranges.length) {
               for (var i = 0, j = ranges.length; i < j; i++) {
-                _this4.buffered.push({
+                _this9.buffered.push({
                   'start': ranges.start(i) * 1000,
                   'end': ranges.end(i) * 1000
                 });
@@ -2476,61 +2513,61 @@
               progress = loaded / total;
             }
 
-            _this4._fireEventQueue({
+            _this9._fireEventQueue({
               e: e,
               progress: progress
             }, 'onprogress');
           },
           durationchange: function durationchange(e) {},
           loadedmetadata: function loadedmetadata(e) {
-            _this4.metaDataLoaded = true;
-            _this4.seekValue && _this4.seek(_this4.seekValue);
+            _this9.metaDataLoaded = true;
+            _this9.seekValue && _this9.seek(_this9.seekValue);
           },
           loadeddata: function loadeddata(e) {},
           timeupdate: function timeupdate(e) {
             // playState is loading but actually is playing
-            if (_this4.playState === playStateSet[0]) {
-              _this4._logInfo("timeupdate's playing");
+            if (_this9.playState === playStateSet[0]) {
+              _this9._logInfo("timeupdate's playing");
 
-              _this4._setPlayState(playStateSet[1]);
+              _this9._setPlayState(playStateSet[1]);
 
-              _this4._fireEventQueue(e, 'onplay');
+              _this9._fireEventQueue(e, 'onplay');
             } // Depending on currentTime and duration to mimic end event
 
 
-            var isEnd = _this4.audioH5.duration && _this4.audioH5.currentTime === _this4.audioH5.duration;
+            var isEnd = _this9.audioH5.duration && _this9.audioH5.currentTime === _this9.audioH5.duration;
 
             if (isEnd) {
-              _this4._logInfo("timeupdate's ended");
+              _this9._logInfo("timeupdate's ended");
 
-              if (_this4.isEnd) {
-                _this4.isEnd = false;
+              if (_this9.isEnd) {
+                _this9.isEnd = false;
               } else {
-                _this4.isEnd = true;
+                _this9.isEnd = true;
 
-                _this4._fireEventQueue(e, 'onend');
+                _this9._fireEventQueue(e, 'onend');
 
-                _this4.config.endAutoCut && _this4._cut(true);
+                _this9.config.endAutoCut && _this9._cut(true);
               }
             }
 
-            _this4._fireEventQueue(e, 'ontimeupdate');
+            _this9._fireEventQueue(e, 'ontimeupdate');
           },
           canplay: function canplay(e) {
-            _this4._fireEventQueue(e, 'oncanplay');
+            _this9._fireEventQueue(e, 'oncanplay');
           },
           seeking: function seeking(e) {
-            _this4._fireEventQueue(e, 'onseeking');
+            _this9._fireEventQueue(e, 'onseeking');
           },
           seeked: function seeked(e) {
-            _this4._fireEventQueue(e, 'onseeked');
+            _this9._fireEventQueue(e, 'onseeked');
           },
           play: function play(e) {},
           volumechange: function volumechange(e) {
-            _this4._fireEventQueue(e, 'onvolume');
+            _this9._fireEventQueue(e, 'onvolume');
           },
           ratechange: function ratechange(e) {
-            _this4._fireEventQueue(e, 'onrate');
+            _this9._fireEventQueue(e, 'onrate');
           },
           abort: function abort(e) {},
           suspend: function suspend(e) {}
@@ -2604,6 +2641,19 @@
         if (!this._checkType(event, 'string')) return this._logErr("removeEvent - unbind event name is not string");
         this._checkType(cb, 'function', true) && removeListener(event, cb, this.audioH5);
       }
+      /* playLock queue handle */
+
+    }, {
+      key: "_playLockQueue",
+      value: function _playLockQueue(fn) {
+        if (this.playLocker) {
+          return this.lockQueue.push(fn);
+        }
+
+        return fn && fn();
+      }
+      /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
       /* check type */
 
     }, {
