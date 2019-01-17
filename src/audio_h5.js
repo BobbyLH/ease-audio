@@ -644,7 +644,7 @@ export class AudioH5 {
         }
 
         // Depending on currentTime and duration to mimic end event
-        const isEnd = this.audioH5.duration && this.audioH5.currentTime === this.audioH5.duration
+        const isEnd = this.audioH5.duration && +this.audioH5.currentTime >= +this.audioH5.duration
         if (isEnd) {
           this._logInfo("timeupdate's ended")
           if (this.isEnd) {
