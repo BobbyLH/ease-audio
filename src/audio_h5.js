@@ -74,10 +74,11 @@ export class AudioH5 {
           this.playLocker = true
 
           play.then(() => {
-            this.playLocker = false
             this.lockQueue.forEach(v => v && v())
             this.lockQueue.splice(0)
+            this.playLocker = false
           }).catch(err => {
+            this.lockQueue.splice(0)
             this.playLocker = false
             this._setPlayState(playStateSet[6])
             this._fireEventQueue(err, 'onplayerror')
