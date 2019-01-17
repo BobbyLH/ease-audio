@@ -2535,7 +2535,7 @@
             } // Depending on currentTime and duration to mimic end event
 
 
-            var isEnd = _this9.audioH5.duration && _this9.audioH5.currentTime === _this9.audioH5.duration;
+            var isEnd = _this9.audioH5.duration && +_this9.audioH5.currentTime >= +_this9.audioH5.duration;
 
             if (isEnd) {
               _this9._logInfo("timeupdate's ended");
