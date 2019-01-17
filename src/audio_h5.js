@@ -71,7 +71,14 @@ export class AudioH5 {
         let play = this.audioH5.play()
 
         if (play && typeof Promise !== 'undefined' && (play instanceof Promise || typeof play.then === 'function')) {
-          play.catch(err => {
+          this.playLocker = true
+
+          play.then(() => {
+            this.playLocker = false
+            this.lockQueue.forEach(v => v && v())
+            this.lockQueue.splice(0)
+          }).catch(err => {
+            this.playLocker = false
             this._setPlayState(playStateSet[6])
             this._fireEventQueue(err, 'onplayerror')
           })
@@ -94,7 +101,7 @@ export class AudioH5 {
 
   pause () {
     if (this._checkInit()) {
-      this.audioH5.pause()
+      this._playLockQueue(() => this.audioH5.pause())
 
       return this.playId
     }
@@ -160,7 +167,7 @@ export class AudioH5 {
         if (val > duration) val = duration
         if (val < 0) val = 0
         this.seekValue = null
-        this.audioH5.currentTime = val
+        this._playLockQueue(() => (this.audioH5.currentTime = val))
       } else {
         return this.audioH5.currentTime
       }
@@ -172,7 +179,7 @@ export class AudioH5 {
       if (this._checkType(val, 'number')) {
         if (val > 2) val = 2
         if (val < 0.5) val = 0.5
-        this.audioH5.playbackRate = val
+        this._playLockQueue(() => (this.audioH5.playbackRate = val))
         this._updateConfig({rate: val})
       } else {
         return this.audioH5.playbackRate
@@ -185,8 +192,10 @@ export class AudioH5 {
       if (this._checkType(val, 'number')) {
         if (val > 1) val = 1
         if (val < 0) val = 0
-        this.audioH5.muted = false
-        this.audioH5.volume = val
+        this._playLockQueue(() => {
+          this.audioH5.muted = false
+          this.audioH5.volume = val
+        })
         this._updateConfig({volume: val})
       } else {
         return this.audioH5.volume
@@ -197,7 +206,7 @@ export class AudioH5 {
   muted (bool) {
     if (this._checkInit()) {
       if (this._checkType(bool, 'boolean', true)) {
-        this.audioH5.muted = bool
+        this._playLockQueue(() => (this.audioH5.muted = bool))
         this._updateConfig({muted: bool})
       } else {
         return this.audioH5.muted
@@ -287,6 +296,8 @@ export class AudioH5 {
     this.debug = config.debug || false
     this.logLevel = (logLevel.indexOf(config.logLevel) !== -1 && config.logLevel) || logLevel[3]
     this.idCounter = 1000
+    this.lockQueue = new Array(0)
+    this.playLocker = false
     this.playId = 1000
     this.playModel = (playModelSet.indexOf(config.playModel) !== -1 && config.playModel) || (config.loop && playModelSet[3]) || playModelSet[0]
     this.playIndex = 0
@@ -720,6 +731,15 @@ export class AudioH5 {
     this._checkType(cb, 'function', true) && removeListener(event, cb, this.audioH5)
   }
 
+  /* playLock queue handle */
+  _playLockQueue (fn) {
+    if (this.playLocker) {
+      return this.lockQueue.push(fn)
+    }
+
+    return fn && fn()
+  }
+  /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
   /* check type */
   _checkType (element, type, logErr) {
     if (typeof type !== 'string') return this._logWarn('checkType - The type must be string')
