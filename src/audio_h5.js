@@ -7,7 +7,8 @@ const playStateSet = [
   'stopped',
   'ended',
   'loaderror',
-  'playerror'
+  'playerror',
+  'unloaded'
 ]
 
 const playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 'single-loop']
@@ -223,6 +224,7 @@ export class AudioH5 {
           this._setPlayState(playStateSet[3])
           this._fireEventQueue(this.playId, 'onstop')
         }
+
         this.audioH5.currentTime = 0
         this.audioH5.pause()
       })
@@ -233,14 +235,18 @@ export class AudioH5 {
 
   unload (forbidEvent) {
     if (this._checkInit()) {
-      this.stop(forbidEvent)
+      this.stop(true)
       this._unregisterEvent()
 
       this._playLockQueue(() => {
+        if (!forbidEvent) {
+          this._setPlayState(playStateSet[7])
+          this._fireEventQueue(this.playId, 'onunload')
+        }
+
         this.audioH5.src = defaultSrc
         this.audioH5 = null
         this.isInit = false
-        !forbidEvent && this._fireEventQueue(this.playId, 'onunload')
       })
     }
   }
