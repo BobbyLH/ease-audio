@@ -128,7 +128,7 @@ export class AudioH5 {
     if (this._checkInit() && this._checkType(playId, 'number', true)) {
       for (let i = 0; i < this.playList.length; i++) {
         if (this.playList[i].playId === playId) {
-          this.unload()
+          this.unload(true)
 
           this._setPlayIndex(i)
           const src = this.playList[this.playIndex].src
@@ -217,13 +217,12 @@ export class AudioH5 {
 
   stop (forbidEvent) {
     if (this._checkInit() && this.playState !== playStateSet[3]) {
-      if (!forbidEvent) {
-        this._blockEvent({block: true})
-        this._setPlayState(playStateSet[3])
-        this._fireEventQueue(this.playId, 'onstop')
-      }
-
       this._playLockQueue(() => {
+        if (!forbidEvent) {
+          this._blockEvent({block: true})
+          this._setPlayState(playStateSet[3])
+          this._fireEventQueue(this.playId, 'onstop')
+        }
         this.audioH5.currentTime = 0
         this.audioH5.pause()
       })
@@ -232,15 +231,16 @@ export class AudioH5 {
     }
   }
 
-  unload () {
+  unload (forbidEvent) {
     if (this._checkInit()) {
-      this.stop()
+      this.stop(forbidEvent)
       this._unregisterEvent()
+
       this._playLockQueue(() => {
         this.audioH5.src = defaultSrc
         this.audioH5 = null
         this.isInit = false
-        this._fireEventQueue(this.playId, 'onunload')
+        !forbidEvent && this._fireEventQueue(this.playId, 'onunload')
       })
     }
   }
@@ -528,7 +528,7 @@ export class AudioH5 {
         this.audioH5.src = src
         this.load()
       } else {
-        this.unload()
+        this.unload(true)
         const config = {...this.config, src}
         this._createAudio(config)
         this._registerEvent(config)
