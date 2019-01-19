@@ -12,7 +12,7 @@ const playStateSet = [
 
 const playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 'single-loop']
 
-const supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onload', 'oncanplay', 'onprogress', 'onvolume', 'onseeking', 'onseeked', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick']
+const supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onload', 'onunload', 'oncanplay', 'onprogress', 'onvolume', 'onseeking', 'onseeked', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick']
 
 const logLevel = ['detail', 'info', 'warn', 'error', 'silent']
 
@@ -215,16 +215,17 @@ export class AudioH5 {
     }
   }
 
-  stop () {
+  stop (forbidEvent) {
     if (this._checkInit() && this.playState !== playStateSet[3]) {
-      this._blockEvent({block: true})
+      if (!forbidEvent) {
+        this._blockEvent({block: true})
+        this._setPlayState(playStateSet[3])
+        this._fireEventQueue(this.playId, 'onstop')
+      }
 
       this._playLockQueue(() => {
         this.audioH5.currentTime = 0
         this.audioH5.pause()
-
-        this._setPlayState(playStateSet[3])
-        this._fireEventQueue(this.playId, 'onstop')
       })
 
       return this.playId
@@ -239,6 +240,7 @@ export class AudioH5 {
         this.audioH5.src = defaultSrc
         this.audioH5 = null
         this.isInit = false
+        this._fireEventQueue(this.playId, 'onunload')
       })
     }
   }
@@ -512,7 +514,7 @@ export class AudioH5 {
 
   /* cut audio */
   _cut (endCut) {
-    this.stop()
+    this.stop(true)
     // can't cut audio if the playModel is single-once
     if (this._checkInit() && this.playModel !== 'single-once') {
       this.metaDataLoaded = false
