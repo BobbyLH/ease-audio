@@ -15,6 +15,6 @@ module.exports = {
   plugins: [
     resolve(),
     commonjs(),
-    babel({exclude: 'node_modules/**'})
+    babel({exclude: 'node_modules/**', runtimeHelpers: true})
   ]
 }
