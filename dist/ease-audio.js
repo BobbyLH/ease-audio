@@ -106,7 +106,7 @@
     return Object.prototype.toString.call(obj).slice(8, len).toLowerCase();
   };
 
-  const playStateSet = ['loading', 'playing', 'paused', 'stopped', 'ended', 'loaderror', 'playerror'];
+  const playStateSet = ['loading', 'playing', 'paused', 'stopped', 'ended', 'loaderror', 'playerror', 'unloaded'];
   const playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 'single-loop'];
   const supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onload', 'onunload', 'oncanplay', 'onprogress', 'onvolume', 'onseeking', 'onseeked', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick'];
   const logLevel = ['detail', 'info', 'warn', 'error', 'silent'];
@@ -359,15 +359,20 @@
 
     unload(forbidEvent) {
       if (this._checkInit()) {
-        this.stop(forbidEvent);
+        this.stop(true);
 
         this._unregisterEvent();
 
         this._playLockQueue(() => {
+          if (!forbidEvent) {
+            this._setPlayState(playStateSet[7]);
+
+            this._fireEventQueue(this.playId, 'onunload');
+          }
+
           this.audioH5.src = defaultSrc;
           this.audioH5 = null;
           this.isInit = false;
-          !forbidEvent && this._fireEventQueue(this.playId, 'onunload');
         });
       }
     }
