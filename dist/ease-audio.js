@@ -258,7 +258,8 @@
 
     load() {
       if (this._checkInit()) {
-        this.audioH5.load();
+        this._playLockQueue(() => this.audioH5.load());
+
         return this.playId;
       }
     }
@@ -341,12 +342,14 @@
           block: true
         });
 
-        this.audioH5.currentTime = 0;
-        this.audioH5.pause();
+        this._playLockQueue(() => {
+          this.audioH5.currentTime = 0;
+          this.audioH5.pause();
 
-        this._setPlayState(playStateSet[3]);
+          this._setPlayState(playStateSet[3]);
 
-        this._fireEventQueue(this.playId, 'onstop');
+          this._fireEventQueue(this.playId, 'onstop');
+        });
 
         return this.playId;
       }
@@ -358,9 +361,11 @@
 
         this._unregisterEvent();
 
-        this.audioH5.src = defaultSrc;
-        this.audioH5 = null;
-        this.isInit = false;
+        this._playLockQueue(() => {
+          this.audioH5.src = defaultSrc;
+          this.audioH5 = null;
+          this.isInit = false;
+        });
       }
     }
     /* set play model */
