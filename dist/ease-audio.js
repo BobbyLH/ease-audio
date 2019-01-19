@@ -232,7 +232,7 @@
       if (this._checkInit() && this._checkType(playId, 'number', true)) {
         for (let i = 0; i < this.playList.length; i++) {
           if (this.playList[i].playId === playId) {
-            this.unload();
+            this.unload(true);
 
             this._setPlayIndex(i);
 
@@ -338,17 +338,17 @@
 
     stop(forbidEvent) {
       if (this._checkInit() && this.playState !== playStateSet[3]) {
-        if (!forbidEvent) {
-          this._blockEvent({
-            block: true
-          });
-
-          this._setPlayState(playStateSet[3]);
-
-          this._fireEventQueue(this.playId, 'onstop');
-        }
-
         this._playLockQueue(() => {
+          if (!forbidEvent) {
+            this._blockEvent({
+              block: true
+            });
+
+            this._setPlayState(playStateSet[3]);
+
+            this._fireEventQueue(this.playId, 'onstop');
+          }
+
           this.audioH5.currentTime = 0;
           this.audioH5.pause();
         });
@@ -357,9 +357,9 @@
       }
     }
 
-    unload() {
+    unload(forbidEvent) {
       if (this._checkInit()) {
-        this.stop();
+        this.stop(forbidEvent);
 
         this._unregisterEvent();
 
@@ -367,8 +367,7 @@
           this.audioH5.src = defaultSrc;
           this.audioH5 = null;
           this.isInit = false;
-
-          this._fireEventQueue(this.playId, 'onunload');
+          !forbidEvent && this._fireEventQueue(this.playId, 'onunload');
         });
       }
     }
@@ -723,7 +722,7 @@
           this.audioH5.src = src;
           this.load();
         } else {
-          this.unload();
+          this.unload(true);
           const config = { ...this.config,
             src
           };
@@ -1050,8 +1049,11 @@
       this.seek = this.audio.seek;
       this.volume = this.audio.volume;
       this.muted = this.audio.muted;
-      this.stop = this.audio.stop;
-      this.unload = this.audio.unload;
+
+      this.stop = () => this.audio.stop();
+
+      this.unload = () => this.audio.unload();
+
       this.on = this.audio.on;
       this.off = this.audio.off;
       this.once = this.audio.once;
