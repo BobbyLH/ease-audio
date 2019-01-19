@@ -108,7 +108,7 @@
 
   const playStateSet = ['loading', 'playing', 'paused', 'stopped', 'ended', 'loaderror', 'playerror'];
   const playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 'single-loop'];
-  const supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onload', 'oncanplay', 'onprogress', 'onvolume', 'onseeking', 'onseeked', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick'];
+  const supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onload', 'onunload', 'oncanplay', 'onprogress', 'onvolume', 'onseeking', 'onseeked', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick'];
   const logLevel = ['detail', 'info', 'warn', 'error', 'silent'];
   const defaultSrc = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
   class AudioH5 {
@@ -336,19 +336,21 @@
       }
     }
 
-    stop() {
+    stop(forbidEvent) {
       if (this._checkInit() && this.playState !== playStateSet[3]) {
-        this._blockEvent({
-          block: true
-        });
-
-        this._playLockQueue(() => {
-          this.audioH5.currentTime = 0;
-          this.audioH5.pause();
+        if (!forbidEvent) {
+          this._blockEvent({
+            block: true
+          });
 
           this._setPlayState(playStateSet[3]);
 
           this._fireEventQueue(this.playId, 'onstop');
+        }
+
+        this._playLockQueue(() => {
+          this.audioH5.currentTime = 0;
+          this.audioH5.pause();
         });
 
         return this.playId;
@@ -365,6 +367,8 @@
           this.audioH5.src = defaultSrc;
           this.audioH5 = null;
           this.isInit = false;
+
+          this._fireEventQueue(this.playId, 'onunload');
         });
       }
     }
@@ -703,7 +707,7 @@
 
 
     _cut(endCut) {
-      this.stop(); // can't cut audio if the playModel is single-once
+      this.stop(true); // can't cut audio if the playModel is single-once
 
       if (this._checkInit() && this.playModel !== 'single-once') {
         this.metaDataLoaded = false;
