@@ -12,7 +12,7 @@ const playStateSet = [
 
 const playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 'single-loop']
 
-const supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onload', 'oncanplay', 'onprogress', 'onvolume', 'onseeking', 'onseeked', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick']
+const supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onload', 'onunload', 'oncanplay', 'onprogress', 'onvolume', 'onseeking', 'onseeked', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick']
 
 const logLevel = ['detail', 'info', 'warn', 'error', 'silent']
 
@@ -215,7 +215,7 @@ export class AudioH5 {
     }
   }
 
-  stop () {
+  stop (fireEvent) {
     if (this._checkInit() && this.playState !== playStateSet[3]) {
       this._blockEvent({block: true})
 
@@ -224,7 +224,7 @@ export class AudioH5 {
         this.audioH5.pause()
 
         this._setPlayState(playStateSet[3])
-        this._fireEventQueue(this.playId, 'onstop')
+        fireEvent && this._fireEventQueue(this.playId, 'onstop')
       })
 
       return this.playId
@@ -239,6 +239,7 @@ export class AudioH5 {
         this.audioH5.src = defaultSrc
         this.audioH5 = null
         this.isInit = false
+        this._fireEventQueue(this.playId, 'onunload')
       })
     }
   }

@@ -145,6 +145,8 @@ Set to `true` to load the audio muted.
 The rate of playback. 0.5 to 2.0, with 1.0 being normal speed.
 #### onload `Function`
 Fires when the sound is start loading.
+#### onunload `Function`
+Fires when the sound is start unload.
 #### onplay `Function`
 Fires when the sound begins playing. The first parameter is the event object.
 #### onend `Function`
