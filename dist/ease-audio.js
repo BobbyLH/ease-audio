@@ -2475,7 +2475,7 @@
 
             case playStateSet[1]:
               // playing
-              if (paused || ended || seeking || !isReady) return false;
+              if (paused || seeking || !isReady) return false;
               break;
 
             case playStateSet[2]:
