@@ -599,8 +599,6 @@
       if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
         // Set @@toStringTag to native iterators
         _setToStringTag(IteratorPrototype, TAG, true);
-        // fix for some old engines
-        if (!_library && typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
       }
     }
     // fix Array#{values, @@iterator}.name in V8 / FF
@@ -609,7 +607,7 @@
       $default = function values() { return $native.call(this); };
     }
     // Define iterator
-    if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+    if ((FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
       _hide(proto, ITERATOR, $default);
     }
     // Plug for library
@@ -2757,6 +2755,8 @@
             } else {
               _this12.isEnd = true;
 
+              _this12._setPlayState(playStateSet[4]);
+
               _this12._fireEventQueue(e, 'onend');
 
               _this12.config.endAutoCut && _this12._cut(true);
@@ -2814,12 +2814,14 @@
             const isEnd = _this12.audioH5.duration && +_this12.audioH5.currentTime >= +_this12.audioH5.duration;
 
             if (isEnd) {
-              _this12._logInfo("timeupdate's ended");
-
               if (_this12.isEnd) {
                 _this12.isEnd = false;
               } else {
+                _this12._logInfo("timeupdate's ended");
+
                 _this12.isEnd = true;
+
+                _this12._setPlayState(playStateSet[4]);
 
                 _this12._fireEventQueue(e, 'onend');
 
