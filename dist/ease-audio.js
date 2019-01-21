@@ -348,7 +348,7 @@
     return store[key] || (store[key] = value !== undefined ? value : {});
   })('versions', []).push({
     version: _core.version,
-    mode: 'pure',
+    mode: _library ? 'pure' : 'global',
     copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
   });
   });
@@ -599,6 +599,8 @@
       if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
         // Set @@toStringTag to native iterators
         _setToStringTag(IteratorPrototype, TAG, true);
+        // fix for some old engines
+        if (!_library && typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
       }
     }
     // fix Array#{values, @@iterator}.name in V8 / FF
@@ -607,7 +609,7 @@
       $default = function values() { return $native.call(this); };
     }
     // Define iterator
-    if ((FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+    if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
       _hide(proto, ITERATOR, $default);
     }
     // Plug for library
@@ -949,7 +951,7 @@
 
   var defineProperty$2 = _objectDp.f;
   var _wksDefine = function (name) {
-    var $Symbol = _core.Symbol || (_core.Symbol = {});
+    var $Symbol = _core.Symbol || (_core.Symbol = _library ? {} : _global.Symbol || {});
     if (name.charAt(0) != '_' && !(name in $Symbol)) defineProperty$2($Symbol, name, { value: _wksExt.f(name) });
   };
 
@@ -1981,7 +1983,7 @@
 
   const playStateSet = ['loading', 'playing', 'paused', 'stopped', 'ended', 'loaderror', 'playerror', 'unloaded'];
   const playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 'single-loop'];
-  const supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onload', 'onunload', 'oncanplay', 'onprogress', 'onvolume', 'onseeking', 'onseeked', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick'];
+  const supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onfinish', 'onload', 'onunload', 'oncanplay', 'onprogress', 'onvolume', 'onseeking', 'onseeked', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick'];
   const logLevel = ['detail', 'info', 'warn', 'error', 'silent'];
   const defaultSrc = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
   let AudioH5 =
@@ -2644,9 +2646,10 @@
           this.metaDataLoaded = false;
           this.seekValue = null;
 
-          this._setPlayIndex();
+          this._setPlayIndex(); // on finish
 
-          if (!this.playList[this.playIndex]) return;
+
+          if (!this.playList[this.playIndex]) return this._fireEventQueue(this.playId, 'onfinish');
           const src = this.playList[this.playIndex].src;
 
           if (endCut) {
