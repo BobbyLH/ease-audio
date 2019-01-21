@@ -348,7 +348,7 @@
     return store[key] || (store[key] = value !== undefined ? value : {});
   })('versions', []).push({
     version: _core.version,
-    mode: _library ? 'pure' : 'global',
+    mode: 'pure',
     copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
   });
   });
@@ -599,8 +599,6 @@
       if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
         // Set @@toStringTag to native iterators
         _setToStringTag(IteratorPrototype, TAG, true);
-        // fix for some old engines
-        if (!_library && typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
       }
     }
     // fix Array#{values, @@iterator}.name in V8 / FF
@@ -609,7 +607,7 @@
       $default = function values() { return $native.call(this); };
     }
     // Define iterator
-    if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+    if ((FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
       _hide(proto, ITERATOR, $default);
     }
     // Plug for library
@@ -951,7 +949,7 @@
 
   var defineProperty$2 = _objectDp.f;
   var _wksDefine = function (name) {
-    var $Symbol = _core.Symbol || (_core.Symbol = _library ? {} : _global.Symbol || {});
+    var $Symbol = _core.Symbol || (_core.Symbol = {});
     if (name.charAt(0) != '_' && !(name in $Symbol)) defineProperty$2($Symbol, name, { value: _wksExt.f(name) });
   };
 
@@ -2762,7 +2760,7 @@
 
               _this12._fireEventQueue(e, 'onend');
 
-              _this12.config.endAutoCut && _this12._cut(true);
+              _this12.config.endAutoCut ? _this12._cut(true) : _this12._fireEventQueue(e, 'onfinish');
             }
           },
           // loaderror state
@@ -2828,7 +2826,7 @@
 
                 _this12._fireEventQueue(e, 'onend');
 
-                _this12.config.endAutoCut && _this12._cut(true);
+                _this12.config.endAutoCut ? _this12._cut(true) : _this12._fireEventQueue(e, 'onfinish');
               }
             }
 
