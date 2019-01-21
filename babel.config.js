@@ -3,7 +3,7 @@ const presets = []
 const plugins = [[
   '@babel/plugin-transform-runtime',
   {
-    'corejs': false,
+    'corejs': 2,
     'helpers': true,
     'regenerator': true,
     'useESModules': false
