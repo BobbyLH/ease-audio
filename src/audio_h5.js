@@ -616,7 +616,7 @@ export class AudioH5 {
           this.isEnd = true
           this._setPlayState(playStateSet[4])
           this._fireEventQueue(e, 'onend')
-          this.config.endAutoCut && this._cut(true)
+          this.config.endAutoCut ? this._cut(true) : this._fireEventQueue(e, 'onfinish')
         }
       },
       // loaderror state
@@ -670,7 +670,7 @@ export class AudioH5 {
             this.isEnd = true
             this._setPlayState(playStateSet[4])
             this._fireEventQueue(e, 'onend')
-            this.config.endAutoCut && this._cut(true)
+            this.config.endAutoCut ? this._cut(true) : this._fireEventQueue(e, 'onfinish')
           }
         }
 
