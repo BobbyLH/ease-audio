@@ -149,12 +149,14 @@ Fires when the sound is start loading.
 Fires when the sound is start unload.
 #### onplay `Function`
 Fires when the sound begins playing. The first parameter is the event object.
-#### onend `Function`
-Fires when the sound finishes playing (if it is looping, it'll fire at the end of each loop). The first parameter is the event object.
 #### onpause `Function`
 Fires when the sound has been paused. The first parameter is the event object.
 #### onstop `Function`
 Fires when the sound has been stopped. The first parameter is the ID of the sound.
+#### onend `Function`
+Fires when the sound finishes playing (if it is looping, it'll fire at the end of each loop). The first parameter is the event object.
+#### onfinish `Function`
+Fires when the playlist has been finished. The first parameter is the ID of the sound.
 #### onmute `Function`
 Fires when the sound has been muted/unmuted. The first parameter is the event object.
 #### onvolume `Function`

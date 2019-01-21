@@ -13,7 +13,7 @@ const playStateSet = [
 
 const playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 'single-loop']
 
-const supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onload', 'onunload', 'oncanplay', 'onprogress', 'onvolume', 'onseeking', 'onseeked', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick']
+const supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onfinish', 'onload', 'onunload', 'oncanplay', 'onprogress', 'onvolume', 'onseeking', 'onseeked', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick']
 
 const logLevel = ['detail', 'info', 'warn', 'error', 'silent']
 
@@ -526,9 +526,11 @@ export class AudioH5 {
       this.metaDataLoaded = false
       this.seekValue = null
       this._setPlayIndex()
-      if (!this.playList[this.playIndex]) return
-      const src = this.playList[this.playIndex].src
 
+      // on finish
+      if (!this.playList[this.playIndex]) return this._fireEventQueue(this.playId, 'onfinish')
+
+      const src = this.playList[this.playIndex].src
       if (endCut) {
         // resolve the IOS auto play problem
         this.audioH5.src = src
