@@ -612,6 +612,7 @@ export class AudioH5 {
           this.isEnd = false
         } else {
           this.isEnd = true
+          this._setPlayState(playStateSet[4])
           this._fireEventQueue(e, 'onend')
           this.config.endAutoCut && this._cut(true)
         }
@@ -660,11 +661,12 @@ export class AudioH5 {
         // Depending on currentTime and duration to mimic end event
         const isEnd = this.audioH5.duration && +this.audioH5.currentTime >= +this.audioH5.duration
         if (isEnd) {
-          this._logInfo("timeupdate's ended")
           if (this.isEnd) {
             this.isEnd = false
           } else {
+            this._logInfo("timeupdate's ended")
             this.isEnd = true
+            this._setPlayState(playStateSet[4])
             this._fireEventQueue(e, 'onend')
             this.config.endAutoCut && this._cut(true)
           }
