@@ -1,13 +1,10 @@
-const presets = []
-
-const plugins = [[
-  '@babel/plugin-transform-runtime',
+const presets = [[
+  '@babel/preset-env',
   {
-    'corejs': 2,
-    'helpers': true,
-    'regenerator': true,
-    'useESModules': false
+    useBuiltIns: 'usage'
   }
 ]]
+
+const plugins = []
 
 module.exports = { presets, plugins }
