@@ -22,6 +22,10 @@ const plugins = [
   ], [
     '@babel/plugin-transform-instanceof'
   ], [
+    '@babel/plugin-transform-property-mutators'
+  ], [
+    '@babel/plugin-transform-block-scoping'
+  ], [
     '@babel/plugin-transform-runtime',
     {
       'corejs': 2,
