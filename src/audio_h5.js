@@ -601,12 +601,12 @@ export class AudioH5 {
       },
       // playing state
       playing: e => {
-        // if playing then set the isTriggerEnd and isFinished to false
-        this.isFinished = false
-        this.isTriggerEnd = false
-
         this._setPlayState(playStateSet[1])
         this._fireEventQueue(e, 'onplay')
+
+        // if playing then set the isTriggerEnd and isFinished to false
+        if (this.isFinished) this.isFinished = false
+        if (this.isTriggerEnd) this.isTriggerEnd = false
       },
       canplaythrough: e => {
         this.playState === playStateSet[0] && this._setPlayState(playStateSet[1])
