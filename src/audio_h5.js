@@ -387,20 +387,21 @@ export class AudioH5 {
       const paused = this.audioH5.paused
       const ended = this.audioH5.ended
       const seeking = this.audioH5.seeking
+      const finished = this.isFinished
 
       // filter impossible state
       switch (state) {
         case playStateSet[0]:
           // loading
-          if (paused || ended || isReady) return false
+          if (!finished && (paused || ended || isReady)) return false
           break
         case playStateSet[1]:
           // playing
-          if (paused || seeking || !isReady) return false
+          if (!finished && (paused || ended || seeking || !isReady)) return false
           break
         case playStateSet[2]:
           // paused
-          if (ended) return false
+          if (finished || ended) return false
           break
       }
 
@@ -528,7 +529,10 @@ export class AudioH5 {
       this._setPlayIndex()
 
       // on finish
-      if (!this.playList[this.playIndex]) return this._fireEventQueue(this.playId, 'onfinish')
+      if (!this.playList[this.playIndex]) {
+        this.isFinished = true
+        return this._fireEventQueue(this.playId, 'onfinish')
+      }
 
       const src = this.playList[this.playIndex].src
       if (endCut) {
@@ -597,6 +601,10 @@ export class AudioH5 {
       },
       // playing state
       playing: e => {
+        // if playing then set the isTriggerEnd and isFinished to false
+        this.isFinished = false
+        this.isTriggerEnd = false
+
         this._setPlayState(playStateSet[1])
         this._fireEventQueue(e, 'onplay')
       },
@@ -605,18 +613,26 @@ export class AudioH5 {
       },
       // paused state
       pause: e => {
-        this._setPlayState(playStateSet[2])
-        this._fireEventQueue(e, 'onpause')
+        // resolve ios cannot trigger onend but onpause event
+        if (!this.isTriggerEnd) {
+          this._setPlayState(playStateSet[2])
+          this._fireEventQueue(e, 'onpause')
+        }
       },
       // ended state
       ended: e => {
-        if (this.isEnd) {
-          this.isEnd = false
+        if (this.isTriggerEnd) {
+          this.isTriggerEnd = false
         } else {
-          this.isEnd = true
+          this.isTriggerEnd = true
           this._setPlayState(playStateSet[4])
           this._fireEventQueue(e, 'onend')
-          this.config.endAutoCut ? this._cut(true) : this._fireEventQueue(this.playId, 'onfinish')
+          if (this.config.endAutoCut) {
+            this._cut(true)
+          } else {
+            this.isFinished = true
+            this._fireEventQueue(this.playId, 'onfinish')
+          }
         }
       },
       // loaderror state
@@ -663,14 +679,19 @@ export class AudioH5 {
         // Depending on currentTime and duration to mimic end event
         const isEnd = this.audioH5.duration && +this.audioH5.currentTime >= +this.audioH5.duration
         if (isEnd) {
-          if (this.isEnd) {
-            this.isEnd = false
+          if (this.isTriggerEnd) {
+            this.isTriggerEnd = false
           } else {
             this._logInfo("timeupdate's ended")
-            this.isEnd = true
+            this.isTriggerEnd = true
             this._setPlayState(playStateSet[4])
             this._fireEventQueue(e, 'onend')
-            this.config.endAutoCut ? this._cut(true) : this._fireEventQueue(this.playId, 'onfinish')
+            if (this.config.endAutoCut) {
+              this._cut(true)
+            } else {
+              this.isFinished = true
+              this._fireEventQueue(this.playId, 'onfinish')
+            }
           }
         }
 
