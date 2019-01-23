@@ -217,7 +217,7 @@ Get/set the position of playback for sound. This method optionally takes 0 or 1 
 
 #### rate([rate])
 Get/set the rate of playback for sound. This method optionally takes 0 or 1 arguments.
-* **rate**: `Number` `optional` The rate of playback. 0.5 to 4.0, with 1.0 being normal speed.
+* **rate**: `Number` `optional` The rate of playback. 0.5 to 2.0, with 1.0 being normal speed.
 
 #### volume([volume])
 Get/set volume of sound. This method optionally takes 0 or 1 arguments.
