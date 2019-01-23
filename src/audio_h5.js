@@ -66,39 +66,38 @@ export class AudioH5 {
   }
 
   play () {
-    if (this._checkInit()) {
-      this._playLockQueue(() => {
-        try {
-          this._blockEvent({block: false})
-          let play = this.audioH5.play()
+    if (this._checkInit() && !this.playLocker) {
+      try {
+        this._blockEvent({block: false})
+        let play = this.audioH5.play()
 
-          if (play && typeof Promise !== 'undefined' && (play instanceof Promise || typeof play.then === 'function')) {
-            this.playLocker = true
+        if (play && typeof Promise !== 'undefined' && (play instanceof Promise || typeof play.then === 'function')) {
+          this.playLocker = true
 
-            play.then(() => {
-              this.playLocker = false
-              this.lockQueue.forEach(v => v && v())
-              this.lockQueue.splice(0)
-            }).catch(err => {
-              this.playLocker = false
-              this.lockQueue.splice(0)
-              this._setPlayState(playStateSet[6])
-              this._fireEventQueue(err, 'onplayerror')
-            })
-          }
+          play.then(() => {
+            this.playLocker = false // this controller must be set before trigger lock queue
 
-          // If the sound is still paused, then we can assume there was a playback issue.
-          if (this.audioH5.paused) {
-            const err = `Playback was unable to start. This is most commonly an issue on mobile devices and Chrome where playback was not within a user interaction.`
-
+            this.lockQueue.forEach(v => v && v())
+            this.lockQueue.splice(0)
+          }).catch(err => {
+            this.playLocker = false
+            this.lockQueue.splice(0)
             this._setPlayState(playStateSet[6])
             this._fireEventQueue(err, 'onplayerror')
-          }
-        } catch (err) {
+          })
+        }
+
+        // If the sound is still paused, then we can assume there was a playback issue.
+        if (this.audioH5.paused) {
+          const err = `Playback was unable to start. This is most commonly an issue on mobile devices and Chrome where playback was not within a user interaction.`
+
           this._setPlayState(playStateSet[6])
           this._fireEventQueue(err, 'onplayerror')
         }
-      })
+      } catch (err) {
+        this._setPlayState(playStateSet[6])
+        this._fireEventQueue(err, 'onplayerror')
+      }
 
       return this.playId
     }
