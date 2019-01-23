@@ -2042,17 +2042,17 @@
               if (play && typeof promise$1 !== 'undefined' && (_instanceof_1(play, promise$1) || typeof play.then === 'function')) {
                 _this.playLocker = true;
                 play.then(function () {
+                  _this.playLocker = false;
+
                   _this.lockQueue.forEach(function (v) {
                     return v && v();
                   });
 
                   _this.lockQueue.splice(0);
-
-                  _this.playLocker = false;
                 }).catch(function (err) {
-                  _this.lockQueue.splice(0);
-
                   _this.playLocker = false;
+
+                  _this.lockQueue.splice(0);
 
                   _this._setPlayState(playStateSet[6]);
 
