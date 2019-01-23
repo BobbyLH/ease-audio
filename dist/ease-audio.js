@@ -2030,50 +2030,48 @@
       value: function play() {
         var _this = this;
 
-        if (this._checkInit()) {
-          this._playLockQueue(function () {
-            try {
-              _this._blockEvent({
-                block: false
-              });
+        if (this._checkInit() && !this.playLocker) {
+          try {
+            this._blockEvent({
+              block: false
+            });
 
-              var play = _this.audioH5.play();
+            var play = this.audioH5.play();
 
-              if (play && typeof promise$1 !== 'undefined' && (_instanceof_1(play, promise$1) || typeof play.then === 'function')) {
-                _this.playLocker = true;
-                play.then(function () {
-                  _this.playLocker = false;
+            if (play && typeof promise$1 !== 'undefined' && (_instanceof_1(play, promise$1) || typeof play.then === 'function')) {
+              this.playLocker = true;
+              play.then(function () {
+                _this.playLocker = false; // this controller must be set before trigger lock queue
 
-                  _this.lockQueue.forEach(function (v) {
-                    return v && v();
-                  });
-
-                  _this.lockQueue.splice(0);
-                }).catch(function (err) {
-                  _this.playLocker = false;
-
-                  _this.lockQueue.splice(0);
-
-                  _this._setPlayState(playStateSet[6]);
-
-                  _this._fireEventQueue(err, 'onplayerror');
+                _this.lockQueue.forEach(function (v) {
+                  return v && v();
                 });
-              } // If the sound is still paused, then we can assume there was a playback issue.
 
+                _this.lockQueue.splice(0);
+              }).catch(function (err) {
+                _this.playLocker = false;
 
-              if (_this.audioH5.paused) {
-                var err = "Playback was unable to start. This is most commonly an issue on mobile devices and Chrome where playback was not within a user interaction.";
+                _this.lockQueue.splice(0);
 
                 _this._setPlayState(playStateSet[6]);
 
                 _this._fireEventQueue(err, 'onplayerror');
-              }
-            } catch (err) {
-              _this._setPlayState(playStateSet[6]);
+              });
+            } // If the sound is still paused, then we can assume there was a playback issue.
 
-              _this._fireEventQueue(err, 'onplayerror');
+
+            if (this.audioH5.paused) {
+              var err = "Playback was unable to start. This is most commonly an issue on mobile devices and Chrome where playback was not within a user interaction.";
+
+              this._setPlayState(playStateSet[6]);
+
+              this._fireEventQueue(err, 'onplayerror');
             }
-          });
+          } catch (err) {
+            this._setPlayState(playStateSet[6]);
+
+            this._fireEventQueue(err, 'onplayerror');
+          }
 
           return this.playId;
         }
