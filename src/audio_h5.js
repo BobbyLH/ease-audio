@@ -257,6 +257,7 @@ export class AudioH5 {
         }
 
         this.audioH5.src = defaultSrc
+        this.audioH5.load()
         delete this.audioH5
         this.isInit = false
       })
