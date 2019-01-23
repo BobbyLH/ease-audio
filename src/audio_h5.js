@@ -233,8 +233,12 @@ export class AudioH5 {
           this._fireEventQueue(this.playId, 'onstop')
         }
 
-        this.audioH5.currentTime = 0
-        this.audioH5.pause()
+        if (!isNaN(+this.audioH5.duration)) {
+          this.audioH5.currentTime = 0
+          this.audioH5.pause()
+        } else {
+          this.audioH5.muted = true
+        }
       })
 
       return this.playId
@@ -253,7 +257,7 @@ export class AudioH5 {
         }
 
         this.audioH5.src = defaultSrc
-        this.audioH5 = null
+        delete this.audioH5
         this.isInit = false
       })
     }
