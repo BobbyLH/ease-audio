@@ -599,8 +599,6 @@
       if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
         // Set @@toStringTag to native iterators
         _setToStringTag(IteratorPrototype, TAG, true);
-        // fix for some old engines
-        if (!_library && typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
       }
     }
     // fix Array#{values, @@iterator}.name in V8 / FF
@@ -609,7 +607,7 @@
       $default = function values() { return $native.call(this); };
     }
     // Define iterator
-    if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+    if ((FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
       _hide(proto, ITERATOR, $default);
     }
     // Plug for library
@@ -2031,47 +2029,49 @@
         var _this = this;
 
         if (this._checkInit()) {
-          try {
-            this._blockEvent({
-              block: false
-            });
+          this._playLockQueue(function () {
+            try {
+              _this._blockEvent({
+                block: false
+              });
 
-            var play = this.audioH5.play();
+              var play = _this.audioH5.play();
 
-            if (play && typeof promise$1 !== 'undefined' && (_instanceof_1(play, promise$1) || typeof play.then === 'function')) {
-              this.playLocker = true;
-              play.then(function () {
-                _this.lockQueue.forEach(function (v) {
-                  return v && v();
+              if (play && typeof promise$1 !== 'undefined' && (_instanceof_1(play, promise$1) || typeof play.then === 'function')) {
+                _this.playLocker = true;
+                play.then(function () {
+                  _this.lockQueue.forEach(function (v) {
+                    return v && v();
+                  });
+
+                  _this.lockQueue.splice(0);
+
+                  _this.playLocker = false;
+                }).catch(function (err) {
+                  _this.lockQueue.splice(0);
+
+                  _this.playLocker = false;
+
+                  _this._setPlayState(playStateSet[6]);
+
+                  _this._fireEventQueue(err, 'onplayerror');
                 });
+              } // If the sound is still paused, then we can assume there was a playback issue.
 
-                _this.lockQueue.splice(0);
 
-                _this.playLocker = false;
-              }).catch(function (err) {
-                _this.lockQueue.splice(0);
-
-                _this.playLocker = false;
+              if (_this.audioH5.paused) {
+                var err = "Playback was unable to start. This is most commonly an issue on mobile devices and Chrome where playback was not within a user interaction.";
 
                 _this._setPlayState(playStateSet[6]);
 
                 _this._fireEventQueue(err, 'onplayerror');
-              });
-            } // If the sound is still paused, then we can assume there was a playback issue.
+              }
+            } catch (err) {
+              _this._setPlayState(playStateSet[6]);
 
-
-            if (this.audioH5.paused) {
-              var err = "Playback was unable to start. This is most commonly an issue on mobile devices and Chrome where playback was not within a user interaction.";
-
-              this._setPlayState(playStateSet[6]);
-
-              this._fireEventQueue(err, 'onplayerror');
+              _this._fireEventQueue(err, 'onplayerror');
             }
-          } catch (err) {
-            this._setPlayState(playStateSet[6]);
-
-            this._fireEventQueue(err, 'onplayerror');
-          }
+          });
 
           return this.playId;
         }
@@ -2109,26 +2109,37 @@
     }, {
       key: "pick",
       value: function pick(playId) {
+        var _this3 = this;
+
         if (this._checkInit() && this._checkType(playId, 'number', true)) {
           for (var i = 0; i < this.playList.length; i++) {
             if (this.playList[i].playId === playId) {
-              this.unload(true);
-
               this._setPlayIndex(i);
 
-              var src = this.playList[this.playIndex].src;
+              this.playLocker && this.cutpickId++;
 
-              var config = objectSpread({}, this.config, {
-                src: src
-              });
+              this._playLockQueue(function (cutpickId) {
+                return function () {
+                  if (cutpickId !== _this3.cutpickId) return;
 
-              this._createAudio(config);
+                  _this3.unload(true);
 
-              this._registerEvent(config);
+                  var src = _this3.playList[_this3.playIndex].src;
 
-              this._fireEventQueue(this.playId, 'onpick');
+                  var config = objectSpread({}, _this3.config, {
+                    src: src
+                  });
 
-              this.play();
+                  _this3._createAudio(config);
+
+                  _this3._registerEvent(config);
+
+                  _this3._fireEventQueue(_this3.playId, 'onpick');
+
+                  _this3.play();
+                };
+              }(this.cutpickId));
+
               break;
             }
           }
@@ -2139,11 +2150,11 @@
     }, {
       key: "load",
       value: function load() {
-        var _this3 = this;
+        var _this4 = this;
 
         if (this._checkInit()) {
           this._playLockQueue(function () {
-            return _this3.audioH5.load();
+            return _this4.audioH5.load();
           });
 
           return this.playId;
@@ -2152,7 +2163,7 @@
     }, {
       key: "seek",
       value: function seek(val) {
-        var _this4 = this;
+        var _this5 = this;
 
         if (this._checkInit()) {
           if (this._checkType(val, 'number')) {
@@ -2168,7 +2179,7 @@
             this.seekValue = null;
 
             this._playLockQueue(function () {
-              return _this4.audioH5.currentTime = val;
+              return _this5.audioH5.currentTime = val;
             });
           } else {
             return this.audioH5.currentTime;
@@ -2178,7 +2189,7 @@
     }, {
       key: "rate",
       value: function rate(val) {
-        var _this5 = this;
+        var _this6 = this;
 
         if (this._checkInit()) {
           if (this._checkType(val, 'number')) {
@@ -2186,7 +2197,7 @@
             if (val < 0.5) val = 0.5;
 
             this._playLockQueue(function () {
-              return _this5.audioH5.playbackRate = val;
+              return _this6.audioH5.playbackRate = val;
             });
 
             this._updateConfig({
@@ -2200,7 +2211,7 @@
     }, {
       key: "volume",
       value: function volume(val) {
-        var _this6 = this;
+        var _this7 = this;
 
         if (this._checkInit()) {
           if (this._checkType(val, 'number')) {
@@ -2208,8 +2219,8 @@
             if (val < 0) val = 0;
 
             this._playLockQueue(function () {
-              _this6.audioH5.muted = false;
-              _this6.audioH5.volume = val;
+              _this7.audioH5.muted = false;
+              _this7.audioH5.volume = val;
             });
 
             this._updateConfig({
@@ -2223,12 +2234,12 @@
     }, {
       key: "muted",
       value: function muted(bool) {
-        var _this7 = this;
+        var _this8 = this;
 
         if (this._checkInit()) {
           if (this._checkType(bool, 'boolean', true)) {
             this._playLockQueue(function () {
-              return _this7.audioH5.muted = bool;
+              return _this8.audioH5.muted = bool;
             });
 
             this._updateConfig({
@@ -2242,23 +2253,23 @@
     }, {
       key: "stop",
       value: function stop(forbidEvent) {
-        var _this8 = this;
+        var _this9 = this;
 
         if (this._checkInit() && this.playState !== playStateSet[3]) {
           this._playLockQueue(function () {
             if (!forbidEvent) {
-              _this8._blockEvent({
+              _this9._blockEvent({
                 block: true
               });
 
-              _this8._setPlayState(playStateSet[3]);
+              _this9._setPlayState(playStateSet[3]);
 
-              _this8._fireEventQueue(_this8.playId, 'onstop');
+              _this9._fireEventQueue(_this9.playId, 'onstop');
             }
 
-            _this8.audioH5.currentTime = 0;
+            _this9.audioH5.currentTime = 0;
 
-            _this8.audioH5.pause();
+            _this9.audioH5.pause();
           });
 
           return this.playId;
@@ -2267,7 +2278,7 @@
     }, {
       key: "unload",
       value: function unload(forbidEvent) {
-        var _this9 = this;
+        var _this10 = this;
 
         if (this._checkInit()) {
           this.stop(true);
@@ -2276,14 +2287,14 @@
 
           this._playLockQueue(function () {
             if (!forbidEvent) {
-              _this9._setPlayState(playStateSet[7]);
+              _this10._setPlayState(playStateSet[7]);
 
-              _this9._fireEventQueue(_this9.playId, 'onunload');
+              _this10._fireEventQueue(_this10.playId, 'onunload');
             }
 
-            _this9.audioH5.src = defaultSrc;
-            _this9.audioH5 = null;
-            _this9.isInit = false;
+            _this10.audioH5.src = defaultSrc;
+            _this10.audioH5 = null;
+            _this10.isInit = false;
           });
         }
       }
@@ -2328,7 +2339,7 @@
     }, {
       key: "once",
       value: function once(event, cb) {
-        var _this10 = this;
+        var _this11 = this;
 
         if (this._checkInit() && this._checkType(event, 'string', true) && this._checkType(cb, 'function', true)) {
           var queueName = event.indexOf('on') === 0 ? event : "on".concat(event);
@@ -2337,7 +2348,7 @@
           var once = function once(e) {
             cb && cb(e);
 
-            _this10._offEvent(queueName, once, funcName);
+            _this11._offEvent(queueName, once, funcName);
           };
 
           this._onEvent(queueName, once, funcName);
@@ -2378,7 +2389,9 @@
         this.playList = new Array(0);
         this.buffered = new Array(0);
         this.eventController = new Array(0);
-        this.eventMethods = create$1(null); // playlist convert to src
+        this.eventMethods = create$1(null);
+        this.cutpickId = 0; // The id for cut or pick because they are only be triggered alternatively
+        // playlist convert to src
 
         var src;
 
@@ -2550,7 +2563,7 @@
     }, {
       key: "_handlePlayList",
       value: function _handlePlayList(_ref) {
-        var _this11 = this;
+        var _this12 = this;
 
         var action = _ref.action,
             list = _ref.list,
@@ -2560,9 +2573,9 @@
         switch (action) {
           case 'add':
             this.playList = [].concat(toConsumableArray(this.playList), toConsumableArray(list.map(function (v) {
-              if (_this11._checkType(v, 'object')) {
-                v.playId = _this11.idCounter;
-                _this11.idCounter++;
+              if (_this12._checkType(v, 'object')) {
+                v.playId = _this12.idCounter;
+                _this12.idCounter++;
                 return v;
               }
             })));
@@ -2586,8 +2599,8 @@
                   var _this$playList;
 
                   return (_this$playList = this.playList).splice.apply(_this$playList, [_i, 0].concat(toConsumableArray(list.map(function (v) {
-                    v.playId = _this11.idCounter;
-                    _this11.idCounter++;
+                    v.playId = _this12.idCounter;
+                    _this12.idCounter++;
                     return v;
                   }))));
                 }
@@ -2603,8 +2616,8 @@
                   var _this$playList2;
 
                   return (_this$playList2 = this.playList).splice.apply(_this$playList2, [_i2, 1].concat(toConsumableArray(list.map(function (v) {
-                    v.playId = _this11.idCounter;
-                    _this11.idCounter++;
+                    v.playId = _this12.idCounter;
+                    _this12.idCounter++;
                     return v;
                   }))));
                 }
@@ -2641,6 +2654,8 @@
     }, {
       key: "_cut",
       value: function _cut(endCut) {
+        var _this13 = this;
+
         this.stop(true); // can't cut audio if the playModel is single-once
 
         if (this._checkInit() && this.playModel !== 'single-once') {
@@ -2655,27 +2670,34 @@
             return this._fireEventQueue(this.playId, 'onfinish');
           }
 
-          var src = this.playList[this.playIndex].src;
+          this.playLocker && this.cutpickId++;
+          return this._playLockQueue(function (cutpickId) {
+            return function () {
+              if (cutpickId !== _this13.cutpickId) return;
+              var src = _this13.playList[_this13.playIndex].src;
 
-          if (endCut) {
-            // resolve the IOS auto play problem
-            this.audioH5.src = src;
-            this.load();
-          } else {
-            this.unload(true);
+              if (endCut) {
+                // resolve the IOS auto play problem
+                _this13.audioH5.src = src;
 
-            var config = objectSpread({}, this.config, {
-              src: src
-            });
+                _this13.load();
+              } else {
+                _this13.unload(true);
 
-            this._createAudio(config);
+                var config = objectSpread({}, _this13.config, {
+                  src: src
+                });
 
-            this._registerEvent(config);
-          }
+                _this13._createAudio(config);
 
-          this._fireEventQueue(this.playId, 'oncut');
+                _this13._registerEvent(config);
+              }
 
-          return this.play();
+              _this13._fireEventQueue(_this13.playId, 'oncut');
+
+              return _this13.play();
+            };
+          }(this.cutpickId));
         }
       }
       /* generate received event callback queue */
@@ -2713,11 +2735,11 @@
     }, {
       key: "_registerEvent",
       value: function _registerEvent(config) {
-        var _this12 = this;
+        var _this14 = this;
 
         var curry = function curry(cb, eventName) {
           return function (e) {
-            if (!_this12._triggerEventController(eventName)) return;
+            if (!_this14._triggerEventController(eventName)) return;
             return cb && cb(e);
           };
         };
@@ -2730,63 +2752,63 @@
           if (v.indexOf('on') === 0) {
             var funcName = "EASE_AUDIO_".concat(v.toUpperCase(), "_INITIAL_CALLBACK");
 
-            _this12._onEvent(v, config[v], funcName);
+            _this14._onEvent(v, config[v], funcName);
           }
         });
         this.eventMethods = {
           // loading state
           loadstart: function loadstart(e) {
-            _this12._setPlayState(playStateSet[0]);
+            _this14._setPlayState(playStateSet[0]);
 
-            _this12._fireEventQueue(e, 'onload');
+            _this14._fireEventQueue(e, 'onload');
           },
           // playing state
           playing: function playing(e) {
-            _this12._setPlayState(playStateSet[1]);
+            _this14._setPlayState(playStateSet[1]);
 
-            _this12._fireEventQueue(e, 'onplay'); // if playing then set the isTriggerEnd and isFinished to false
+            _this14._fireEventQueue(e, 'onplay'); // if playing then set the isTriggerEnd and isFinished to false
 
 
-            if (_this12.isFinished) _this12.isFinished = false;
-            if (_this12.isTriggerEnd) _this12.isTriggerEnd = false;
+            if (_this14.isFinished) _this14.isFinished = false;
+            if (_this14.isTriggerEnd) _this14.isTriggerEnd = false;
           },
           canplaythrough: function canplaythrough(e) {
-            _this12.playState === playStateSet[0] && _this12._setPlayState(playStateSet[1]);
+            _this14.playState === playStateSet[0] && _this14._setPlayState(playStateSet[1]);
           },
           // paused state
           pause: function pause(e) {
             // resolve ios cannot trigger onend but onpause event
-            if (!_this12.isTriggerEnd) {
-              _this12._setPlayState(playStateSet[2]);
+            if (!_this14.isTriggerEnd) {
+              _this14._setPlayState(playStateSet[2]);
 
-              _this12._fireEventQueue(e, 'onpause');
+              _this14._fireEventQueue(e, 'onpause');
             }
           },
           // ended state
           ended: function ended(e) {
-            if (_this12.isTriggerEnd) {
-              _this12.isTriggerEnd = false;
+            if (_this14.isTriggerEnd) {
+              _this14.isTriggerEnd = false;
             } else {
-              _this12.isTriggerEnd = true;
+              _this14.isTriggerEnd = true;
 
-              _this12._setPlayState(playStateSet[4]);
+              _this14._setPlayState(playStateSet[4]);
 
-              _this12._fireEventQueue(e, 'onend');
+              _this14._fireEventQueue(e, 'onend');
 
-              if (_this12.config.endAutoCut) {
-                _this12._cut(true);
+              if (_this14.config.endAutoCut) {
+                _this14._cut(true);
               } else {
-                _this12.isFinished = true;
+                _this14.isFinished = true;
 
-                _this12._fireEventQueue(_this12.playId, 'onfinish');
+                _this14._fireEventQueue(_this14.playId, 'onfinish');
               }
             }
           },
           // loaderror state
           error: function error(e) {
-            _this12._setPlayState(playStateSet[5]);
+            _this14._setPlayState(playStateSet[5]);
 
-            _this12._fireEventQueue(e, 'onloaderror');
+            _this14._fireEventQueue(e, 'onloaderror');
           },
           // others
           progress: function progress(e) {
@@ -2798,7 +2820,7 @@
 
             if (ranges && ranges.length) {
               for (var i = 0, j = ranges.length; i < j; i++) {
-                _this12.buffered.push({
+                _this14.buffered.push({
                   'start': ranges.start(i) * 1000,
                   'end': ranges.end(i) * 1000
                 });
@@ -2809,69 +2831,69 @@
               progress = loaded / total;
             }
 
-            _this12._fireEventQueue({
+            _this14._fireEventQueue({
               e: e,
               progress: progress
             }, 'onprogress');
           },
           durationchange: function durationchange(e) {},
           loadedmetadata: function loadedmetadata(e) {
-            _this12.metaDataLoaded = true;
-            _this12.seekValue && _this12.seek(_this12.seekValue);
+            _this14.metaDataLoaded = true;
+            _this14.seekValue && _this14.seek(_this14.seekValue);
           },
           loadeddata: function loadeddata(e) {},
           timeupdate: function timeupdate(e) {
             // playState is loading but actually is playing
-            if (_this12.playState === playStateSet[0]) {
-              _this12._logInfo("timeupdate's playing");
+            if (_this14.playState === playStateSet[0]) {
+              _this14._logInfo("timeupdate's playing");
 
-              _this12._setPlayState(playStateSet[1]);
+              _this14._setPlayState(playStateSet[1]);
 
-              _this12._fireEventQueue(e, 'onplay');
+              _this14._fireEventQueue(e, 'onplay');
             } // Depending on currentTime and duration to mimic end event
 
 
-            var isEnd = _this12.audioH5.duration && +_this12.audioH5.currentTime >= +_this12.audioH5.duration;
+            var isEnd = _this14.audioH5.duration && +_this14.audioH5.currentTime >= +_this14.audioH5.duration;
 
             if (isEnd) {
-              if (_this12.isTriggerEnd) {
-                _this12.isTriggerEnd = false;
+              if (_this14.isTriggerEnd) {
+                _this14.isTriggerEnd = false;
               } else {
-                _this12._logInfo("timeupdate's ended");
+                _this14._logInfo("timeupdate's ended");
 
-                _this12.isTriggerEnd = true;
+                _this14.isTriggerEnd = true;
 
-                _this12._setPlayState(playStateSet[4]);
+                _this14._setPlayState(playStateSet[4]);
 
-                _this12._fireEventQueue(e, 'onend');
+                _this14._fireEventQueue(e, 'onend');
 
-                if (_this12.config.endAutoCut) {
-                  _this12._cut(true);
+                if (_this14.config.endAutoCut) {
+                  _this14._cut(true);
                 } else {
-                  _this12.isFinished = true;
+                  _this14.isFinished = true;
 
-                  _this12._fireEventQueue(_this12.playId, 'onfinish');
+                  _this14._fireEventQueue(_this14.playId, 'onfinish');
                 }
               }
             }
 
-            _this12._fireEventQueue(e, 'ontimeupdate');
+            _this14._fireEventQueue(e, 'ontimeupdate');
           },
           canplay: function canplay(e) {
-            _this12._fireEventQueue(e, 'oncanplay');
+            _this14._fireEventQueue(e, 'oncanplay');
           },
           seeking: function seeking(e) {
-            _this12._fireEventQueue(e, 'onseeking');
+            _this14._fireEventQueue(e, 'onseeking');
           },
           seeked: function seeked(e) {
-            _this12._fireEventQueue(e, 'onseeked');
+            _this14._fireEventQueue(e, 'onseeked');
           },
           play: function play(e) {},
           volumechange: function volumechange(e) {
-            _this12._fireEventQueue(e, 'onvolume');
+            _this14._fireEventQueue(e, 'onvolume');
           },
           ratechange: function ratechange(e) {
-            _this12._fireEventQueue(e, 'onrate');
+            _this14._fireEventQueue(e, 'onrate');
           },
           abort: function abort(e) {},
           suspend: function suspend(e) {}
