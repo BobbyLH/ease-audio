@@ -547,8 +547,8 @@ export class AudioH5 {
       }
 
       this._fireEventQueue(this.playId, 'oncut')
-      this.play()
-      return this._setPlayState(playStateSet[1])
+
+      return this.play()
     }
   }
 
@@ -596,7 +596,7 @@ export class AudioH5 {
     this.eventMethods = {
       // loading state
       loadstart: e => {
-        this.playState === playStateSet[1] && this._setPlayState(playStateSet[0])
+        this._setPlayState(playStateSet[0])
         this._fireEventQueue(e, 'onload')
       },
       // playing state
