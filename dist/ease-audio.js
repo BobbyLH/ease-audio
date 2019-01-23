@@ -2299,6 +2299,9 @@
             }
 
             _this10.audioH5.src = defaultSrc;
+
+            _this10.audioH5.load();
+
             delete _this10.audioH5;
             _this10.isInit = false;
           });
