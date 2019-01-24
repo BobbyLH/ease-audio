@@ -6,6 +6,7 @@ const playStateSet = [
   'paused',
   'stopped',
   'ended',
+  'finished',
   'loaderror',
   'playerror',
   'unloaded'
@@ -82,7 +83,7 @@ export class AudioH5 {
           }).catch(err => {
             this.playLocker = false
             this.lockQueue.splice(0)
-            this._setPlayState(playStateSet[6])
+            this._setPlayState(playStateSet[7])
             this._fireEventQueue(err, 'onplayerror')
           })
         }
@@ -91,11 +92,11 @@ export class AudioH5 {
         if (this.audioH5.paused) {
           const err = `Playback was unable to start. This is most commonly an issue on mobile devices and Chrome where playback was not within a user interaction.`
 
-          this._setPlayState(playStateSet[6])
+          this._setPlayState(playStateSet[7])
           this._fireEventQueue(err, 'onplayerror')
         }
       } catch (err) {
-        this._setPlayState(playStateSet[6])
+        this._setPlayState(playStateSet[7])
         this._fireEventQueue(err, 'onplayerror')
       }
 
@@ -132,6 +133,7 @@ export class AudioH5 {
       for (let i = 0; i < this.playList.length; i++) {
         if (this.playList[i].playId === playId) {
           this._setPlayIndex(i)
+          this._fireEventQueue(this.playId, 'onpick')
 
           this.playLocker && this.cutpickId++
           this._playLockQueue((cutpickId => () => {
@@ -143,7 +145,6 @@ export class AudioH5 {
             this._createAudio(config)
             this._registerEvent(config)
 
-            this._fireEventQueue(this.playId, 'onpick')
             this.play()
           })(this.cutpickId))
 
@@ -251,7 +252,7 @@ export class AudioH5 {
 
       this._playLockQueue(() => {
         if (!forbidEvent) {
-          this._setPlayState(playStateSet[7])
+          this._setPlayState(playStateSet[8])
           this._fireEventQueue(this.playId, 'onunload')
         }
 
@@ -397,24 +398,26 @@ export class AudioH5 {
     if (this._checkType(state, 'string', true) && this.playState !== state) {
       const readyState = this.audioH5.readyState
       const isReady = readyState > 2
-      const paused = this.audioH5.paused
-      const ended = this.audioH5.ended
+      const paused = this.playState === playStateSet[2]
+      const stopped = this.playState === playStateSet[3]
+      const ended = this.playState === playStateSet[4]
+      const finished = this.playState === playStateSet[5]
+      const unloaded = this.playState === playStateSet[8]
       const seeking = this.audioH5.seeking
-      const finished = this.isFinished
 
       // filter impossible state
       switch (state) {
         case playStateSet[0]:
-          // loading
-          if (!finished && (paused || ended || isReady)) return false
+          // could not be loading: paused or ready when not finished
+          if (!finished && (paused || isReady)) return false
           break
         case playStateSet[1]:
-          // playing
-          if (!finished && (paused || ended || seeking || !isReady)) return false
+          // could not be playing: paused or unloaded or seeking or not ready when not finished
+          if (!finished && (paused || unloaded || seeking || !isReady)) return false
           break
         case playStateSet[2]:
-          // paused
-          if (finished || ended) return false
+          // could not be paused: stopped or ended or finished
+          if (stopped || ended || finished || unloaded) return false
           break
       }
 
@@ -539,11 +542,13 @@ export class AudioH5 {
     if (this._checkInit() && this.playModel !== 'single-once') {
       this.metaDataLoaded = false
       this.seekValue = null
+
       this._setPlayIndex()
+      this._fireEventQueue(this.playId, 'oncut')
 
       // on finish
       if (!this.playList[this.playIndex]) {
-        this.isFinished = true
+        this._setPlayState(playStateSet[5])
         return this._fireEventQueue(this.playId, 'onfinish')
       }
 
@@ -555,15 +560,13 @@ export class AudioH5 {
         if (endCut) {
           // resolve the IOS auto play problem
           this.audioH5.src = src
-          this.load()
+          this.audioH5.load()
         } else {
           this.unload(true)
           const config = {...this.config, src}
           this._createAudio(config)
           this._registerEvent(config)
         }
-
-        this._fireEventQueue(this.playId, 'oncut')
 
         return this.play()
       })(this.cutpickId))
@@ -622,8 +625,7 @@ export class AudioH5 {
         this._setPlayState(playStateSet[1])
         this._fireEventQueue(e, 'onplay')
 
-        // if playing then set the isTriggerEnd and isFinished to false
-        if (this.isFinished) this.isFinished = false
+        // if playing then set the isTriggerEnd to false
         if (this.isTriggerEnd) this.isTriggerEnd = false
       },
       canplaythrough: e => {
@@ -648,14 +650,14 @@ export class AudioH5 {
           if (this.config.endAutoCut) {
             this._cut(true)
           } else {
-            this.isFinished = true
+            this._setPlayState(playStateSet[5])
             this._fireEventQueue(this.playId, 'onfinish')
           }
         }
       },
       // loaderror state
       error: e => {
-        this._setPlayState(playStateSet[5])
+        this._setPlayState(playStateSet[6])
         this._fireEventQueue(e, 'onloaderror')
       },
       // others
@@ -707,7 +709,7 @@ export class AudioH5 {
             if (this.config.endAutoCut) {
               this._cut(true)
             } else {
-              this.isFinished = true
+              this._setPlayState(playStateSet[5])
               this._fireEventQueue(this.playId, 'onfinish')
             }
           }
