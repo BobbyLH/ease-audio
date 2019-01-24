@@ -254,7 +254,7 @@ Remove event listener that you've set. Call without parameters to remove all eve
 Return the track duration property.
 
 #### playState `String`
-Return the play state(`loading`, `playing`, `paused`, `stopped`, `ended`,`loaderror`, `playerror`, `unloaded`).
+Return the play state(`loading`, `playing`, `paused`, `stopped`, `ended`, `finished`, `loaderror`, `playerror`, `unloaded`).
 
 #### playId `Number`
 Return the current playing id.
