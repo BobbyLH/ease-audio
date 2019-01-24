@@ -398,6 +398,7 @@ export class AudioH5 {
     if (this._checkType(state, 'string', true) && this.playState !== state) {
       const readyState = this.audioH5.readyState
       const isReady = readyState > 2
+      const nodePaused = this.audioH5.paused
       const paused = this.playState === playStateSet[2]
       const stopped = this.playState === playStateSet[3]
       const ended = this.playState === playStateSet[4]
@@ -412,8 +413,8 @@ export class AudioH5 {
           if (!finished && (paused || isReady)) return false
           break
         case playStateSet[1]:
-          // could not be playing: paused or unloaded or seeking or not ready when not finished
-          if (!finished && (paused || unloaded || seeking || !isReady)) return false
+          // could not be playing: node paused or unloaded or seeking or not ready when not finished
+          if (!finished && (nodePaused || unloaded || seeking || !isReady)) return false
           break
         case playStateSet[2]:
           // could not be paused: stopped or ended or finished
