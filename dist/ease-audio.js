@@ -1981,7 +1981,7 @@
     return Object.prototype.toString.call(obj).slice(8, len).toLowerCase();
   };
 
-  var playStateSet = ['loading', 'playing', 'paused', 'stopped', 'ended', 'loaderror', 'playerror', 'unloaded'];
+  var playStateSet = ['loading', 'playing', 'paused', 'stopped', 'ended', 'finished', 'loaderror', 'playerror', 'unloaded'];
   var playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 'single-loop'];
   var supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onfinish', 'onload', 'onunload', 'oncanplay', 'onprogress', 'onvolume', 'onseeking', 'onseeked', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick'];
   var logLevel = ['detail', 'info', 'warn', 'error', 'silent'];
@@ -2053,7 +2053,7 @@
 
                 _this.lockQueue.splice(0);
 
-                _this._setPlayState(playStateSet[6]);
+                _this._setPlayState(playStateSet[7]);
 
                 _this._fireEventQueue(err, 'onplayerror');
               });
@@ -2063,12 +2063,12 @@
             if (this.audioH5.paused) {
               var err = "Playback was unable to start. This is most commonly an issue on mobile devices and Chrome where playback was not within a user interaction.";
 
-              this._setPlayState(playStateSet[6]);
+              this._setPlayState(playStateSet[7]);
 
               this._fireEventQueue(err, 'onplayerror');
             }
           } catch (err) {
-            this._setPlayState(playStateSet[6]);
+            this._setPlayState(playStateSet[7]);
 
             this._fireEventQueue(err, 'onplayerror');
           }
@@ -2116,6 +2116,8 @@
             if (this.playList[i].playId === playId) {
               this._setPlayIndex(i);
 
+              this._fireEventQueue(this.playId, 'onpick');
+
               this.playLocker && this.cutpickId++;
 
               this._playLockQueue(function (cutpickId) {
@@ -2133,8 +2135,6 @@
                   _this3._createAudio(config);
 
                   _this3._registerEvent(config);
-
-                  _this3._fireEventQueue(_this3.playId, 'onpick');
 
                   _this3.play();
                 };
@@ -2291,7 +2291,7 @@
 
           this._playLockQueue(function () {
             if (!forbidEvent) {
-              _this10._setPlayState(playStateSet[7]);
+              _this10._setPlayState(playStateSet[8]);
 
               _this10._fireEventQueue(_this10.playId, 'onunload');
             }
@@ -2483,25 +2483,27 @@
         if (this._checkType(state, 'string', true) && this.playState !== state) {
           var readyState = this.audioH5.readyState;
           var isReady = readyState > 2;
-          var paused = this.audioH5.paused;
-          var ended = this.audioH5.ended;
-          var seeking = this.audioH5.seeking;
-          var finished = this.isFinished; // filter impossible state
+          var paused = this.playState === playStateSet[2];
+          var stopped = this.playState === playStateSet[3];
+          var ended = this.playState === playStateSet[4];
+          var finished = this.playState === playStateSet[5];
+          var unloaded = this.playState === playStateSet[8];
+          var seeking = this.audioH5.seeking; // filter impossible state
 
           switch (state) {
             case playStateSet[0]:
-              // loading
-              if (!finished && (paused || ended || isReady)) return false;
+              // could not be loading: paused or ready when not finished
+              if (!finished && (paused || isReady)) return false;
               break;
 
             case playStateSet[1]:
-              // playing
-              if (!finished && (paused || ended || seeking || !isReady)) return false;
+              // could not be playing: paused or unloaded or seeking or not ready when not finished
+              if (!finished && (paused || unloaded || seeking || !isReady)) return false;
               break;
 
             case playStateSet[2]:
-              // paused
-              if (finished || ended) return false;
+              // could not be paused: stopped or ended or finished
+              if (stopped || ended || finished || unloaded) return false;
               break;
           }
 
@@ -2669,11 +2671,14 @@
           this.metaDataLoaded = false;
           this.seekValue = null;
 
-          this._setPlayIndex(); // on finish
+          this._setPlayIndex();
+
+          this._fireEventQueue(this.playId, 'oncut'); // on finish
 
 
           if (!this.playList[this.playIndex]) {
-            this.isFinished = true;
+            this._setPlayState(playStateSet[5]);
+
             return this._fireEventQueue(this.playId, 'onfinish');
           }
 
@@ -2687,7 +2692,7 @@
                 // resolve the IOS auto play problem
                 _this13.audioH5.src = src;
 
-                _this13.load();
+                _this13.audioH5.load();
               } else {
                 _this13.unload(true);
 
@@ -2699,8 +2704,6 @@
 
                 _this13._registerEvent(config);
               }
-
-              _this13._fireEventQueue(_this13.playId, 'oncut');
 
               return _this13.play();
             };
@@ -2773,10 +2776,9 @@
           playing: function playing(e) {
             _this14._setPlayState(playStateSet[1]);
 
-            _this14._fireEventQueue(e, 'onplay'); // if playing then set the isTriggerEnd and isFinished to false
+            _this14._fireEventQueue(e, 'onplay'); // if playing then set the isTriggerEnd to false
 
 
-            if (_this14.isFinished) _this14.isFinished = false;
             if (_this14.isTriggerEnd) _this14.isTriggerEnd = false;
           },
           canplaythrough: function canplaythrough(e) {
@@ -2805,7 +2807,7 @@
               if (_this14.config.endAutoCut) {
                 _this14._cut(true);
               } else {
-                _this14.isFinished = true;
+                _this14._setPlayState(playStateSet[5]);
 
                 _this14._fireEventQueue(_this14.playId, 'onfinish');
               }
@@ -2813,7 +2815,7 @@
           },
           // loaderror state
           error: function error(e) {
-            _this14._setPlayState(playStateSet[5]);
+            _this14._setPlayState(playStateSet[6]);
 
             _this14._fireEventQueue(e, 'onloaderror');
           },
@@ -2877,7 +2879,7 @@
                 if (_this14.config.endAutoCut) {
                   _this14._cut(true);
                 } else {
-                  _this14.isFinished = true;
+                  _this14._setPlayState(playStateSet[5]);
 
                   _this14._fireEventQueue(_this14.playId, 'onfinish');
                 }
