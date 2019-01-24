@@ -2483,6 +2483,7 @@
         if (this._checkType(state, 'string', true) && this.playState !== state) {
           var readyState = this.audioH5.readyState;
           var isReady = readyState > 2;
+          var nodePaused = this.audioH5.paused;
           var paused = this.playState === playStateSet[2];
           var stopped = this.playState === playStateSet[3];
           var ended = this.playState === playStateSet[4];
@@ -2497,8 +2498,8 @@
               break;
 
             case playStateSet[1]:
-              // could not be playing: paused or unloaded or seeking or not ready when not finished
-              if (!finished && (paused || unloaded || seeking || !isReady)) return false;
+              // could not be playing: node paused or unloaded or seeking or not ready when not finished
+              if (!finished && (nodePaused || unloaded || seeking || !isReady)) return false;
               break;
 
             case playStateSet[2]:
