@@ -599,6 +599,8 @@
       if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
         // Set @@toStringTag to native iterators
         _setToStringTag(IteratorPrototype, TAG, true);
+        // fix for some old engines
+        if (!_library && typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
       }
     }
     // fix Array#{values, @@iterator}.name in V8 / FF
@@ -607,7 +609,7 @@
       $default = function values() { return $native.call(this); };
     }
     // Define iterator
-    if ((FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+    if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
       _hide(proto, ITERATOR, $default);
     }
     // Plug for library
@@ -3158,35 +3160,35 @@
     }, {
       key: "duration",
       get: function get() {
-        return this.audio.duration;
+        return this.audio ? this.audio.duration : 0;
       }
     }, {
       key: "playState",
       get: function get() {
-        return this.audio.playState;
+        return this.audio ? this.audio.playState : null;
       }
     }, {
       key: "playId",
       get: function get() {
-        return this.audio.playId;
+        return this.audio ? this.audio.playId : 1000;
       }
     }, {
       key: "playingData",
       get: function get() {
-        return this.audio.playList[this.audio.playIndex];
+        return this.audio ? this.audio.playList[this.audio.playIndex] : {};
       }
     }, {
       key: "playlist",
       set: function set(params) {
-        this.audio.playlist(params);
+        this.audio && this.audio.playlist(params);
       },
       get: function get() {
-        return this.audio.playList;
+        return this.audio ? this.audio.playList : [];
       }
     }, {
       key: "networkState",
       get: function get() {
-        return this.audio.networkState;
+        return this.audio ? this.audio.networkState : 0;
       }
     }]);
 
