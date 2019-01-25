@@ -823,28 +823,41 @@ export class AudioH5 {
   _log (detail) {
     const canLog = this.logLevel !== 'silent' && this.logLevel === 'detail'
 
-    return canLog && this.debug && console.log('[EASE_AUDIO_H5 DETAIL]:', detail)
+    return canLog && this.debug && this._logOptimize(detail, 'log')
   }
 
   /* info logger */
   _logInfo (info) {
     const canLog = this.logLevel !== 'silent' && this.logLevel !== 'error' && this.logLevel !== 'warn'
 
-    return canLog && this.debug && console.info('[EASE_AUDIO_H5 INFO]:', info)
+    return canLog && this.debug && this._logOptimize(info, 'info')
   }
 
   /* warn logger */
   _logWarn (warn) {
     const canLog = this.logLevel !== 'silent' && this.logLevel !== 'error'
 
-    return canLog && this.debug && console.warn('[EASE_AUDIO_H5 WARN]:', warn)
+    return canLog && this.debug && this._logOptimize(warn, 'warn')
   }
 
   /* error logger */
-  _logErr (err) {
+  _logErr (error) {
     const canLog = this.logLevel !== 'silent'
 
-    return canLog && this.debug && console.error('[EASE_AUDIO_H5 ERROR]:', err)
+    return canLog && this.debug && this._logOptimize(error, 'error')
+  }
+
+  /* console log optimize */
+  _logOptimize (msg, method) {
+    const logger = console[method] || console.log
+    const prefix = `[EASE_AUDIO_H5 ${method.toUpperCase()}]:`
+
+    if (this._checkType(msg, 'object') || this._checkType(msg, 'array')) {
+      logger(prefix)
+      return console.table(msg)
+    }
+
+    return logger(msg)
   }
 }
 
