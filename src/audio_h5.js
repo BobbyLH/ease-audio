@@ -857,7 +857,7 @@ export class AudioH5 {
       return console.table(msg)
     }
 
-    return logger(msg)
+    return logger(prefix, msg)
   }
 }
 
