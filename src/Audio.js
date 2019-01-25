@@ -25,31 +25,31 @@ export class EaseAudio {
   }
 
   get duration () {
-    return this.audio.duration
+    return this.audio ? this.audio.duration : 0
   }
 
   get playState () {
-    return this.audio.playState
+    return this.audio ? this.audio.playState : null
   }
 
   get playId () {
-    return this.audio.playId
+    return this.audio ? this.audio.playId : 1000
   }
 
   get playingData () {
-    return this.audio.playList[this.audio.playIndex]
+    return this.audio ? this.audio.playList[this.audio.playIndex] : {}
   }
 
   set playlist (params) {
-    this.audio.playlist(params)
+    this.audio && this.audio.playlist(params)
   }
 
   get playlist () {
-    return this.audio.playList
+    return this.audio ? this.audio.playList : []
   }
 
   get networkState () {
-    return this.audio.networkState
+    return this.audio ? this.audio.networkState : 0
   }
 
   _createAudio (config) {
