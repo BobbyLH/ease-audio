@@ -852,7 +852,7 @@ export class AudioH5 {
     const logger = console[method] || console.log
     const prefix = `[EASE_AUDIO_H5 ${method.toUpperCase()}]:`
 
-    if (this._checkType(msg, 'object') || this._checkType(msg, 'array')) {
+    if ((this._checkType(msg, 'object') || this._checkType(msg, 'array')) && console.table) {
       logger(prefix)
       return console.table(msg)
     }
