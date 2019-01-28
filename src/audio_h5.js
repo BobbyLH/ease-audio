@@ -68,12 +68,6 @@ export class AudioH5 {
 
   play () {
     if (this._checkInit() && !this.playLocker) {
-      // if trigger load error then clear lock queue and block play
-      if (this.playState === playStateSet[6]) {
-        this.lockQueue.splice(0)
-        return
-      }
-
       try {
         this._blockEvent({block: false})
         let play = this.audioH5.play()
@@ -89,8 +83,11 @@ export class AudioH5 {
           }).catch(err => {
             this.playLocker = false
             this.lockQueue.splice(0)
-            this._setPlayState(playStateSet[7])
-            this._fireEventQueue(err, 'onplayerror')
+            // set play error if not trigger load error
+            if (this.playState !== playStateSet[6]) {
+              this._setPlayState(playStateSet[7])
+              this._fireEventQueue(err, 'onplayerror')
+            }
           })
         }
 
@@ -102,8 +99,11 @@ export class AudioH5 {
           this._fireEventQueue(err, 'onplayerror')
         }
       } catch (err) {
-        this._setPlayState(playStateSet[7])
-        this._fireEventQueue(err, 'onplayerror')
+        // set play error if not trigger load error
+        if (this.playState !== playStateSet[6]) {
+          this._setPlayState(playStateSet[7])
+          this._fireEventQueue(err, 'onplayerror')
+        }
       }
 
       return this.playId
