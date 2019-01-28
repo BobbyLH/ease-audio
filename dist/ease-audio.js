@@ -3067,7 +3067,7 @@
     }, {
       key: "duration",
       get: function get() {
-        return this.audioH5.duration;
+        return this.audioH5 && this.audioH5.duration;
       }
     }, {
       key: "setProps",
