@@ -599,6 +599,8 @@
       if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
         // Set @@toStringTag to native iterators
         _setToStringTag(IteratorPrototype, TAG, true);
+        // fix for some old engines
+        if (!_library && typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
       }
     }
     // fix Array#{values, @@iterator}.name in V8 / FF
@@ -607,7 +609,7 @@
       $default = function values() { return $native.call(this); };
     }
     // Define iterator
-    if ((FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+    if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
       _hide(proto, ITERATOR, $default);
     }
     // Plug for library
@@ -2049,14 +2051,23 @@
               }).catch(function (err) {
                 _this.playLocker = false;
 
-                _this.lockQueue.splice(0); // set play error if not trigger load error
+                if (_this.playErrLocker) {
+                  // trigger lock queue if the playErrLocker is a truthy
+                  _this.playErrLocker = false;
 
+                  _this.lockQueue.forEach(function (v) {
+                    return v && v();
+                  });
+                } else {
+                  // set play error if not trigger load error
+                  if (_this.playState !== playStateSet[6]) {
+                    _this._setPlayState(playStateSet[7]);
 
-                if (_this.playState !== playStateSet[6]) {
-                  _this._setPlayState(playStateSet[7]);
-
-                  _this._fireEventQueue(err, 'onplayerror');
+                    _this._fireEventQueue(err, 'onplayerror');
+                  }
                 }
+
+                _this.lockQueue.splice(0);
               });
             } // If the sound is still paused, then we can assume there was a playback issue.
 
@@ -2069,11 +2080,13 @@
               this._fireEventQueue(err, 'onplayerror');
             }
           } catch (err) {
-            // set play error if not trigger load error
-            if (this.playState !== playStateSet[6]) {
+            // set play error if not trigger load error and playErrLocker is a falsy
+            if (!this.playErrLocker && this.playState !== playStateSet[6]) {
               this._setPlayState(playStateSet[7]);
 
               this._fireEventQueue(err, 'onplayerror');
+            } else {
+              this.playErrLocker = false;
             }
           }
 
@@ -2121,6 +2134,10 @@
               this._setPlayIndex(i);
 
               this._fireEventQueue(this.playId, 'onpick');
+
+              this.playErrLocker = true;
+
+              this._abortLoad();
 
               this.playLocker && this.cutpickId++;
 
@@ -2300,9 +2317,7 @@
               _this10._fireEventQueue(_this10.playId, 'onunload');
             }
 
-            _this10.audioH5.src = defaultSrc;
-
-            _this10.audioH5.load();
+            _this10._abortLoad();
 
             delete _this10.audioH5;
             _this10.isInit = false;
@@ -2394,6 +2409,7 @@
         this.idCounter = 1000;
         this.lockQueue = new Array(0);
         this.playLocker = false;
+        this.playErrLocker = false;
         this.playId = 1000;
         this.playModel = playModelSet.indexOf(config.playModel) !== -1 && config.playModel || config.loop && playModelSet[3] || playModelSet[0];
         this.playIndex = 0;
@@ -2478,6 +2494,16 @@
           playingData: this.playList[this.playIndex],
           playlist: this.playList
         };
+      }
+      /* abort load sound */
+
+    }, {
+      key: "_abortLoad",
+      value: function _abortLoad() {
+        if (this.audioH5.src !== defaultSrc) {
+          this.audioH5.src = defaultSrc;
+          this.audioH5.load();
+        }
       }
       /* set play state */
 
@@ -2678,7 +2704,11 @@
 
           this._setPlayIndex();
 
-          this._fireEventQueue(this.playId, 'oncut'); // on finish
+          this._fireEventQueue(this.playId, 'oncut');
+
+          this.playErrLocker = true;
+
+          this._abortLoad(); // on finish
 
 
           if (!this.playList[this.playIndex]) {
