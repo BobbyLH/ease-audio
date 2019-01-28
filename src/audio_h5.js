@@ -82,12 +82,18 @@ export class AudioH5 {
             this.lockQueue.splice(0)
           }).catch(err => {
             this.playLocker = false
-            this.lockQueue.splice(0)
-            // set play error if not trigger load error
-            if (this.playState !== playStateSet[6]) {
-              this._setPlayState(playStateSet[7])
-              this._fireEventQueue(err, 'onplayerror')
+            if (this.playErrLocker) {
+              // trigger lock queue if the playErrLocker is a truthy
+              this.playErrLocker = false
+              this.lockQueue.forEach(v => v && v())
+            } else {
+              // set play error if not trigger load error
+              if (this.playState !== playStateSet[6]) {
+                this._setPlayState(playStateSet[7])
+                this._fireEventQueue(err, 'onplayerror')
+              }
             }
+            this.lockQueue.splice(0)
           })
         }
 
@@ -99,10 +105,12 @@ export class AudioH5 {
           this._fireEventQueue(err, 'onplayerror')
         }
       } catch (err) {
-        // set play error if not trigger load error
-        if (this.playState !== playStateSet[6]) {
+        // set play error if not trigger load error and playErrLocker is a falsy
+        if (!this.playErrLocker && this.playState !== playStateSet[6]) {
           this._setPlayState(playStateSet[7])
           this._fireEventQueue(err, 'onplayerror')
+        } else {
+          this.playErrLocker = false
         }
       }
 
@@ -140,6 +148,8 @@ export class AudioH5 {
         if (this.playList[i].playId === playId) {
           this._setPlayIndex(i)
           this._fireEventQueue(this.playId, 'onpick')
+          this.playErrLocker = true
+          this._abortLoad()
 
           this.playLocker && this.cutpickId++
           this._playLockQueue((cutpickId => () => {
@@ -262,8 +272,7 @@ export class AudioH5 {
           this._fireEventQueue(this.playId, 'onunload')
         }
 
-        this.audioH5.src = defaultSrc
-        this.audioH5.load()
+        this._abortLoad()
         delete this.audioH5
         this.isInit = false
       })
@@ -331,6 +340,7 @@ export class AudioH5 {
     this.idCounter = 1000
     this.lockQueue = new Array(0)
     this.playLocker = false
+    this.playErrLocker = false
     this.playId = 1000
     this.playModel = (playModelSet.indexOf(config.playModel) !== -1 && config.playModel) || (config.loop && playModelSet[3]) || playModelSet[0]
     this.playIndex = 0
@@ -397,6 +407,14 @@ export class AudioH5 {
 
   _returnParams () {
     return {playId: this.playId, playingData: this.playList[this.playIndex], playlist: this.playList}
+  }
+
+  /* abort load sound */
+  _abortLoad () {
+    if (this.audioH5.src !== defaultSrc) {
+      this.audioH5.src = defaultSrc
+      this.audioH5.load()
+    }
   }
 
   /* set play state */
@@ -552,6 +570,8 @@ export class AudioH5 {
 
       this._setPlayIndex()
       this._fireEventQueue(this.playId, 'oncut')
+      this.playErrLocker = true
+      this._abortLoad()
 
       // on finish
       if (!this.playList[this.playIndex]) {
