@@ -599,8 +599,6 @@
       if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
         // Set @@toStringTag to native iterators
         _setToStringTag(IteratorPrototype, TAG, true);
-        // fix for some old engines
-        if (!_library && typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
       }
     }
     // fix Array#{values, @@iterator}.name in V8 / FF
@@ -609,7 +607,7 @@
       $default = function values() { return $native.call(this); };
     }
     // Define iterator
-    if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+    if ((FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
       _hide(proto, ITERATOR, $default);
     }
     // Plug for library
@@ -2807,6 +2805,11 @@
 
             _this14._fireEventQueue(e, 'onload');
           },
+          seeking: function seeking(e) {
+            _this14._setPlayState(playStateSet[0]);
+
+            _this14._fireEventQueue(e, 'onseeking');
+          },
           // playing state
           playing: function playing(e) {
             _this14._setPlayState(playStateSet[1]);
@@ -2925,9 +2928,6 @@
           },
           canplay: function canplay(e) {
             _this14._fireEventQueue(e, 'oncanplay');
-          },
-          seeking: function seeking(e) {
-            _this14._fireEventQueue(e, 'onseeking');
           },
           seeked: function seeked(e) {
             _this14._fireEventQueue(e, 'onseeked');
