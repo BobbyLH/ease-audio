@@ -47,7 +47,7 @@ export class AudioH5 {
   }
 
   get duration () {
-    return this.audioH5 && this.audioH5.duration
+    return this.audioH5 ? this.audioH5.duration : 0
   }
 
   set setProps ({prop, value}) {
@@ -83,8 +83,11 @@ export class AudioH5 {
           }).catch(err => {
             this.playLocker = false
             this.lockQueue.splice(0)
-            this._setPlayState(playStateSet[7])
-            this._fireEventQueue(err, 'onplayerror')
+            // set play error if not trigger load error
+            if (this.playState !== playStateSet[6]) {
+              this._setPlayState(playStateSet[7])
+              this._fireEventQueue(err, 'onplayerror')
+            }
           })
         }
 
@@ -96,8 +99,11 @@ export class AudioH5 {
           this._fireEventQueue(err, 'onplayerror')
         }
       } catch (err) {
-        this._setPlayState(playStateSet[7])
-        this._fireEventQueue(err, 'onplayerror')
+        // set play error if not trigger load error
+        if (this.playState !== playStateSet[6]) {
+          this._setPlayState(playStateSet[7])
+          this._fireEventQueue(err, 'onplayerror')
+        }
       }
 
       return this.playId
