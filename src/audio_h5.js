@@ -47,7 +47,7 @@ export class AudioH5 {
   }
 
   get duration () {
-    return this.audioH5.duration
+    return this.audioH5 && this.audioH5.duration
   }
 
   set setProps ({prop, value}) {
