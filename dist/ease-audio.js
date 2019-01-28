@@ -599,8 +599,6 @@
       if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
         // Set @@toStringTag to native iterators
         _setToStringTag(IteratorPrototype, TAG, true);
-        // fix for some old engines
-        if (!_library && typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
       }
     }
     // fix Array#{values, @@iterator}.name in V8 / FF
@@ -609,7 +607,7 @@
       $default = function values() { return $native.call(this); };
     }
     // Define iterator
-    if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+    if ((FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
       _hide(proto, ITERATOR, $default);
     }
     // Plug for library
@@ -2051,11 +2049,14 @@
               }).catch(function (err) {
                 _this.playLocker = false;
 
-                _this.lockQueue.splice(0);
+                _this.lockQueue.splice(0); // set play error if not trigger load error
 
-                _this._setPlayState(playStateSet[7]);
 
-                _this._fireEventQueue(err, 'onplayerror');
+                if (_this.playState !== playStateSet[6]) {
+                  _this._setPlayState(playStateSet[7]);
+
+                  _this._fireEventQueue(err, 'onplayerror');
+                }
               });
             } // If the sound is still paused, then we can assume there was a playback issue.
 
@@ -2068,9 +2069,12 @@
               this._fireEventQueue(err, 'onplayerror');
             }
           } catch (err) {
-            this._setPlayState(playStateSet[7]);
+            // set play error if not trigger load error
+            if (this.playState !== playStateSet[6]) {
+              this._setPlayState(playStateSet[7]);
 
-            this._fireEventQueue(err, 'onplayerror');
+              this._fireEventQueue(err, 'onplayerror');
+            }
           }
 
           return this.playId;
@@ -3067,7 +3071,7 @@
     }, {
       key: "duration",
       get: function get() {
-        return this.audioH5 && this.audioH5.duration;
+        return this.audioH5 ? this.audioH5.duration : 0;
       }
     }, {
       key: "setProps",
