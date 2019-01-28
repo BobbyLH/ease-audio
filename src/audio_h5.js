@@ -47,7 +47,7 @@ export class AudioH5 {
   }
 
   get duration () {
-    return this.audioH5 && this.audioH5.duration
+    return this.audioH5 ? this.audioH5.duration : 0
   }
 
   set setProps ({prop, value}) {
@@ -68,6 +68,12 @@ export class AudioH5 {
 
   play () {
     if (this._checkInit() && !this.playLocker) {
+      // if trigger load error then clear lock queue and block play
+      if (this.playState === playStateSet[6]) {
+        this.lockQueue.splice(0)
+        return
+      }
+
       try {
         this._blockEvent({block: false})
         let play = this.audioH5.play()
