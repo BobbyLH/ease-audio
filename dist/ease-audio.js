@@ -2069,9 +2069,7 @@
                 } else {
                   // set play error if not trigger load error
                   if (_this.playState !== playStateSet[6]) {
-                    _this._setPlayState(playStateSet[7]);
-
-                    _this._fireEventQueue(err, 'onplayerror');
+                    _this.eventMethods.playerror(err);
                   }
                 }
 
@@ -2082,17 +2080,12 @@
 
             if (this.audioH5.paused) {
               var _err = "Playback was unable to start. This is most commonly an issue on mobile devices and Chrome where playback was not within a user interaction.";
-
-              this._setPlayState(playStateSet[7]);
-
-              this._fireEventQueue(_err, 'onplayerror');
+              this.eventMethods.playerror(_err);
             }
           } catch (err) {
             // set play error if not trigger load error and playErrLocker is a falsy
             if (!this.playErrLocker && this.playState !== playStateSet[6]) {
-              this._setPlayState(playStateSet[7]);
-
-              this._fireEventQueue(err, 'onplayerror');
+              this.eventMethods.playerror(err);
             } else {
               this.playErrLocker = false;
             }
@@ -2117,7 +2110,7 @@
     }, {
       key: "toggle",
       value: function toggle() {
-        if (this._checkInit() && this.playState !== 'stopped' && this.playState !== 'ended' && this.playState !== 'loaderror' && this.playState !== 'playerror') {
+        if (this._checkInit() && this.playState !== playStateSet[6] && this.playState !== playStateSet[7] && this.playState !== playStateSet[8]) {
           this.playState === null || this.playState === 'paused' ? this.play() : this.pause();
           return this.playId;
         }
