@@ -27,7 +27,7 @@
   });
 
   var _core = createCommonjsModule(function (module) {
-  var core = module.exports = { version: '2.6.2' };
+  var core = module.exports = { version: '2.6.3' };
   if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
   });
   var _core_1 = _core.version;
@@ -599,6 +599,8 @@
       if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
         // Set @@toStringTag to native iterators
         _setToStringTag(IteratorPrototype, TAG, true);
+        // fix for some old engines
+        if (!_library && typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
       }
     }
     // fix Array#{values, @@iterator}.name in V8 / FF
@@ -607,7 +609,7 @@
       $default = function values() { return $native.call(this); };
     }
     // Define iterator
-    if ((FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+    if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
       _hide(proto, ITERATOR, $default);
     }
     // Plug for library
@@ -1982,6 +1984,7 @@
   var playStateSet = ['loading', 'playing', 'paused', 'stopped', 'ended', 'finished', 'loaderror', 'playerror', 'unloaded'];
   var playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 'single-loop'];
   var supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onfinish', 'onload', 'onunload', 'oncanplay', 'onprogress', 'onvolume', 'onseeking', 'onseeked', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick'];
+  var uselessEvents = ['finish', 'playerror', 'cut', 'pick', 'play', 'abort', 'suspend'];
   var logLevel = ['detail', 'info', 'warn', 'error', 'silent'];
   var defaultSrc = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
   var AudioH5 =
@@ -2030,6 +2033,13 @@
 
         if (this._checkInit() && !this.playLocker) {
           try {
+            if (this.audioH5.src === defaultSrc) {
+              // without correct src the sound couldn't play
+              // manual trigger load error event
+              var err = 'Because the error src property, manual trigger load error event';
+              return this.eventMethods.error(err);
+            }
+
             this._blockEvent({
               block: false
             });
@@ -2071,11 +2081,11 @@
 
 
             if (this.audioH5.paused) {
-              var err = "Playback was unable to start. This is most commonly an issue on mobile devices and Chrome where playback was not within a user interaction.";
+              var _err = "Playback was unable to start. This is most commonly an issue on mobile devices and Chrome where playback was not within a user interaction.";
 
               this._setPlayState(playStateSet[7]);
 
-              this._fireEventQueue(err, 'onplayerror');
+              this._fireEventQueue(_err, 'onplayerror');
             }
           } catch (err) {
             // set play error if not trigger load error and playErrLocker is a falsy
@@ -2131,8 +2141,7 @@
             if (this.playList[i].playId === playId) {
               this._setPlayIndex(i);
 
-              this._fireEventQueue(this.playId, 'onpick');
-
+              this.eventMethods.pick(this.playId);
               this.playErrLocker = true;
 
               this._abortLoad();
@@ -2439,16 +2448,8 @@
           });
 
           src = config.playlist[0] && config.playlist[0].src;
-
-          if (!src || !this._checkType(src, 'string')) {
-            src = defaultSrc;
-
-            this._logErr('The src property is necessary and must be string!');
-          }
         } else {
           this._logErr('Please pass correct playlist parameters!');
-
-          src = defaultSrc;
         } // create Audio Object
 
 
@@ -2476,6 +2477,8 @@
         if (src && this._checkType(src, 'string')) {
           return src;
         }
+
+        this._logErr("The ".concat(this.playId, "s' src property is: ").concat(src, ".\nIt's necessary and must be string!"));
 
         return defaultSrc;
       }
@@ -2702,17 +2705,14 @@
 
           this._setPlayIndex();
 
-          this._fireEventQueue(this.playId, 'oncut');
-
+          this.eventMethods.cut(this.playId);
           this.playErrLocker = true;
 
           this._abortLoad(); // on finish
 
 
           if (!this.playList[this.playIndex]) {
-            this._setPlayState(playStateSet[5]);
-
-            return this._fireEventQueue(this.playId, 'onfinish');
+            return this.eventMethods.finish(this.playId);
           }
 
           this.playLocker && this.cutpickId++;
@@ -2845,17 +2845,29 @@
               if (_this14.config.endAutoCut) {
                 _this14._cut(true);
               } else {
-                _this14._setPlayState(playStateSet[5]);
-
-                _this14._fireEventQueue(_this14.playId, 'onfinish');
+                _this14.eventMethods.finish(_this14.playId);
               }
             }
+          },
+          // finish state
+          // The Audio not really exist this event, just for intergration
+          finish: function finish(e) {
+            _this14._setPlayState(playStateSet[5]);
+
+            _this14._fireEventQueue(e, 'onfinish');
           },
           // loaderror state
           error: function error(e) {
             _this14._setPlayState(playStateSet[6]);
 
             _this14._fireEventQueue(e, 'onloaderror');
+          },
+          // playerror state
+          // The Audio not really exist this event, just for intergration
+          playerror: function playerror(e) {
+            _this14._setPlayState(playStateSet[7]);
+
+            _this14._fireEventQueue(e, 'onplayerror');
           },
           // others
           progress: function progress(e) {
@@ -2917,9 +2929,7 @@
                 if (_this14.config.endAutoCut) {
                   _this14._cut(true);
                 } else {
-                  _this14._setPlayState(playStateSet[5]);
-
-                  _this14._fireEventQueue(_this14.playId, 'onfinish');
+                  _this14.eventMethods.finish(_this14.playId);
                 }
               }
             }
@@ -2927,18 +2937,24 @@
             _this14._fireEventQueue(e, 'ontimeupdate');
           },
           canplay: function canplay(e) {
-            _this14._fireEventQueue(e, 'oncanplay');
+            return _this14._fireEventQueue(e, 'oncanplay');
           },
           seeked: function seeked(e) {
-            _this14._fireEventQueue(e, 'onseeked');
+            return _this14._fireEventQueue(e, 'onseeked');
           },
-          play: function play(e) {},
           volumechange: function volumechange(e) {
-            _this14._fireEventQueue(e, 'onvolume');
+            return _this14._fireEventQueue(e, 'onvolume');
           },
           ratechange: function ratechange(e) {
-            _this14._fireEventQueue(e, 'onrate');
+            return _this14._fireEventQueue(e, 'onrate');
           },
+          cut: function cut(e) {
+            return _this14._fireEventQueue(e, 'oncut');
+          },
+          pick: function pick(e) {
+            return _this14._fireEventQueue(e, 'onpick');
+          },
+          play: function play(e) {},
           abort: function abort(e) {},
           suspend: function suspend(e) {}
         };
@@ -2948,6 +2964,8 @@
         }
 
         for (var _k in this.eventMethods) {
+          if (uselessEvents.indexOf[_k] !== -1) continue;
+
           this._bindEvent(this.eventMethods[_k], _k);
         }
 
@@ -2962,6 +2980,8 @@
       value: function _unregisterEvent() {
         if (this._checkInit()) {
           for (var k in this.eventMethods) {
+            if (uselessEvents.indexOf[k] !== -1) continue;
+
             this._removeEvent(this.eventMethods[k], k);
           }
         }
