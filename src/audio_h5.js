@@ -16,6 +16,8 @@ const playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 's
 
 const supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onfinish', 'onload', 'onunload', 'oncanplay', 'onprogress', 'onvolume', 'onseeking', 'onseeked', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick']
 
+const uselessEvents = ['finish', 'playerror', 'cut', 'pick', 'play', 'abort', 'suspend']
+
 const logLevel = ['detail', 'info', 'warn', 'error', 'silent']
 
 const defaultSrc = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA'
@@ -69,6 +71,13 @@ export class AudioH5 {
   play () {
     if (this._checkInit() && !this.playLocker) {
       try {
+        if (this.audioH5.src === defaultSrc) {
+          // without correct src the sound couldn't play
+          // manual trigger load error event
+          const err = 'Because the error src property, manual trigger load error event'
+          return this.eventMethods.error(err)
+        }
+
         this._blockEvent({block: false})
         let play = this.audioH5.play()
 
@@ -147,7 +156,7 @@ export class AudioH5 {
       for (let i = 0; i < this.playList.length; i++) {
         if (this.playList[i].playId === playId) {
           this._setPlayIndex(i)
-          this._fireEventQueue(this.playId, 'onpick')
+          this.eventMethods.pick(this.playId)
           this.playErrLocker = true
           this._abortLoad()
 
@@ -564,14 +573,13 @@ export class AudioH5 {
       this.seekValue = null
 
       this._setPlayIndex()
-      this._fireEventQueue(this.playId, 'oncut')
+      this.eventMethods.cut(this.playId)
       this.playErrLocker = true
       this._abortLoad()
 
       // on finish
       if (!this.playList[this.playIndex]) {
-        this._setPlayState(playStateSet[5])
-        return this._fireEventQueue(this.playId, 'onfinish')
+        return this.eventMethods.finish(this.playId)
       }
 
       this.playLocker && this.cutpickId++
@@ -676,15 +684,26 @@ export class AudioH5 {
           if (this.config.endAutoCut) {
             this._cut(true)
           } else {
-            this._setPlayState(playStateSet[5])
-            this._fireEventQueue(this.playId, 'onfinish')
+            this.eventMethods.finish(this.playId)
           }
         }
+      },
+      // finish state
+      // The Audio not really exist this event, just for intergration
+      finish: e => {
+        this._setPlayState(playStateSet[5])
+        this._fireEventQueue(e, 'onfinish')
       },
       // loaderror state
       error: e => {
         this._setPlayState(playStateSet[6])
         this._fireEventQueue(e, 'onloaderror')
+      },
+      // playerror state
+      // The Audio not really exist this event, just for intergration
+      playerror: e => {
+        this._setPlayState(playStateSet[7])
+        this._fireEventQueue(e, 'onplayerror')
       },
       // others
       progress: e => {
@@ -735,27 +754,20 @@ export class AudioH5 {
             if (this.config.endAutoCut) {
               this._cut(true)
             } else {
-              this._setPlayState(playStateSet[5])
-              this._fireEventQueue(this.playId, 'onfinish')
+              this.eventMethods.finish(this.playId)
             }
           }
         }
 
         this._fireEventQueue(e, 'ontimeupdate')
       },
-      canplay: e => {
-        this._fireEventQueue(e, 'oncanplay')
-      },
-      seeked: e => {
-        this._fireEventQueue(e, 'onseeked')
-      },
+      canplay: e => this._fireEventQueue(e, 'oncanplay'),
+      seeked: e => this._fireEventQueue(e, 'onseeked'),
+      volumechange: e => this._fireEventQueue(e, 'onvolume'),
+      ratechange: e => this._fireEventQueue(e, 'onrate'),
+      cut: e => this._fireEventQueue(e, 'oncut'),
+      pick: e => this._fireEventQueue(e, 'onpick'),
       play: e => {},
-      volumechange: e => {
-        this._fireEventQueue(e, 'onvolume')
-      },
-      ratechange: e => {
-        this._fireEventQueue(e, 'onrate')
-      },
       abort: e => {},
       suspend: e => {}
     }
@@ -765,6 +777,8 @@ export class AudioH5 {
     }
 
     for (let k in this.eventMethods) {
+      if (uselessEvents.indexOf[k] !== -1) continue
+
       this._bindEvent(this.eventMethods[k], k)
     }
 
@@ -775,6 +789,8 @@ export class AudioH5 {
   _unregisterEvent () {
     if (this._checkInit()) {
       for (let k in this.eventMethods) {
+        if (uselessEvents.indexOf[k] !== -1) continue
+
         this._removeEvent(this.eventMethods[k], k)
       }
     }
