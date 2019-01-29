@@ -365,15 +365,9 @@ export class AudioH5 {
         })
       }
       this._handlePlayList({action: 'add', list: config.playlist})
-
       src = config.playlist[0] && config.playlist[0].src
-      if (!src || !this._checkType(src, 'string')) {
-        src = defaultSrc
-        this._logErr('The src property is necessary and must be string!')
-      }
     } else {
       this._logErr('Please pass correct playlist parameters!')
-      src = defaultSrc
     }
 
     // create Audio Object
@@ -398,6 +392,7 @@ export class AudioH5 {
     if (src && this._checkType(src, 'string')) {
       return src
     }
+    this._logErr(`The ${this.playId}s' src property is: ${src}.\nIt's necessary and must be string!`)
     return defaultSrc
   }
 
