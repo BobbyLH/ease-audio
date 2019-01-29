@@ -69,6 +69,15 @@ export class AudioH5 {
   play () {
     if (this._checkInit() && !this.playLocker) {
       try {
+        if (this.audioH5.src === defaultSrc) {
+          // without correct src the sound couldn't play
+          // manual trigger ended event
+          return this.eventMethods.ended && this.eventMethods.ended({
+            playId: this.playId,
+            message: `Because the error src property, manual trigger onend event`
+          })
+        }
+
         this._blockEvent({block: false})
         let play = this.audioH5.play()
 
