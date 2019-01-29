@@ -98,8 +98,7 @@ export class AudioH5 {
             } else {
               // set play error if not trigger load error
               if (this.playState !== playStateSet[6]) {
-                this._setPlayState(playStateSet[7])
-                this._fireEventQueue(err, 'onplayerror')
+                this.eventMethods.playerror(err)
               }
             }
             this.lockQueue.splice(0)
@@ -110,14 +109,12 @@ export class AudioH5 {
         if (this.audioH5.paused) {
           const err = `Playback was unable to start. This is most commonly an issue on mobile devices and Chrome where playback was not within a user interaction.`
 
-          this._setPlayState(playStateSet[7])
-          this._fireEventQueue(err, 'onplayerror')
+          this.eventMethods.playerror(err)
         }
       } catch (err) {
         // set play error if not trigger load error and playErrLocker is a falsy
         if (!this.playErrLocker && this.playState !== playStateSet[6]) {
-          this._setPlayState(playStateSet[7])
-          this._fireEventQueue(err, 'onplayerror')
+          this.eventMethods.playerror(err)
         } else {
           this.playErrLocker = false
         }
@@ -136,7 +133,7 @@ export class AudioH5 {
   }
 
   toggle () {
-    if (this._checkInit() && this.playState !== 'stopped' && this.playState !== 'ended' && this.playState !== 'loaderror' && this.playState !== 'playerror') {
+    if (this._checkInit() && this.playState !== playStateSet[6] && this.playState !== playStateSet[7] && this.playState !== playStateSet[8]) {
       this.playState === null || this.playState === 'paused' ? this.play() : this.pause()
 
       return this.playId
