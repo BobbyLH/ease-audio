@@ -2964,7 +2964,7 @@
         }
 
         for (var _k in this.eventMethods) {
-          if (uselessEvents.indexOf[_k] !== -1) continue;
+          if (uselessEvents.indexOf(_k) !== -1) continue;
 
           this._bindEvent(this.eventMethods[_k], _k);
         }
@@ -2980,7 +2980,7 @@
       value: function _unregisterEvent() {
         if (this._checkInit()) {
           for (var k in this.eventMethods) {
-            if (uselessEvents.indexOf[k] !== -1) continue;
+            if (uselessEvents.indexOf(k) !== -1) continue;
 
             this._removeEvent(this.eventMethods[k], k);
           }
