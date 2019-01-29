@@ -777,7 +777,7 @@ export class AudioH5 {
     }
 
     for (let k in this.eventMethods) {
-      if (uselessEvents.indexOf[k] !== -1) continue
+      if (uselessEvents.indexOf(k) !== -1) continue
 
       this._bindEvent(this.eventMethods[k], k)
     }
@@ -789,7 +789,7 @@ export class AudioH5 {
   _unregisterEvent () {
     if (this._checkInit()) {
       for (let k in this.eventMethods) {
-        if (uselessEvents.indexOf[k] !== -1) continue
+        if (uselessEvents.indexOf(k) !== -1) continue
 
         this._removeEvent(this.eventMethods[k], k)
       }
