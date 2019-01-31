@@ -79,7 +79,7 @@ var sound = new EaseAudio({
   playlist: ['sound.mp3']
 });
 
-// Clear listener after first call.
+// Clear listener after first call onload event.
 sound.once('load', function(){
   console.log('loading')
 });
