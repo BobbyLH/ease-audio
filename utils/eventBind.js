@@ -20,7 +20,7 @@ export const removeListener = (event, fn, dom) => {
 }
 // prevent default
 export const preventEvent = event => {
-  const e = event || window.event
+  const e = event || (typeof window !== 'undefined' && window.event)
   if (e && e.preventDefault) {
     e.cancelable && !e.defaultPrevented && e.preventDefault()
   } else {
@@ -30,7 +30,7 @@ export const preventEvent = event => {
 }
 // stop propagat
 export const stopEvent = event => {
-  const e = event || window.event
+  const e = event || (typeof window !== 'undefined' && window.event)
   if (e && e.stopPropagation) {
     e.stopPropagation()
   } else {
