@@ -71,10 +71,12 @@ export class EaseAudio {
     const { usingWebAudio } = config || {}
 
     try {
-      if (usingWebAudio && (window.AudioContext || window.webkitAudioContext)) {
-        audio = new AudioCtx(config)
-      } else if (window.Audio) {
-        audio = new AudioH5(config)
+      if (typeof window !== 'undefined') {
+        if (usingWebAudio && (window.AudioContext || window.webkitAudioContext)) {
+          audio = new AudioCtx(config)
+        } else if (window.Audio) {
+          audio = new AudioH5(config)
+        }
       }
     } catch (err) {
       console.error('[EASE_AUDIO ERROR]:', err)

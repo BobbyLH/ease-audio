@@ -3,7 +3,7 @@ import getUA from './handleUA'
 let ua
 
 try {
-  ua = window && window.navigator && window.navigator.userAgent
+  ua = typeof window !== 'undefined' && window.navigator && window.navigator.userAgent
 } catch (error) {
   console.error(`[isIE]: ${error}`)
 }

@@ -383,7 +383,7 @@ export class AudioH5 {
   _createAudio (config) {
     this.isInit = true
 
-    this.audioH5 = new window.Audio()
+    this.audioH5 = typeof window !== 'undefined' && new window.Audio()
     this.audioH5.autoplay = config.autoplay || false
     this.audioH5.loop = config.loop || false
     this.audioH5.src = this._srcAssemble(config.src)
