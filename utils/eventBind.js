@@ -1,6 +1,6 @@
 // adapt IE add event
 export const addListener = (event, fn, dom) => {
-  if (!window) return false
+  if (typeof window === 'undefined') return false
   const eventDOM = dom || window
   if (window.addEventListener) {
     eventDOM.addEventListener(event, fn, false)
@@ -10,7 +10,7 @@ export const addListener = (event, fn, dom) => {
 }
 // adapt IE remove event
 export const removeListener = (event, fn, dom) => {
-  if (!window) return false
+  if (typeof window === 'undefined') return false
   const eventDOM = dom || window
   if (window.removeEventListener) {
     eventDOM.removeEventListener(event, fn, false)
