@@ -43,6 +43,8 @@ var sound = new EaseAudio({
     {src: 'sound1.mp3', tag: 'your tag'}, 
     {src: 'sound2.mp3', tag: 'your tag'}
   ],
+  // pick second playlist item for initiation
+  initIndex: 1,
   volume: 1,
   playModel: 'list-once',
   preload: true,

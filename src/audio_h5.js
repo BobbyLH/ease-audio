@@ -371,7 +371,8 @@ export class AudioH5 {
         })
       }
       this._handlePlayList({action: 'add', list: config.playlist})
-      src = config.playlist[0] && config.playlist[0].src
+      const srcIndex = config.initIndex && config.playlist[config.initIndex] ? config.initIndex : 0
+      src = config.playlist[srcIndex].src
     } else {
       this._logErr('Please pass correct playlist parameters!')
     }
