@@ -2438,7 +2438,8 @@
             list: config.playlist
           });
 
-          src = config.playlist[0] && config.playlist[0].src;
+          var srcIndex = config.initIndex && config.playlist[config.initIndex] ? config.initIndex : 0;
+          src = config.playlist[srcIndex].src;
         } else {
           this._logErr('Please pass correct playlist parameters!');
         } // create Audio Object
