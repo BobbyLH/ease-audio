@@ -599,6 +599,8 @@
       if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
         // Set @@toStringTag to native iterators
         _setToStringTag(IteratorPrototype, TAG, true);
+        // fix for some old engines
+        if (!_library && typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
       }
     }
     // fix Array#{values, @@iterator}.name in V8 / FF
@@ -607,7 +609,7 @@
       $default = function values() { return $native.call(this); };
     }
     // Define iterator
-    if ((FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+    if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
       _hide(proto, ITERATOR, $default);
     }
     // Plug for library
@@ -2438,8 +2440,11 @@
             list: config.playlist
           });
 
-          var srcIndex = config.initIndex && config.playlist[config.initIndex] ? config.initIndex : 0;
-          src = config.playlist[srcIndex].src;
+          var srcIndex = config.initIndex && this.playList[config.initIndex] ? config.initIndex : 0;
+
+          this._setPlayIndex(srcIndex);
+
+          src = this.playList[srcIndex].src;
         } else {
           this._logErr('Please pass correct playlist parameters!');
         } // create Audio Object
