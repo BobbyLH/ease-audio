@@ -255,7 +255,7 @@ export class AudioH5 {
           this._fireEventQueue(this.playId, 'onstop')
         }
 
-        if (!isNaN(+this.audioH5.duration)) {
+        if (!isNaN('' + this.audioH5.duration)) {
           this.audioH5.currentTime = 0
           this.audioH5.pause()
         } else {
@@ -350,6 +350,7 @@ export class AudioH5 {
     this.playId = 1000
     this.playModel = (playModelSet.indexOf(config.playModel) !== -1 && config.playModel) || (config.loop && playModelSet[3]) || playModelSet[0]
     this.playIndex = 0
+    this.prevPlayIndex = 0
     this.playList = new Array(0)
     this.buffered = new Array(0)
     this.eventController = new Array(0)
@@ -459,6 +460,9 @@ export class AudioH5 {
   _setPlayIndex (index) {
     const playModel = this.playModel
     const maxIndex = this.playList.length - 1
+
+    // reserve playIndex
+    this.prevPlayIndex = this.playIndex
 
     if (index === 0) {
       this.playIndex = 0
@@ -577,40 +581,45 @@ export class AudioH5 {
 
   /* cut audio */
   _cut (endCut) {
-    this.stop(true)
-    // can't cut audio if the playModel is single-once
-    if (this._checkInit() && this.playModel !== 'single-once') {
-      this.metaDataLoaded = false
-      this.seekValue = null
+    if (this._checkInit()) {
+      if (this.playModel === 'single-once') {
+        // can't cut audio if the playModel is single-once
+        this.stop()
+      } else {
+        this.metaDataLoaded = false
+        this.seekValue = null
 
-      this._setPlayIndex()
-      this.eventMethods.cut(this.playId)
-      this.playErrLocker = true
-      this._abortLoad()
+        this._setPlayIndex()
 
-      // on finish
-      if (!this.playList[this.playIndex]) {
-        return this.eventMethods.finish(this.playId)
-      }
-
-      this.playLocker && this.cutpickId++
-      return this._playLockQueue((cutpickId => () => {
-        if (cutpickId !== this.cutpickId) return
-
-        const src = this.playList[this.playIndex].src
-        if (endCut) {
-          // resolve the IOS auto play problem
-          this.audioH5.src = src
-          this.audioH5.load()
-        } else {
-          this.unload(true)
-          const config = {...this.config, src}
-          this._createAudio(config)
-          this._registerEvent(config)
+        // on finish
+        if (!this.playList[this.playIndex]) {
+          this.playIndex = this.prevPlayIndex
+          return this.eventMethods.finish(this.playId)
         }
 
-        return this.play()
-      })(this.cutpickId))
+        this.eventMethods.cut(this.playId)
+        this.playErrLocker = true
+        this._abortLoad()
+
+        this.playLocker && this.cutpickId++
+        return this._playLockQueue((cutpickId => () => {
+          if (cutpickId !== this.cutpickId) return
+
+          const src = this.playList[this.playIndex].src
+          if (endCut) {
+            // resolve the IOS auto play problem
+            this.audioH5.src = src
+            this.audioH5.load()
+          } else {
+            this.unload(true)
+            const config = {...this.config, src}
+            this._createAudio(config)
+            this._registerEvent(config)
+          }
+
+          return this.play()
+        })(this.cutpickId))
+      }
     }
   }
 
