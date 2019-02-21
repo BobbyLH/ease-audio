@@ -15,5 +15,5 @@ if (match) {
       match[3] = parseInt(match[3]) + 1
     }
   }
-  fs.writeFileSync('./package.json', pkg.replace(/version.*(\d+).(\d+).(\d+)/, `version": "${match[1]}.${match[2]}.${match[3]}`))
+  fs.writeFileSync('./package.json', pkg.replace(/version.*,/, `version": "${match[1]}.${match[2]}.${match[3]}",`))
 }
