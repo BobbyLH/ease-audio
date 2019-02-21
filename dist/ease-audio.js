@@ -2623,7 +2623,10 @@
             if (playId) {
               for (var i = 0; i < this.playList.length; i++) {
                 if (this.playList[i].playId === playId) {
-                  return this.playList.splice(i, 1);
+                  var playlist = new Array(this.playList);
+                  playlist.splice(i, 1);
+                  this.playList = [].concat(playlist);
+                  break;
                 }
               }
             }
@@ -2634,13 +2637,16 @@
             if (playId && list) {
               for (var _i = 0; _i < this.playList.length; _i++) {
                 if (this.playList[_i].playId === playId) {
-                  var _this$playList;
+                  var _playlist = new Array(this.playList);
 
-                  return (_this$playList = this.playList).splice.apply(_this$playList, [_i, 0].concat(toConsumableArray(list.map(function (v) {
+                  _playlist.splice.apply(_playlist, [_i, 0].concat(toConsumableArray(list.map(function (v) {
                     v.playId = _this12.idCounter;
                     _this12.idCounter++;
                     return v;
                   }))));
+
+                  this.playList = [].concat(_playlist);
+                  break;
                 }
               }
             }
@@ -2651,13 +2657,16 @@
             if (playId && list) {
               for (var _i2 = 0; _i2 < this.playList.length; _i2++) {
                 if (this.playList[_i2].playId === playId) {
-                  var _this$playList2;
+                  var _playlist2 = new Array(this.playList);
 
-                  return (_this$playList2 = this.playList).splice.apply(_this$playList2, [_i2, 1].concat(toConsumableArray(list.map(function (v) {
+                  _playlist2.splice.apply(_playlist2, [_i2, 1].concat(toConsumableArray(list.map(function (v) {
                     v.playId = _this12.idCounter;
                     _this12.idCounter++;
                     return v;
                   }))));
+
+                  this.playList = [].concat(_playlist2);
+                  break;
                 }
               }
             }
@@ -2668,9 +2677,14 @@
             if (playId && params) {
               for (var _i3 = 0; _i3 < this.playList.length; _i3++) {
                 if (this.playList[_i3].playId === playId) {
+                  var _playlist3 = new Array(this.playList);
+
                   var newData = objectSpread({}, this.playList[_i3], params);
 
-                  return this.playList.splice(_i3, 1, newData);
+                  _playlist3.splice(_i3, 1, newData);
+
+                  this.playList = [].concat(_playlist3);
+                  break;
                 }
               }
             }
