@@ -2288,7 +2288,7 @@
               _this9._fireEventQueue(_this9.playId, 'onstop');
             }
 
-            if (!isNaN(+_this9.audioH5.duration)) {
+            if (!isNaN('' + _this9.audioH5.duration)) {
               _this9.audioH5.currentTime = 0;
 
               _this9.audioH5.pause();
@@ -2413,6 +2413,7 @@
         this.playId = 1000;
         this.playModel = playModelSet.indexOf(config.playModel) !== -1 && config.playModel || config.loop && playModelSet[3] || playModelSet[0];
         this.playIndex = 0;
+        this.prevPlayIndex = 0;
         this.playList = new Array(0);
         this.buffered = new Array(0);
         this.eventController = new Array(0);
@@ -2548,7 +2549,9 @@
       key: "_setPlayIndex",
       value: function _setPlayIndex(index) {
         var playModel = this.playModel;
-        var maxIndex = this.playList.length - 1;
+        var maxIndex = this.playList.length - 1; // reserve playIndex
+
+        this.prevPlayIndex = this.playIndex;
 
         if (index === 0) {
           this.playIndex = 0;
@@ -2708,50 +2711,54 @@
       value: function _cut(endCut) {
         var _this13 = this;
 
-        this.stop(true); // can't cut audio if the playModel is single-once
+        if (this._checkInit()) {
+          if (this.playModel === 'single-once') {
+            // can't cut audio if the playModel is single-once
+            this.stop();
+          } else {
+            this.metaDataLoaded = false;
+            this.seekValue = null;
 
-        if (this._checkInit() && this.playModel !== 'single-once') {
-          this.metaDataLoaded = false;
-          this.seekValue = null;
-
-          this._setPlayIndex();
-
-          this.eventMethods.cut(this.playId);
-          this.playErrLocker = true;
-
-          this._abortLoad(); // on finish
+            this._setPlayIndex(); // on finish
 
 
-          if (!this.playList[this.playIndex]) {
-            return this.eventMethods.finish(this.playId);
+            if (!this.playList[this.playIndex]) {
+              this.playIndex = this.prevPlayIndex;
+              return this.eventMethods.finish(this.playId);
+            }
+
+            this.eventMethods.cut(this.playId);
+            this.playErrLocker = true;
+
+            this._abortLoad();
+
+            this.playLocker && this.cutpickId++;
+            return this._playLockQueue(function (cutpickId) {
+              return function () {
+                if (cutpickId !== _this13.cutpickId) return;
+                var src = _this13.playList[_this13.playIndex].src;
+
+                if (endCut) {
+                  // resolve the IOS auto play problem
+                  _this13.audioH5.src = src;
+
+                  _this13.audioH5.load();
+                } else {
+                  _this13.unload(true);
+
+                  var config = objectSpread({}, _this13.config, {
+                    src: src
+                  });
+
+                  _this13._createAudio(config);
+
+                  _this13._registerEvent(config);
+                }
+
+                return _this13.play();
+              };
+            }(this.cutpickId));
           }
-
-          this.playLocker && this.cutpickId++;
-          return this._playLockQueue(function (cutpickId) {
-            return function () {
-              if (cutpickId !== _this13.cutpickId) return;
-              var src = _this13.playList[_this13.playIndex].src;
-
-              if (endCut) {
-                // resolve the IOS auto play problem
-                _this13.audioH5.src = src;
-
-                _this13.audioH5.load();
-              } else {
-                _this13.unload(true);
-
-                var config = objectSpread({}, _this13.config, {
-                  src: src
-                });
-
-                _this13._createAudio(config);
-
-                _this13._registerEvent(config);
-              }
-
-              return _this13.play();
-            };
-          }(this.cutpickId));
         }
       }
       /* generate received event callback queue */
