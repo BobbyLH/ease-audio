@@ -2104,7 +2104,11 @@
             _this2.waitPause = playLock;
             return function () {
               _this2.waitPause = false;
-              if (_this2.cancalPause) return;
+
+              if (_this2.cancalPause && playLock) {
+                _this2.cancalPause = false;
+                return;
+              }
 
               _this2.audioH5.pause();
             };
@@ -2118,7 +2122,7 @@
       value: function toggle() {
         if (this._checkInit() && this.playState !== playStateSet[6] && this.playState !== playStateSet[7] && this.playState !== playStateSet[8]) {
           if (this.waitPause) {
-            this.cancalPause = true;
+            this.cancalPause = !this.cancalPause;
           } else {
             if (this.playState === null || this.playState === 'paused') {
               // trigger play method
