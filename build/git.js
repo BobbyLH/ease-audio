@@ -1,6 +1,6 @@
 const fs = require('fs')
 const pkg = fs.readFileSync('./package.json', 'utf-8')
-const version = pkg.match(/version.*,/)
+const version = pkg.match(/"version.*,/)
 
 async function autoGit () {
   const simpleGit = require('simple-git/promise')
