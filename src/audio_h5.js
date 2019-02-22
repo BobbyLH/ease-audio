@@ -126,7 +126,14 @@ export class AudioH5 {
 
   pause () {
     if (this._checkInit()) {
-      this._playLockQueue(() => this.audioH5.pause())
+      this._playLockQueue((playLock => {
+        this.waitPause = playLock
+        return () => {
+          if (this.cancalPause) return
+          this.waitPause = false
+          this.audioH5.pause()
+        }
+      })(this.playLocker))
 
       return this.playId
     }
@@ -134,7 +141,16 @@ export class AudioH5 {
 
   toggle () {
     if (this._checkInit() && this.playState !== playStateSet[6] && this.playState !== playStateSet[7] && this.playState !== playStateSet[8]) {
-      this.playState === null || this.playState === 'paused' ? this.play() : this.pause()
+      if (this.playState === null || this.playState === 'paused') {
+        // trigger play method
+        if (this.waitPause) {
+          this.cancalPause = true
+        } else {
+          this.play()
+        }
+      } else {
+        this.pause()
+      }
 
       return this.playId
     }
@@ -347,6 +363,8 @@ export class AudioH5 {
     this.lockQueue = new Array(0)
     this.playLocker = false
     this.playErrLocker = false
+    this.waitPause = false
+    this.cancalPause = false
     this.playId = 1000
     this.playModel = (playModelSet.indexOf(config.playModel) !== -1 && config.playModel) || (config.loop && playModelSet[3]) || playModelSet[0]
     this.playIndex = 0
