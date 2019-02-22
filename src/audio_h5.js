@@ -130,7 +130,7 @@ export class AudioH5 {
         this.waitPause = playLock
         return () => {
           this.waitPause = false
-          if (this.cancalPause) return
+          if (this.cancalPause && playLock) return
           this.audioH5.pause()
         }
       })(this.playLocker))
