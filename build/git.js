@@ -1,14 +1,13 @@
 const fs = require('fs')
 const pkg = fs.readFileSync('./package.json', 'utf-8')
-const match = pkg.match(/version.*(\d+).(\d+).(\d+)/)
-const version = `${match[1]}.${match[2]}.${match[3]}`
+const version = pkg.match(/version.*,/)
 
 async function autoGit () {
   const simpleGit = require('simple-git/promise')
   const git = simpleGit(__dirname)
   const { current } = await git.branch()
   const branch = (process.argv && process.argv[2]) || current
-  const message = `version - ${version}`
+  const message = version
   let gitStatus = null
   try {
     gitStatus = await git.add('../*')
