@@ -141,15 +141,15 @@ export class AudioH5 {
 
   toggle () {
     if (this._checkInit() && this.playState !== playStateSet[6] && this.playState !== playStateSet[7] && this.playState !== playStateSet[8]) {
-      if (this.playState === null || this.playState === 'paused') {
-        // trigger play method
-        if (this.waitPause) {
-          this.cancalPause = true
-        } else {
-          this.play()
-        }
+      if (this.waitPause) {
+        this.cancalPause = true
       } else {
-        this.pause()
+        if (this.playState === null || this.playState === 'paused') {
+          // trigger play method
+          this.play()
+        } else {
+          this.pause()
+        }
       }
 
       return this.playId
