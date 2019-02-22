@@ -348,7 +348,7 @@
     return store[key] || (store[key] = value !== undefined ? value : {});
   })('versions', []).push({
     version: _core.version,
-    mode: 'pure',
+    mode: _library ? 'pure' : 'global',
     copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
   });
   });
@@ -951,7 +951,7 @@
 
   var defineProperty$2 = _objectDp.f;
   var _wksDefine = function (name) {
-    var $Symbol = _core.Symbol || (_core.Symbol = {});
+    var $Symbol = _core.Symbol || (_core.Symbol = _library ? {} : _global.Symbol || {});
     if (name.charAt(0) != '_' && !(name in $Symbol)) defineProperty$2($Symbol, name, { value: _wksExt.f(name) });
   };
 
@@ -2100,9 +2100,15 @@
         var _this2 = this;
 
         if (this._checkInit()) {
-          this._playLockQueue(function () {
-            return _this2.audioH5.pause();
-          });
+          this._playLockQueue(function (playLock) {
+            _this2.waitPause = playLock;
+            return function () {
+              if (_this2.cancalPause) return;
+              _this2.waitPause = false;
+
+              _this2.audioH5.pause();
+            };
+          }(this.playLocker));
 
           return this.playId;
         }
@@ -2111,7 +2117,17 @@
       key: "toggle",
       value: function toggle() {
         if (this._checkInit() && this.playState !== playStateSet[6] && this.playState !== playStateSet[7] && this.playState !== playStateSet[8]) {
-          this.playState === null || this.playState === 'paused' ? this.play() : this.pause();
+          if (this.playState === null || this.playState === 'paused') {
+            // trigger play method
+            if (this.waitPause) {
+              this.cancalPause = true;
+            } else {
+              this.play();
+            }
+          } else {
+            this.pause();
+          }
+
           return this.playId;
         }
       }
@@ -2410,6 +2426,8 @@
         this.lockQueue = new Array(0);
         this.playLocker = false;
         this.playErrLocker = false;
+        this.waitPause = false;
+        this.cancalPause = false;
         this.playId = 1000;
         this.playModel = playModelSet.indexOf(config.playModel) !== -1 && config.playModel || config.loop && playModelSet[3] || playModelSet[0];
         this.playIndex = 0;
