@@ -348,7 +348,7 @@
     return store[key] || (store[key] = value !== undefined ? value : {});
   })('versions', []).push({
     version: _core.version,
-    mode: _library ? 'pure' : 'global',
+    mode: 'pure',
     copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
   });
   });
@@ -951,7 +951,7 @@
 
   var defineProperty$2 = _objectDp.f;
   var _wksDefine = function (name) {
-    var $Symbol = _core.Symbol || (_core.Symbol = _library ? {} : _global.Symbol || {});
+    var $Symbol = _core.Symbol || (_core.Symbol = {});
     if (name.charAt(0) != '_' && !(name in $Symbol)) defineProperty$2($Symbol, name, { value: _wksExt.f(name) });
   };
 
@@ -2117,15 +2117,15 @@
       key: "toggle",
       value: function toggle() {
         if (this._checkInit() && this.playState !== playStateSet[6] && this.playState !== playStateSet[7] && this.playState !== playStateSet[8]) {
-          if (this.playState === null || this.playState === 'paused') {
-            // trigger play method
-            if (this.waitPause) {
-              this.cancalPause = true;
-            } else {
-              this.play();
-            }
+          if (this.waitPause) {
+            this.cancalPause = true;
           } else {
-            this.pause();
+            if (this.playState === null || this.playState === 'paused') {
+              // trigger play method
+              this.play();
+            } else {
+              this.pause();
+            }
           }
 
           return this.playId;
