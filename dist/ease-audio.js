@@ -2103,8 +2103,8 @@
           this._playLockQueue(function (playLock) {
             _this2.waitPause = playLock;
             return function () {
-              if (_this2.cancalPause) return;
               _this2.waitPause = false;
+              if (_this2.cancalPause) return;
 
               _this2.audioH5.pause();
             };
