@@ -126,17 +126,19 @@ export class AudioH5 {
 
   pause () {
     if (this._checkInit()) {
-      this._playLockQueue((playLock => {
-        this.waitPause = playLock
-        return () => {
-          this.waitPause = false
-          if (this.cancalPause && playLock) {
-            this.cancalPause = false
-            return
+      if (!this.lock_waitPause) {
+        this._playLockQueue((playLock => {
+          this.lock_waitPause = playLock
+          return () => {
+            this.lock_waitPause = false
+            if (this.lock_cancalPause && playLock) {
+              this.lock_cancalPause = false
+              return
+            }
+            this.audioH5.pause()
           }
-          this.audioH5.pause()
-        }
-      })(this.playLocker))
+        })(this.playLocker))
+      }
 
       return this.playId
     }
@@ -144,8 +146,8 @@ export class AudioH5 {
 
   toggle () {
     if (this._checkInit() && this.playState !== playStateSet[6] && this.playState !== playStateSet[7] && this.playState !== playStateSet[8]) {
-      if (this.waitPause) {
-        this.cancalPause = !this.cancalPause
+      if (this.lock_waitPause) {
+        this.lock_cancalPause = !this.lock_cancalPause
       } else {
         if (this.playState === null || this.playState === 'paused') {
           // trigger play method
@@ -176,9 +178,9 @@ export class AudioH5 {
           this.playErrLocker = true
           this._abortLoad()
 
-          this.playLocker && this.cutpickId++
+          this.playLocker && this.lock_cutpickId++
           this._playLockQueue((cutpickId => () => {
-            if (cutpickId !== this.cutpickId) return
+            if (cutpickId !== this.lock_cutpickId) return
             this.unload(true)
 
             const src = this.playList[this.playIndex].src
@@ -187,7 +189,7 @@ export class AudioH5 {
             this._registerEvent(config)
 
             this.play()
-          })(this.cutpickId))
+          })(this.lock_cutpickId))
 
           break
         }
@@ -218,7 +220,13 @@ export class AudioH5 {
         if (val > duration) val = duration
         if (val < 0) val = 0
         this.seekValue = null
-        this._playLockQueue(() => (this.audioH5.currentTime = val))
+
+        this.playLocker && this.lock_seekId++
+        this._playLockQueue((seekId => () => {
+          if (seekId !== this.lock_seekId) return
+
+          this.audioH5.currentTime = val
+        })(this.lock_seekId))
       } else {
         return this.audioH5.currentTime
       }
@@ -230,7 +238,14 @@ export class AudioH5 {
       if (this._checkType(val, 'number')) {
         if (val > 2) val = 2
         if (val < 0.5) val = 0.5
-        this._playLockQueue(() => (this.audioH5.playbackRate = val))
+
+        this.playLocker && this.lock_rateId++
+        this._playLockQueue((rateId => () => {
+          if (rateId !== this.lock_rateId) return
+
+          this.audioH5.playbackRate = val
+        })(this.lock_rateId))
+
         this._updateConfig({rate: val})
       } else {
         return this.audioH5.playbackRate
@@ -243,10 +258,15 @@ export class AudioH5 {
       if (this._checkType(val, 'number')) {
         if (val > 1) val = 1
         if (val < 0) val = 0
-        this._playLockQueue(() => {
+
+        this.playLocker && this.lock_volumeId++
+        this._playLockQueue((volumeId => () => {
+          if (volumeId !== this.lock_volumeId) return
+
           this.audioH5.muted = false
           this.audioH5.volume = val
-        })
+        })(this.lock_volumeId))
+
         this._updateConfig({volume: val})
       } else {
         return this.audioH5.volume
@@ -257,7 +277,13 @@ export class AudioH5 {
   muted (bool) {
     if (this._checkInit()) {
       if (this._checkType(bool, 'boolean', true)) {
-        this._playLockQueue(() => (this.audioH5.muted = bool))
+        this.playLocker && this.lock_muteId++
+        this._playLockQueue((muteId => () => {
+          if (muteId !== this.lock_muteId) return
+
+          this.audioH5.muted = bool
+        })(this.lock_muteId))
+
         this._updateConfig({muted: bool})
       } else {
         return this.audioH5.muted
@@ -366,8 +392,13 @@ export class AudioH5 {
     this.lockQueue = new Array(0)
     this.playLocker = false
     this.playErrLocker = false
-    this.waitPause = false
-    this.cancalPause = false
+    this.lock_waitPause = false
+    this.lock_cancalPause = false
+    this.lock_cutpickId = 0 // The id for cut or pick in lockQueue because they are only be triggered alternatively
+    this.lock_seekId = 0
+    this.lock_volumeId = 0
+    this.lock_rateId = 0
+    this.lock_muteId = 0
     this.playId = 1000
     this.playModel = (playModelSet.indexOf(config.playModel) !== -1 && config.playModel) || (config.loop && playModelSet[3]) || playModelSet[0]
     this.playIndex = 0
@@ -376,7 +407,6 @@ export class AudioH5 {
     this.buffered = new Array(0)
     this.eventController = new Array(0)
     this.eventMethods = Object.create(null)
-    this.cutpickId = 0 // The id for cut or pick because they are only be triggered alternatively
 
     // playlist convert to src
     let src
@@ -622,9 +652,9 @@ export class AudioH5 {
         this.playErrLocker = true
         this._abortLoad()
 
-        this.playLocker && this.cutpickId++
+        this.playLocker && this.lock_cutpickId++
         return this._playLockQueue((cutpickId => () => {
-          if (cutpickId !== this.cutpickId) return
+          if (cutpickId !== this.lock_cutpickId) return
 
           const src = this.playList[this.playIndex].src
           if (endCut) {
@@ -639,7 +669,7 @@ export class AudioH5 {
           }
 
           return this.play()
-        })(this.cutpickId))
+        })(this.lock_cutpickId))
       }
     }
   }
@@ -878,6 +908,7 @@ export class AudioH5 {
 
     return fn && fn()
   }
+
   /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
   /* check type */
   _checkType (element, type, logErr) {
