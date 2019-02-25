@@ -1,8 +1,14 @@
 const fs = require('fs')
 const pkg = fs.readFileSync('./package.json', 'utf-8')
-const match = pkg.match(/version.*(\d+).(\d+).(\d+)/)
+const normalRegExp = /version.*(\d+).(\d+).(\d+)/
+const betaRegExp = /version.*(\d+).(\d+).(\d+)\-(beta).(\d+)/
+const match = pkg.match(betaRegExp)
 
+let version = ''
 if (match) {
+  version = `version": "${match[1]}.${match[2]}.${match[3]}",`
+} else {
+  const match = pkg.match(normalRegExp)
   if (match[2] >= 99 && match[3] >= 99) {
     match[1] = parseInt(match[1]) + 1
     match[2] = 0
@@ -15,5 +21,7 @@ if (match) {
       match[3] = parseInt(match[3]) + 1
     }
   }
-  fs.writeFileSync('./package.json', pkg.replace(/version.*,/, `version": "${match[1]}.${match[2]}.${match[3]}",`))
+  version = `version": "${match[1]}.${match[2]}.${match[3]}",`
 }
+
+fs.writeFileSync('./package.json', pkg.replace(/version.*,/, version))
