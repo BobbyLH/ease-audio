@@ -599,6 +599,8 @@
       if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
         // Set @@toStringTag to native iterators
         _setToStringTag(IteratorPrototype, TAG, true);
+        // fix for some old engines
+        if (!_library && typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
       }
     }
     // fix Array#{values, @@iterator}.name in V8 / FF
@@ -607,7 +609,7 @@
       $default = function values() { return $native.call(this); };
     }
     // Define iterator
-    if ((FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+    if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
       _hide(proto, ITERATOR, $default);
     }
     // Plug for library
@@ -2029,64 +2031,69 @@
       value: function play() {
         var _this = this;
 
-        if (this._checkInit() && !this.playLocker) {
-          try {
-            if (this.audioH5.src === defaultSrc) {
-              // without correct src the sound couldn't play
-              // manual trigger load error event
-              var err = 'Because the error src property, manual trigger load error event';
-              return this.eventMethods.error(err);
-            }
+        if (this._checkInit()) {
+          if (!this.playLocker) {
+            try {
+              if (this.audioH5.src === defaultSrc) {
+                // without correct src the sound couldn't play
+                // manual trigger load error event
+                var err = 'Because the error src property, manual trigger load error event';
+                return this.eventMethods.error(err);
+              }
 
-            this._blockEvent({
-              block: false
-            });
+              this._blockEvent({
+                block: false
+              });
 
-            var play = this.audioH5.play();
+              var play = this.audioH5.play();
 
-            if (play && typeof promise$1 !== 'undefined' && (_instanceof_1(play, promise$1) || typeof play.then === 'function')) {
-              this.playLocker = true;
-              play.then(function () {
-                _this.playLocker = false; // this controller must be set before trigger lock queue
-
-                _this.lockQueue.forEach(function (v) {
-                  return v && v();
-                });
-
-                _this.lockQueue.splice(0);
-              }).catch(function (err) {
-                _this.playLocker = false;
-
-                if (_this.playErrLocker) {
-                  // trigger lock queue if the playErrLocker is a truthy
-                  _this.playErrLocker = false;
+              if (play && typeof promise$1 !== 'undefined' && (_instanceof_1(play, promise$1) || typeof play.then === 'function')) {
+                this.playLocker = true;
+                play.then(function () {
+                  _this.playLocker = false; // this controller must be set before trigger lock queue
 
                   _this.lockQueue.forEach(function (v) {
                     return v && v();
                   });
-                } else {
-                  // set play error if not trigger load error
-                  if (_this.playState !== playStateSet[6]) {
-                    _this.eventMethods.playerror(err);
+
+                  _this.lockQueue.splice(0);
+                }).catch(function (err) {
+                  _this.playLocker = false;
+
+                  if (_this.playErrLocker) {
+                    // trigger lock queue if the playErrLocker is a truthy
+                    _this.playErrLocker = false;
+
+                    _this.lockQueue.forEach(function (v) {
+                      return v && v();
+                    });
+                  } else {
+                    // set play error if not trigger load error
+                    if (_this.playState !== playStateSet[6]) {
+                      _this.eventMethods.playerror(err);
+                    }
                   }
-                }
 
-                _this.lockQueue.splice(0);
-              });
-            } // If the sound is still paused, then we can assume there was a playback issue.
+                  _this.lockQueue.splice(0);
+                });
+              } // If the sound is still paused, then we can assume there was a playback issue.
 
 
-            if (this.audioH5.paused) {
-              var _err = "Playback was unable to start. This is most commonly an issue on mobile devices and Chrome where playback was not within a user interaction.";
-              this.eventMethods.playerror(_err);
+              if (this.audioH5.paused) {
+                var _err = "Playback was unable to start. This is most commonly an issue on mobile devices and Chrome where playback was not within a user interaction.";
+                this.eventMethods.playerror(_err);
+              }
+            } catch (err) {
+              // set play error if not trigger load error and playErrLocker is a falsy
+              if (!this.playErrLocker && this.playState !== playStateSet[6]) {
+                this.eventMethods.playerror(err);
+              } else {
+                this.playErrLocker = false;
+              }
             }
-          } catch (err) {
-            // set play error if not trigger load error and playErrLocker is a falsy
-            if (!this.playErrLocker && this.playState !== playStateSet[6]) {
-              this.eventMethods.playerror(err);
-            } else {
-              this.playErrLocker = false;
-            }
+          } else if (this.lockTags.pause_wait) {
+            // trigger play when the playLock means cancel pause
+            this.lockTags.pause_cancel = true;
           }
 
           return this.playId;
@@ -2098,20 +2105,24 @@
         var _this2 = this;
 
         if (this._checkInit()) {
-          if (!this.lock_waitPause) {
+          // the pause method in lockQueue allow only one
+          if (!this.lockTags.pause_wait) {
             this._playLockQueue(function (playLock) {
-              _this2.lock_waitPause = playLock;
+              _this2.lockTags.pause_wait = playLock;
               return function () {
-                _this2.lock_waitPause = false;
+                _this2.lockTags.pause_wait = false;
 
-                if (_this2.lock_cancalPause && playLock) {
-                  _this2.lock_cancalPause = false;
+                if (_this2.lockTags.pause_cancel) {
+                  _this2.lockTags.pause_cancel = false;
                   return;
                 }
 
                 _this2.audioH5.pause();
               };
             }(this.playLocker));
+          } else {
+            // trigger pause when the playLock means allow pause
+            this.lockTags.pause_cancel = false;
           }
 
           return this.playId;
@@ -2121,8 +2132,8 @@
       key: "toggle",
       value: function toggle() {
         if (this._checkInit() && this.playState !== playStateSet[6] && this.playState !== playStateSet[7] && this.playState !== playStateSet[8]) {
-          if (this.lock_waitPause) {
-            this.lock_cancalPause = !this.lock_cancalPause;
+          if (this.lockTags.pause_wait) {
+            this.lockTags.pause_cancel = !this.lockTags.pause_cancel;
           } else {
             if (this.playState === null || this.playState === 'paused') {
               // trigger play method
@@ -2159,27 +2170,21 @@
 
               this._abortLoad();
 
-              this.playLocker && this.lock_cutpickId++;
+              this._commonLock('cutpick', function () {
+                _this3.unload(true);
 
-              this._playLockQueue(function (cutpickId) {
-                return function () {
-                  if (cutpickId !== _this3.lock_cutpickId) return;
+                var src = _this3.playList[_this3.playIndex].src;
 
-                  _this3.unload(true);
+                var config = objectSpread({}, _this3.config, {
+                  src: src
+                });
 
-                  var src = _this3.playList[_this3.playIndex].src;
+                _this3._createAudio(config);
 
-                  var config = objectSpread({}, _this3.config, {
-                    src: src
-                  });
+                _this3._registerEvent(config);
 
-                  _this3._createAudio(config);
-
-                  _this3._registerEvent(config);
-
-                  _this3.play();
-                };
-              }(this.lock_cutpickId));
+                _this3.play();
+              });
 
               break;
             }
@@ -2218,14 +2223,10 @@
             if (val > duration) val = duration;
             if (val < 0) val = 0;
             this.seekValue = null;
-            this.playLocker && this.lock_seekId++;
 
-            this._playLockQueue(function (seekId) {
-              return function () {
-                if (seekId !== _this5.lock_seekId) return;
-                _this5.audioH5.currentTime = val;
-              };
-            }(this.lock_seekId));
+            this._commonLock('seek', function () {
+              return _this5.audioH5.currentTime = val;
+            });
           } else {
             return this.audioH5.currentTime;
           }
@@ -2240,14 +2241,10 @@
           if (this._checkType(val, 'number')) {
             if (val > 2) val = 2;
             if (val < 0.5) val = 0.5;
-            this.playLocker && this.lock_rateId++;
 
-            this._playLockQueue(function (rateId) {
-              return function () {
-                if (rateId !== _this6.lock_rateId) return;
-                _this6.audioH5.playbackRate = val;
-              };
-            }(this.lock_rateId));
+            this._commonLock('rate', function () {
+              return _this6.audioH5.playbackRate = val;
+            });
 
             this._updateConfig({
               rate: val
@@ -2266,15 +2263,11 @@
           if (this._checkType(val, 'number')) {
             if (val > 1) val = 1;
             if (val < 0) val = 0;
-            this.playLocker && this.lock_volumeId++;
 
-            this._playLockQueue(function (volumeId) {
-              return function () {
-                if (volumeId !== _this7.lock_volumeId) return;
-                _this7.audioH5.muted = false;
-                _this7.audioH5.volume = val;
-              };
-            }(this.lock_volumeId));
+            this._commonLock('volume', function () {
+              _this7.audioH5.muted = false;
+              _this7.audioH5.volume = val;
+            });
 
             this._updateConfig({
               volume: val
@@ -2291,14 +2284,9 @@
 
         if (this._checkInit()) {
           if (this._checkType(bool, 'boolean', true)) {
-            this.playLocker && this.lock_muteId++;
-
-            this._playLockQueue(function (muteId) {
-              return function () {
-                if (muteId !== _this8.lock_muteId) return;
-                _this8.audioH5.muted = bool;
-              };
-            }(this.lock_muteId));
+            this._commonLock('mute', function () {
+              return _this8.audioH5.muted = bool;
+            });
 
             this._updateConfig({
               muted: bool
@@ -2447,14 +2435,16 @@
         this.lockQueue = new Array(0);
         this.playLocker = false;
         this.playErrLocker = false;
-        this.lock_waitPause = false;
-        this.lock_cancalPause = false;
-        this.lock_cutpickId = 0; // The id for cut or pick in lockQueue because they are only be triggered alternatively
-
-        this.lock_seekId = 0;
-        this.lock_volumeId = 0;
-        this.lock_rateId = 0;
-        this.lock_muteId = 0;
+        this.lockTags = {
+          cutpick: 0,
+          // The tag for cut or pick in lockQueue because they are only be triggered alternatively
+          seek: 0,
+          volume: 0,
+          rate: 0,
+          mute: 0,
+          pause_wait: false,
+          pause_cancel: false
+        };
         this.playId = 1000;
         this.playModel = playModelSet.indexOf(config.playModel) !== -1 && config.playModel || config.loop && playModelSet[3] || playModelSet[0];
         this.playIndex = 0;
@@ -2555,8 +2545,7 @@
         if (this._checkType(state, 'string', true) && this.playState !== state) {
           var readyState = this.audioH5.readyState;
           var isReady = readyState > 2;
-          var nodePaused = this.audioH5.paused;
-          var paused = this.playState === playStateSet[2];
+          var paused = this.audioH5.paused;
           var stopped = this.playState === playStateSet[3];
           var ended = this.playState === playStateSet[4];
           var finished = this.playState === playStateSet[5];
@@ -2565,13 +2554,13 @@
 
           switch (state) {
             case playStateSet[0]:
-              // could not be loading: paused or ready when not finished
-              if (!finished && (paused || isReady)) return false;
+              // could not be loading: ready when not finished
+              if (!finished && isReady) return false;
               break;
 
             case playStateSet[1]:
-              // could not be playing: node paused or unloaded or seeking or not ready when not finished
-              if (!finished && (nodePaused || unloaded || seeking || !isReady)) return false;
+              // could not be playing: paused or unloaded or seeking or not ready when not finished
+              if (!finished && (paused || unloaded || seeking || !isReady)) return false;
               break;
 
             case playStateSet[2]:
@@ -2775,32 +2764,28 @@
 
             this._abortLoad();
 
-            this.playLocker && this.lock_cutpickId++;
-            return this._playLockQueue(function (cutpickId) {
-              return function () {
-                if (cutpickId !== _this13.lock_cutpickId) return;
-                var src = _this13.playList[_this13.playIndex].src;
+            return this._commonLock('cutpick', function () {
+              var src = _this13.playList[_this13.playIndex].src;
 
-                if (endCut) {
-                  // resolve the IOS auto play problem
-                  _this13.audioH5.src = src;
+              if (endCut) {
+                // resolve the IOS auto play problem
+                _this13.audioH5.src = src;
 
-                  _this13.audioH5.load();
-                } else {
-                  _this13.unload(true);
+                _this13.audioH5.load();
+              } else {
+                _this13.unload(true);
 
-                  var config = objectSpread({}, _this13.config, {
-                    src: src
-                  });
+                var config = objectSpread({}, _this13.config, {
+                  src: src
+                });
 
-                  _this13._createAudio(config);
+                _this13._createAudio(config);
 
-                  _this13._registerEvent(config);
-                }
+                _this13._registerEvent(config);
+              }
 
-                return _this13.play();
-              };
-            }(this.lock_cutpickId));
+              return _this13.play();
+            });
           }
         }
       }
@@ -3102,6 +3087,22 @@
         }
 
         return fn && fn();
+      }
+      /* trigger lockqueue general method */
+
+    }, {
+      key: "_commonLock",
+      value: function _commonLock(tag, fn) {
+        var _this15 = this;
+
+        this.playLocker && this.lockTags[tag]++;
+
+        this._playLockQueue(function (id) {
+          return function () {
+            if (id !== _this15.lockTags[tag]) return;
+            fn && fn();
+          };
+        }(this.lockTags[tag]));
       }
       /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
