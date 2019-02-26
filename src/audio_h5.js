@@ -69,55 +69,60 @@ export class AudioH5 {
   }
 
   play () {
-    if (this._checkInit() && !this.playLocker) {
-      try {
-        if (this.audioH5.src === defaultSrc) {
-          // without correct src the sound couldn't play
-          // manual trigger load error event
-          const err = 'Because the error src property, manual trigger load error event'
-          return this.eventMethods.error(err)
-        }
+    if (this._checkInit()) {
+      if (!this.playLocker) {
+        try {
+          if (this.audioH5.src === defaultSrc) {
+            // without correct src the sound couldn't play
+            // manual trigger load error event
+            const err = 'Because the error src property, manual trigger load error event'
+            return this.eventMethods.error(err)
+          }
 
-        this._blockEvent({block: false})
-        let play = this.audioH5.play()
+          this._blockEvent({block: false})
+          let play = this.audioH5.play()
 
-        if (play && typeof Promise !== 'undefined' && (play instanceof Promise || typeof play.then === 'function')) {
-          this.playLocker = true
+          if (play && typeof Promise !== 'undefined' && (play instanceof Promise || typeof play.then === 'function')) {
+            this.playLocker = true
 
-          play.then(() => {
-            this.playLocker = false // this controller must be set before trigger lock queue
+            play.then(() => {
+              this.playLocker = false // this controller must be set before trigger lock queue
 
-            this.lockQueue.forEach(v => v && v())
-            this.lockQueue.splice(0)
-          }).catch(err => {
-            this.playLocker = false
-            if (this.playErrLocker) {
-              // trigger lock queue if the playErrLocker is a truthy
-              this.playErrLocker = false
               this.lockQueue.forEach(v => v && v())
-            } else {
-              // set play error if not trigger load error
-              if (this.playState !== playStateSet[6]) {
-                this.eventMethods.playerror(err)
+              this.lockQueue.splice(0)
+            }).catch(err => {
+              this.playLocker = false
+              if (this.playErrLocker) {
+                // trigger lock queue if the playErrLocker is a truthy
+                this.playErrLocker = false
+                this.lockQueue.forEach(v => v && v())
+              } else {
+                // set play error if not trigger load error
+                if (this.playState !== playStateSet[6]) {
+                  this.eventMethods.playerror(err)
+                }
               }
-            }
-            this.lockQueue.splice(0)
-          })
-        }
+              this.lockQueue.splice(0)
+            })
+          }
 
-        // If the sound is still paused, then we can assume there was a playback issue.
-        if (this.audioH5.paused) {
-          const err = `Playback was unable to start. This is most commonly an issue on mobile devices and Chrome where playback was not within a user interaction.`
+          // If the sound is still paused, then we can assume there was a playback issue.
+          if (this.audioH5.paused) {
+            const err = `Playback was unable to start. This is most commonly an issue on mobile devices and Chrome where playback was not within a user interaction.`
 
-          this.eventMethods.playerror(err)
+            this.eventMethods.playerror(err)
+          }
+        } catch (err) {
+          // set play error if not trigger load error and playErrLocker is a falsy
+          if (!this.playErrLocker && this.playState !== playStateSet[6]) {
+            this.eventMethods.playerror(err)
+          } else {
+            this.playErrLocker = false
+          }
         }
-      } catch (err) {
-        // set play error if not trigger load error and playErrLocker is a falsy
-        if (!this.playErrLocker && this.playState !== playStateSet[6]) {
-          this.eventMethods.playerror(err)
-        } else {
-          this.playErrLocker = false
-        }
+      } else if (this.lockTags.pause_wait) {
+        // trigger play when the playLock means cancel pause
+        this.lockTags.pause_cancel = true
       }
 
       return this.playId
@@ -126,18 +131,23 @@ export class AudioH5 {
 
   pause () {
     if (this._checkInit()) {
-      if (!this.lock_waitPause) {
+      // the pause method in lockQueue allow only one
+      if (!this.lockTags.pause_wait) {
         this._playLockQueue((playLock => {
-          this.lock_waitPause = playLock
+          this.lockTags.pause_wait = playLock
+
           return () => {
-            this.lock_waitPause = false
-            if (this.lock_cancalPause && playLock) {
-              this.lock_cancalPause = false
+            this.lockTags.pause_wait = false
+            if (this.lockTags.pause_cancel) {
+              this.lockTags.pause_cancel = false
               return
             }
             this.audioH5.pause()
           }
         })(this.playLocker))
+      } else {
+        // trigger pause when the playLock means allow pause
+        this.lockTags.pause_cancel = false
       }
 
       return this.playId
@@ -146,8 +156,8 @@ export class AudioH5 {
 
   toggle () {
     if (this._checkInit() && this.playState !== playStateSet[6] && this.playState !== playStateSet[7] && this.playState !== playStateSet[8]) {
-      if (this.lock_waitPause) {
-        this.lock_cancalPause = !this.lock_cancalPause
+      if (this.lockTags.pause_wait) {
+        this.lockTags.pause_cancel = !this.lockTags.pause_cancel
       } else {
         if (this.playState === null || this.playState === 'paused') {
           // trigger play method
@@ -178,9 +188,7 @@ export class AudioH5 {
           this.playErrLocker = true
           this._abortLoad()
 
-          this.playLocker && this.lock_cutpickId++
-          this._playLockQueue((cutpickId => () => {
-            if (cutpickId !== this.lock_cutpickId) return
+          this._commonLock('cutpick', () => {
             this.unload(true)
 
             const src = this.playList[this.playIndex].src
@@ -189,7 +197,7 @@ export class AudioH5 {
             this._registerEvent(config)
 
             this.play()
-          })(this.lock_cutpickId))
+          })
 
           break
         }
@@ -221,12 +229,7 @@ export class AudioH5 {
         if (val < 0) val = 0
         this.seekValue = null
 
-        this.playLocker && this.lock_seekId++
-        this._playLockQueue((seekId => () => {
-          if (seekId !== this.lock_seekId) return
-
-          this.audioH5.currentTime = val
-        })(this.lock_seekId))
+        this._commonLock('seek', () => (this.audioH5.currentTime = val))
       } else {
         return this.audioH5.currentTime
       }
@@ -239,13 +242,7 @@ export class AudioH5 {
         if (val > 2) val = 2
         if (val < 0.5) val = 0.5
 
-        this.playLocker && this.lock_rateId++
-        this._playLockQueue((rateId => () => {
-          if (rateId !== this.lock_rateId) return
-
-          this.audioH5.playbackRate = val
-        })(this.lock_rateId))
-
+        this._commonLock('rate', () => (this.audioH5.playbackRate = val))
         this._updateConfig({rate: val})
       } else {
         return this.audioH5.playbackRate
@@ -259,14 +256,10 @@ export class AudioH5 {
         if (val > 1) val = 1
         if (val < 0) val = 0
 
-        this.playLocker && this.lock_volumeId++
-        this._playLockQueue((volumeId => () => {
-          if (volumeId !== this.lock_volumeId) return
-
+        this._commonLock('volume', () => {
           this.audioH5.muted = false
           this.audioH5.volume = val
-        })(this.lock_volumeId))
-
+        })
         this._updateConfig({volume: val})
       } else {
         return this.audioH5.volume
@@ -277,13 +270,7 @@ export class AudioH5 {
   muted (bool) {
     if (this._checkInit()) {
       if (this._checkType(bool, 'boolean', true)) {
-        this.playLocker && this.lock_muteId++
-        this._playLockQueue((muteId => () => {
-          if (muteId !== this.lock_muteId) return
-
-          this.audioH5.muted = bool
-        })(this.lock_muteId))
-
+        this._commonLock('mute', () => (this.audioH5.muted = bool))
         this._updateConfig({muted: bool})
       } else {
         return this.audioH5.muted
@@ -392,13 +379,15 @@ export class AudioH5 {
     this.lockQueue = new Array(0)
     this.playLocker = false
     this.playErrLocker = false
-    this.lock_waitPause = false
-    this.lock_cancalPause = false
-    this.lock_cutpickId = 0 // The id for cut or pick in lockQueue because they are only be triggered alternatively
-    this.lock_seekId = 0
-    this.lock_volumeId = 0
-    this.lock_rateId = 0
-    this.lock_muteId = 0
+    this.lockTags = {
+      cutpick: 0, // The tag for cut or pick in lockQueue because they are only be triggered alternatively
+      seek: 0,
+      volume: 0,
+      rate: 0,
+      mute: 0,
+      pause_wait: false,
+      pause_cancel: false
+    }
     this.playId = 1000
     this.playModel = (playModelSet.indexOf(config.playModel) !== -1 && config.playModel) || (config.loop && playModelSet[3]) || playModelSet[0]
     this.playIndex = 0
@@ -477,8 +466,7 @@ export class AudioH5 {
     if (this._checkType(state, 'string', true) && this.playState !== state) {
       const readyState = this.audioH5.readyState
       const isReady = readyState > 2
-      const nodePaused = this.audioH5.paused
-      const paused = this.playState === playStateSet[2]
+      const paused = this.audioH5.paused
       const stopped = this.playState === playStateSet[3]
       const ended = this.playState === playStateSet[4]
       const finished = this.playState === playStateSet[5]
@@ -488,12 +476,12 @@ export class AudioH5 {
       // filter impossible state
       switch (state) {
         case playStateSet[0]:
-          // could not be loading: paused or ready when not finished
-          if (!finished && (paused || isReady)) return false
+          // could not be loading: ready when not finished
+          if (!finished && isReady) return false
           break
         case playStateSet[1]:
-          // could not be playing: node paused or unloaded or seeking or not ready when not finished
-          if (!finished && (nodePaused || unloaded || seeking || !isReady)) return false
+          // could not be playing: paused or unloaded or seeking or not ready when not finished
+          if (!finished && (paused || unloaded || seeking || !isReady)) return false
           break
         case playStateSet[2]:
           // could not be paused: stopped or ended or finished
@@ -652,10 +640,7 @@ export class AudioH5 {
         this.playErrLocker = true
         this._abortLoad()
 
-        this.playLocker && this.lock_cutpickId++
-        return this._playLockQueue((cutpickId => () => {
-          if (cutpickId !== this.lock_cutpickId) return
-
+        return this._commonLock('cutpick', () => {
           const src = this.playList[this.playIndex].src
           if (endCut) {
             // resolve the IOS auto play problem
@@ -669,7 +654,7 @@ export class AudioH5 {
           }
 
           return this.play()
-        })(this.lock_cutpickId))
+        })
       }
     }
   }
@@ -907,6 +892,16 @@ export class AudioH5 {
     }
 
     return fn && fn()
+  }
+
+  /* trigger lockqueue general method */
+  _commonLock (tag, fn) {
+    this.playLocker && this.lockTags[tag]++
+    this._playLockQueue((id => () => {
+      if (id !== this.lockTags[tag]) return
+
+      fn && fn()
+    })(this.lockTags[tag]))
   }
 
   /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */

@@ -1,5 +1,5 @@
 # Description
-[ease-audio.js](https://github.com/BobbyLH/ease-audio) is an audio library base on **HTML5 Audio** and **Web Audio**.
+[ease-audio.js](https://github.com/BobbyLH/ease-audio) is an audio library base on **HTML5 Audio**.
 
 
 
@@ -54,7 +54,7 @@ var sound = new EaseAudio({
     console.log('loading')
   },
   oncanplay: e => {
-    console.log('playing')
+    console.log('can play')
     sound.play()
   },
   onplay: e => {
@@ -177,8 +177,6 @@ Fires when the sound has been picked. The first parameter is the ID of the sound
 Fires when the sound is unable to load. The first parameter is the event object.
 #### onplayerror `Function`
 Fires when the sound is unable to play. The first parameter is the error message.
-#### usingWebAudio `Boolean`
-`true` if the Web Audio API is available.
 #### debug `Boolean` `false`
 Set to `true` will log the debug information.
 #### logLevel `string` `error`
