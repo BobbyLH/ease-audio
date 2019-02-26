@@ -707,7 +707,7 @@ export class AudioH5 {
         this._fireEventQueue(e, 'onload')
       },
       seeking: e => {
-        this._setPlayState(playStateSet[0])
+        this.playState !== playStateSet[2] && this._setPlayState(playStateSet[0])
         this._fireEventQueue(e, 'onseeking')
       },
       // playing state
