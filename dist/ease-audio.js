@@ -419,53 +419,6 @@
 
   var keys$1 = keys;
 
-  // 7.2.2 IsArray(argument)
-
-  var _isArray = Array.isArray || function isArray(arg) {
-    return _cof(arg) == 'Array';
-  };
-
-  // 22.1.2.2 / 15.4.3.2 Array.isArray(arg)
-
-
-  _export(_export.S, 'Array', { isArray: _isArray });
-
-  var isArray = _core.Array.isArray;
-
-  var isArray$1 = isArray;
-
-  function _arrayWithoutHoles(arr) {
-    if (isArray$1(arr)) {
-      for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) {
-        arr2[i] = arr[i];
-      }
-
-      return arr2;
-    }
-  }
-
-  var arrayWithoutHoles = _arrayWithoutHoles;
-
-  // true  -> String#at
-  // false -> String#codePointAt
-  var _stringAt = function (TO_STRING) {
-    return function (that, pos) {
-      var s = String(_defined(that));
-      var i = _toInteger(pos);
-      var l = s.length;
-      var a, b;
-      if (i < 0 || i >= l) return TO_STRING ? '' : undefined;
-      a = s.charCodeAt(i);
-      return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff
-        ? TO_STRING ? s.charAt(i) : a
-        : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
-    };
-  };
-
-  var _redefine = _hide;
-
-  var _iterators = {};
-
   var _objectDps = _descriptors ? Object.defineProperties : function defineProperties(O, Properties) {
     _anObject(O);
     var keys = _objectKeys(Properties);
@@ -520,6 +473,246 @@
     } else result = createDict();
     return Properties === undefined ? result : _objectDps(result, Properties);
   };
+
+  // fast apply, http://jsperf.lnkit.com/fast-apply/5
+  var _invoke = function (fn, args, that) {
+    var un = that === undefined;
+    switch (args.length) {
+      case 0: return un ? fn()
+                        : fn.call(that);
+      case 1: return un ? fn(args[0])
+                        : fn.call(that, args[0]);
+      case 2: return un ? fn(args[0], args[1])
+                        : fn.call(that, args[0], args[1]);
+      case 3: return un ? fn(args[0], args[1], args[2])
+                        : fn.call(that, args[0], args[1], args[2]);
+      case 4: return un ? fn(args[0], args[1], args[2], args[3])
+                        : fn.call(that, args[0], args[1], args[2], args[3]);
+    } return fn.apply(that, args);
+  };
+
+  var arraySlice = [].slice;
+  var factories = {};
+
+  var construct = function (F, len, args) {
+    if (!(len in factories)) {
+      for (var n = [], i = 0; i < len; i++) n[i] = 'a[' + i + ']';
+      // eslint-disable-next-line no-new-func
+      factories[len] = Function('F,a', 'return new F(' + n.join(',') + ')');
+    } return factories[len](F, args);
+  };
+
+  var _bind = Function.bind || function bind(that /* , ...args */) {
+    var fn = _aFunction(this);
+    var partArgs = arraySlice.call(arguments, 1);
+    var bound = function (/* args... */) {
+      var args = partArgs.concat(arraySlice.call(arguments));
+      return this instanceof bound ? construct(fn, args.length, args) : _invoke(fn, args, that);
+    };
+    if (_isObject(fn.prototype)) bound.prototype = fn.prototype;
+    return bound;
+  };
+
+  // 26.1.2 Reflect.construct(target, argumentsList [, newTarget])
+
+
+
+
+
+
+
+  var rConstruct = (_global.Reflect || {}).construct;
+
+  // MS Edge supports only 2 arguments and argumentsList argument is optional
+  // FF Nightly sets third argument as `new.target`, but does not create `this` from it
+  var NEW_TARGET_BUG = _fails(function () {
+    function F() { /* empty */ }
+    return !(rConstruct(function () { /* empty */ }, [], F) instanceof F);
+  });
+  var ARGS_BUG = !_fails(function () {
+    rConstruct(function () { /* empty */ });
+  });
+
+  _export(_export.S + _export.F * (NEW_TARGET_BUG || ARGS_BUG), 'Reflect', {
+    construct: function construct(Target, args /* , newTarget */) {
+      _aFunction(Target);
+      _anObject(args);
+      var newTarget = arguments.length < 3 ? Target : _aFunction(arguments[2]);
+      if (ARGS_BUG && !NEW_TARGET_BUG) return rConstruct(Target, args, newTarget);
+      if (Target == newTarget) {
+        // w/o altered newTarget, optimization for 0-4 arguments
+        switch (args.length) {
+          case 0: return new Target();
+          case 1: return new Target(args[0]);
+          case 2: return new Target(args[0], args[1]);
+          case 3: return new Target(args[0], args[1], args[2]);
+          case 4: return new Target(args[0], args[1], args[2], args[3]);
+        }
+        // w/o altered newTarget, lot of arguments case
+        var $args = [null];
+        $args.push.apply($args, args);
+        return new (_bind.apply(Target, $args))();
+      }
+      // with altered newTarget, not support built-in constructors
+      var proto = newTarget.prototype;
+      var instance = _objectCreate(_isObject(proto) ? proto : Object.prototype);
+      var result = Function.apply.call(Target, instance, args);
+      return _isObject(result) ? result : instance;
+    }
+  });
+
+  var construct$1 = _core.Reflect.construct;
+
+  var construct$2 = construct$1;
+
+  var f$1 = {}.propertyIsEnumerable;
+
+  var _objectPie = {
+  	f: f$1
+  };
+
+  var gOPD = Object.getOwnPropertyDescriptor;
+
+  var f$2 = _descriptors ? gOPD : function getOwnPropertyDescriptor(O, P) {
+    O = _toIobject(O);
+    P = _toPrimitive(P, true);
+    if (_ie8DomDefine) try {
+      return gOPD(O, P);
+    } catch (e) { /* empty */ }
+    if (_has(O, P)) return _propertyDesc(!_objectPie.f.call(O, P), O[P]);
+  };
+
+  var _objectGopd = {
+  	f: f$2
+  };
+
+  // Works with __proto__ only. Old v8 can't work with null proto objects.
+  /* eslint-disable no-proto */
+
+
+  var check = function (O, proto) {
+    _anObject(O);
+    if (!_isObject(proto) && proto !== null) throw TypeError(proto + ": can't set as prototype!");
+  };
+  var _setProto = {
+    set: Object.setPrototypeOf || ('__proto__' in {} ? // eslint-disable-line
+      function (test, buggy, set) {
+        try {
+          set = _ctx(Function.call, _objectGopd.f(Object.prototype, '__proto__').set, 2);
+          set(test, []);
+          buggy = !(test instanceof Array);
+        } catch (e) { buggy = true; }
+        return function setPrototypeOf(O, proto) {
+          check(O, proto);
+          if (buggy) O.__proto__ = proto;
+          else set(O, proto);
+          return O;
+        };
+      }({}, false) : undefined),
+    check: check
+  };
+
+  // 19.1.3.19 Object.setPrototypeOf(O, proto)
+
+  _export(_export.S, 'Object', { setPrototypeOf: _setProto.set });
+
+  var setPrototypeOf = _core.Object.setPrototypeOf;
+
+  var setPrototypeOf$1 = setPrototypeOf;
+
+  var setPrototypeOf$2 = createCommonjsModule(function (module) {
+  function _setPrototypeOf(o, p) {
+    module.exports = _setPrototypeOf = setPrototypeOf$1 || function _setPrototypeOf(o, p) {
+      o.__proto__ = p;
+      return o;
+    };
+
+    return _setPrototypeOf(o, p);
+  }
+
+  module.exports = _setPrototypeOf;
+  });
+
+  var construct$3 = createCommonjsModule(function (module) {
+  function isNativeReflectConstruct() {
+    if (typeof Reflect === "undefined" || !construct$2) return false;
+    if (construct$2.sham) return false;
+    if (typeof Proxy === "function") return true;
+
+    try {
+      Date.prototype.toString.call(construct$2(Date, [], function () {}));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function _construct(Parent, args, Class) {
+    if (isNativeReflectConstruct()) {
+      module.exports = _construct = construct$2;
+    } else {
+      module.exports = _construct = function _construct(Parent, args, Class) {
+        var a = [null];
+        a.push.apply(a, args);
+        var Constructor = Function.bind.apply(Parent, a);
+        var instance = new Constructor();
+        if (Class) setPrototypeOf$2(instance, Class.prototype);
+        return instance;
+      };
+    }
+
+    return _construct.apply(null, arguments);
+  }
+
+  module.exports = _construct;
+  });
+
+  // 7.2.2 IsArray(argument)
+
+  var _isArray = Array.isArray || function isArray(arg) {
+    return _cof(arg) == 'Array';
+  };
+
+  // 22.1.2.2 / 15.4.3.2 Array.isArray(arg)
+
+
+  _export(_export.S, 'Array', { isArray: _isArray });
+
+  var isArray = _core.Array.isArray;
+
+  var isArray$1 = isArray;
+
+  function _arrayWithoutHoles(arr) {
+    if (isArray$1(arr)) {
+      for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) {
+        arr2[i] = arr[i];
+      }
+
+      return arr2;
+    }
+  }
+
+  var arrayWithoutHoles = _arrayWithoutHoles;
+
+  // true  -> String#at
+  // false -> String#codePointAt
+  var _stringAt = function (TO_STRING) {
+    return function (that, pos) {
+      var s = String(_defined(that));
+      var i = _toInteger(pos);
+      var l = s.length;
+      var a, b;
+      if (i < 0 || i >= l) return TO_STRING ? '' : undefined;
+      a = s.charCodeAt(i);
+      return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff
+        ? TO_STRING ? s.charAt(i) : a
+        : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
+    };
+  };
+
+  var _redefine = _hide;
+
+  var _iterators = {};
 
   var _wks = createCommonjsModule(function (module) {
   var store = _shared('wks');
@@ -841,27 +1034,6 @@
   };
 
   var create$1 = create;
-
-  var f$1 = {}.propertyIsEnumerable;
-
-  var _objectPie = {
-  	f: f$1
-  };
-
-  var gOPD = Object.getOwnPropertyDescriptor;
-
-  var f$2 = _descriptors ? gOPD : function getOwnPropertyDescriptor(O, P) {
-    O = _toIobject(O);
-    P = _toPrimitive(P, true);
-    if (_ie8DomDefine) try {
-      return gOPD(O, P);
-    } catch (e) { /* empty */ }
-    if (_has(O, P)) return _propertyDesc(!_objectPie.f.call(O, P), O[P]);
-  };
-
-  var _objectGopd = {
-  	f: f$2
-  };
 
   // 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
 
@@ -1357,23 +1529,6 @@
     var C = _anObject(O).constructor;
     var S;
     return C === undefined || (S = _anObject(C)[SPECIES]) == undefined ? D : _aFunction(S);
-  };
-
-  // fast apply, http://jsperf.lnkit.com/fast-apply/5
-  var _invoke = function (fn, args, that) {
-    var un = that === undefined;
-    switch (args.length) {
-      case 0: return un ? fn()
-                        : fn.call(that);
-      case 1: return un ? fn(args[0])
-                        : fn.call(that, args[0]);
-      case 2: return un ? fn(args[0], args[1])
-                        : fn.call(that, args[0], args[1]);
-      case 3: return un ? fn(args[0], args[1], args[2])
-                        : fn.call(that, args[0], args[1], args[2]);
-      case 4: return un ? fn(args[0], args[1], args[2], args[3])
-                        : fn.call(that, args[0], args[1], args[2], args[3]);
-    } return fn.apply(that, args);
   };
 
   var process = _global.process;
@@ -2656,9 +2811,10 @@
             if (playId) {
               for (var i = 0; i < this.playList.length; i++) {
                 if (this.playList[i].playId === playId) {
-                  var playlist = new Array(this.playList);
+                  var playlist = construct$3(Array, toConsumableArray(this.playList));
+
                   playlist.splice(i, 1);
-                  this.playList = [].concat(playlist);
+                  this.playList = toConsumableArray(playlist);
                   break;
                 }
               }
@@ -2670,7 +2826,7 @@
             if (playId && list) {
               for (var _i = 0; _i < this.playList.length; _i++) {
                 if (this.playList[_i].playId === playId) {
-                  var _playlist = new Array(this.playList);
+                  var _playlist = construct$3(Array, toConsumableArray(this.playList));
 
                   _playlist.splice.apply(_playlist, [_i, 0].concat(toConsumableArray(list.map(function (v) {
                     v.playId = _this12.idCounter;
@@ -2678,7 +2834,7 @@
                     return v;
                   }))));
 
-                  this.playList = [].concat(_playlist);
+                  this.playList = toConsumableArray(_playlist);
                   break;
                 }
               }
@@ -2690,7 +2846,7 @@
             if (playId && list) {
               for (var _i2 = 0; _i2 < this.playList.length; _i2++) {
                 if (this.playList[_i2].playId === playId) {
-                  var _playlist2 = new Array(this.playList);
+                  var _playlist2 = construct$3(Array, toConsumableArray(this.playList));
 
                   _playlist2.splice.apply(_playlist2, [_i2, 1].concat(toConsumableArray(list.map(function (v) {
                     v.playId = _this12.idCounter;
@@ -2698,7 +2854,7 @@
                     return v;
                   }))));
 
-                  this.playList = [].concat(_playlist2);
+                  this.playList = toConsumableArray(_playlist2);
                   break;
                 }
               }
@@ -2710,13 +2866,13 @@
             if (playId && params) {
               for (var _i3 = 0; _i3 < this.playList.length; _i3++) {
                 if (this.playList[_i3].playId === playId) {
-                  var _playlist3 = new Array(this.playList);
+                  var _playlist3 = construct$3(Array, toConsumableArray(this.playList));
 
                   var newData = objectSpread({}, this.playList[_i3], params);
 
                   _playlist3.splice(_i3, 1, newData);
 
-                  this.playList = [].concat(_playlist3);
+                  this.playList = toConsumableArray(_playlist3);
                   break;
                 }
               }
