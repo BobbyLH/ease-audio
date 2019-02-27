@@ -557,7 +557,7 @@ export class AudioH5 {
         if (playId) {
           for (let i = 0; i < this.playList.length; i++) {
             if (this.playList[i].playId === playId) {
-              const playlist = new Array(this.playList)
+              const playlist = new Array(...this.playList)
               playlist.splice(i, 1)
               this.playList = [...playlist]
               break
@@ -569,7 +569,7 @@ export class AudioH5 {
         if (playId && list) {
           for (let i = 0; i < this.playList.length; i++) {
             if (this.playList[i].playId === playId) {
-              const playlist = new Array(this.playList)
+              const playlist = new Array(...this.playList)
               playlist.splice(i, 0, ...list.map(v => {
                 v.playId = this.idCounter
                 this.idCounter++
@@ -585,7 +585,7 @@ export class AudioH5 {
         if (playId && list) {
           for (let i = 0; i < this.playList.length; i++) {
             if (this.playList[i].playId === playId) {
-              const playlist = new Array(this.playList)
+              const playlist = new Array(...this.playList)
               playlist.splice(i, 1, ...list.map(v => {
                 v.playId = this.idCounter
                 this.idCounter++
@@ -601,7 +601,7 @@ export class AudioH5 {
         if (playId && params) {
           for (let i = 0; i < this.playList.length; i++) {
             if (this.playList[i].playId === playId) {
-              const playlist = new Array(this.playList)
+              const playlist = new Array(...this.playList)
               const newData = {...this.playList[i], ...params}
               playlist.splice(i, 1, newData)
               this.playList = [...playlist]
