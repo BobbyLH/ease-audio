@@ -1853,7 +1853,7 @@ var getType = function getType(obj) {
   if (typeof obj !== 'object') return typeof obj;
   var len = Object.prototype.toString.call(obj).length - 1;
   return Object.prototype.toString.call(obj).slice(8, len).toLowerCase();
-};var playStateSet = ['loading', 'playing', 'paused', 'stopped', 'ended', 'finished', 'loaderror', 'playerror', 'unloaded'];
+};var playStateSet = ['loading', 'playing', 'paused', 'stopped', 'ended', 'finished', 'loaderror', 'playerror', 'unloaded', 'loaded'];
 var playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 'single-loop'];
 var supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onfinish', 'onload', 'onunload', 'oncanplay', 'onprogress', 'onvolume', 'onseeking', 'onseeked', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick'];
 var uselessEvents = ['finish', 'playerror', 'cut', 'pick', 'play', 'abort', 'suspend'];
@@ -2007,7 +2007,7 @@ function () {
         if (this.lockTags.pause_wait) {
           this.lockTags.pause_cancel = !this.lockTags.pause_cancel;
         } else {
-          if (this.playState === null || this.playState === 'paused') {
+          if (this.playState === null || this.playState === playStateSet[2] || this.playState === playStateSet[9]) {
             // trigger play method
             this.play();
           } else {
@@ -2729,6 +2729,10 @@ function () {
 
           _this14._fireEventQueue(e, 'onseeking');
         },
+        // loaded state
+        canplaythrough: function canplaythrough(e) {
+          _this14.playState === playStateSet[0] && _this14._setPlayState(playStateSet[9]);
+        },
         // playing state
         playing: function playing(e) {
           _this14._setPlayState(playStateSet[1]);
@@ -2737,9 +2741,6 @@ function () {
 
 
           if (_this14.isTriggerEnd) _this14.isTriggerEnd = false;
-        },
-        canplaythrough: function canplaythrough(e) {
-          _this14.playState === playStateSet[0] && _this14._setPlayState(playStateSet[1]);
         },
         // paused state
         pause: function pause(e) {
