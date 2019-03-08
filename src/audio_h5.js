@@ -9,7 +9,8 @@ const playStateSet = [
   'finished',
   'loaderror',
   'playerror',
-  'unloaded'
+  'unloaded',
+  'loaded'
 ]
 
 const playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 'single-loop']
@@ -159,7 +160,7 @@ export class AudioH5 {
       if (this.lockTags.pause_wait) {
         this.lockTags.pause_cancel = !this.lockTags.pause_cancel
       } else {
-        if (this.playState === null || this.playState === 'paused') {
+        if (this.playState === null || this.playState === playStateSet[2] || this.playState === playStateSet[9]) {
           // trigger play method
           this.play()
         } else {
@@ -710,6 +711,10 @@ export class AudioH5 {
         this.playState !== playStateSet[2] && this._setPlayState(playStateSet[0])
         this._fireEventQueue(e, 'onseeking')
       },
+      // loaded state
+      canplaythrough: e => {
+        this.playState === playStateSet[0] && this._setPlayState(playStateSet[9])
+      },
       // playing state
       playing: e => {
         this._setPlayState(playStateSet[1])
@@ -717,9 +722,6 @@ export class AudioH5 {
 
         // if playing then set the isTriggerEnd to false
         if (this.isTriggerEnd) this.isTriggerEnd = false
-      },
-      canplaythrough: e => {
-        this.playState === playStateSet[0] && this._setPlayState(playStateSet[1])
       },
       // paused state
       pause: e => {
