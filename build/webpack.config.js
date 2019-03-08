@@ -9,7 +9,7 @@ module.exports = [{
     filename: 'ease-audio.min.js',
     path: path.resolve(__dirname, '../dist'),
     library: 'EaseAudio',
-    libraryTarget: 'commonjs2'
+    libraryTarget: 'umd'
   },
   module: {
     rules: [
