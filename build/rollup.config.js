@@ -9,6 +9,7 @@ module.exports = {
     format: 'umd',
     name: 'EaseAudio',
     exports: 'named',
+    compact: true,
     banner: '/* ease-audio */',
     footer: '/* Copyright (c) 2018-2019 Bobby.li \n* MIT License \n*/'
   },
