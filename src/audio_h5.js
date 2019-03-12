@@ -15,7 +15,7 @@ const playStateSet = [
 
 const playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 'single-loop']
 
-const supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onfinish', 'onload', 'onunload', 'oncanplay', 'onprogress', 'onvolume', 'onseeking', 'onseeked', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick']
+const supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onfinish', 'onload', 'onunload', 'oncanplay', 'oncanplaythrough', 'onprogress', 'onvolume', 'onseeking', 'onseeked', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick']
 
 const uselessEvents = ['finish', 'playerror', 'cut', 'pick', 'play', 'abort', 'suspend']
 
@@ -477,7 +477,7 @@ export class AudioH5 {
       // filter impossible state
       switch (state) {
         case playStateSet[0]:
-          // could not be loading: ready when not finished
+          // could not be loading: ready and not finished
           if (!finished && isReady) return false
           break
         case playStateSet[1]:
@@ -704,16 +704,19 @@ export class AudioH5 {
     this.eventMethods = {
       // loading state
       loadstart: e => {
+        if (this.audioH5.src === defaultSrc) return
         this._setPlayState(playStateSet[0])
         this._fireEventQueue(e, 'onload')
       },
       seeking: e => {
-        this.playState !== playStateSet[2] && this._setPlayState(playStateSet[0])
+        if (this.audioH5.src !== defaultSrc && this.playState !== playStateSet[2]) this._setPlayState(playStateSet[0])
         this._fireEventQueue(e, 'onseeking')
       },
       // loaded state
       canplaythrough: e => {
+        if (this.audioH5.src === defaultSrc) return
         this.playState === playStateSet[0] && this._setPlayState(playStateSet[9])
+        this._fireEventQueue(e, 'oncanplaythrough')
       },
       // playing state
       playing: e => {
