@@ -1853,7 +1853,7 @@ var getType = function getType(obj) {
   return Object.prototype.toString.call(obj).slice(8, len).toLowerCase();
 };var playStateSet = ['loading', 'playing', 'paused', 'stopped', 'ended', 'finished', 'loaderror', 'playerror', 'unloaded', 'loaded'];
 var playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 'single-loop'];
-var supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onfinish', 'onload', 'onunload', 'oncanplay', 'onprogress', 'onvolume', 'onseeking', 'onseeked', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick'];
+var supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onfinish', 'onload', 'onunload', 'oncanplay', 'oncanplaythrough', 'onprogress', 'onvolume', 'onseeking', 'onseeked', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick'];
 var uselessEvents = ['finish', 'playerror', 'cut', 'pick', 'play', 'abort', 'suspend'];
 var logLevel = ['detail', 'info', 'warn', 'error', 'silent'];
 var defaultSrc = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
@@ -2424,7 +2424,7 @@ function () {
 
         switch (state) {
           case playStateSet[0]:
-            // could not be loading: ready when not finished
+            // could not be loading: ready and not finished
             if (!finished && isReady) return false;
             break;
 
@@ -2718,18 +2718,23 @@ function () {
       this.eventMethods = {
         // loading state
         loadstart: function loadstart(e) {
+          if (_this14.audioH5.src === defaultSrc) return;
+
           _this14._setPlayState(playStateSet[0]);
 
           _this14._fireEventQueue(e, 'onload');
         },
         seeking: function seeking(e) {
-          _this14.playState !== playStateSet[2] && _this14._setPlayState(playStateSet[0]);
+          if (_this14.audioH5.src !== defaultSrc && _this14.playState !== playStateSet[2]) _this14._setPlayState(playStateSet[0]);
 
           _this14._fireEventQueue(e, 'onseeking');
         },
         // loaded state
         canplaythrough: function canplaythrough(e) {
+          if (_this14.audioH5.src === defaultSrc) return;
           _this14.playState === playStateSet[0] && _this14._setPlayState(playStateSet[9]);
+
+          _this14._fireEventQueue(e, 'oncanplaythrough');
         },
         // playing state
         playing: function playing(e) {
