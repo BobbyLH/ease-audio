@@ -235,17 +235,17 @@ Unload and destroy the EaseAudio object. This will immediately stop and remove i
 
 #### on(event, function)
 Listen for events. Multiple events can be added by calling this multiple times.
-* **event**: `String` Name of event to fire/set (`play`, `pause`, `stop`, `end`, `load`, `unload`, `canplay`, `progress`, `volume`, `seek`, `rate`, `timeupdate`, `loaderror`, `playerror`).
+* **event**: `String` Name of event to fire/set (`play`, `pause`, `stop`, `end`, `load`, `unload`, `canplay`, `canplaythrough`, `progress`, `volume`, `seek`, `rate`, `timeupdate`, `loaderror`, `playerror`).
 * **function**: `Function` Define function to fire on event.
 
 #### once(event, function)
 Same as `on`, but it removes itself after the callback is fired.
-* **event**: `String` Name of event to fire/set (`play`, `pause`, `stop`, `end`, `load`, `unload`, `canplay`, `progress`, `volume`, `seek`, `rate`, `timeupdate`, `loaderror`, `playerror`).
+* **event**: `String` Name of event to fire/set (`play`, `pause`, `stop`, `end`, `load`, `unload`, `canplay`, `canplaythrough`, `progress`, `volume`, `seek`, `rate`, `timeupdate`, `loaderror`, `playerror`).
 * **function**: `Function` Define function to fire on event.
 
 #### off(event, [function])
 Remove event listener that you've set. Call without parameters to remove all events.
-* **event**: `String` Name of event (`play`, `pause`, `stop`, `end`, `load`, `unload`, `canplay`, `progress`, `volume`, `seek`, `rate`, `timeupdate`, `loaderror`, `playerror`).
+* **event**: `String` Name of event (`play`, `pause`, `stop`, `end`, `load`, `unload`, `canplay`, `canplaythrough`, `progress`, `volume`, `seek`, `rate`, `timeupdate`, `loaderror`, `playerror`).
 * **function**: `Function` `optional` The listener to remove. Omit this to remove all events of type.
 
 
