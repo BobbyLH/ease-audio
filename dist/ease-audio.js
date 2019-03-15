@@ -2765,11 +2765,15 @@ function () {
 
             _this14._fireEventQueue(e, 'onend');
 
-            if (_this14.config.endAutoCut) {
-              _this14._cut(true);
-            } else {
-              _this14.eventMethods.finish(_this14.playId);
-            }
+            return new promise$1(function (resolve, reject) {
+              var _ref2 = _this14.config || {},
+                  autocut = _ref2.autocut;
+
+              if (_this14._checkType(autocut, 'boolean')) return resolve(autocut);
+              if (_this14._checkType(autocut, 'function')) return resolve(autocut(e));
+            }).then(function (isCut) {
+              return isCut ? _this14._cut(true) : _this14.eventMethods.finish(_this14.playId);
+            });
           }
         },
         // finish state
@@ -2849,11 +2853,15 @@ function () {
 
               _this14._fireEventQueue(e, 'onend');
 
-              if (_this14.config.endAutoCut) {
-                _this14._cut(true);
-              } else {
-                _this14.eventMethods.finish(_this14.playId);
-              }
+              return new promise$1(function (resolve, reject) {
+                var _ref3 = _this14.config || {},
+                    autocut = _ref3.autocut;
+
+                if (_this14._checkType(autocut, 'boolean')) return resolve(autocut);
+                if (_this14._checkType(autocut, 'function')) return resolve(autocut(e));
+              }).then(function (isCut) {
+                return isCut ? _this14._cut(true) : _this14.eventMethods.finish(_this14.playId);
+              });
             }
           }
 
@@ -2913,9 +2921,9 @@ function () {
 
   }, {
     key: "_blockEvent",
-    value: function _blockEvent(_ref2) {
-      var event = _ref2.event,
-          block = _ref2.block;
+    value: function _blockEvent(_ref4) {
+      var event = _ref4.event,
+          block = _ref4.block;
 
       if (this._checkInit()) {
         if (event && this._checkType(event, 'string')) {
@@ -3064,9 +3072,9 @@ function () {
     }
   }, {
     key: "setProps",
-    set: function set(_ref3) {
-      var prop = _ref3.prop,
-          value = _ref3.value;
+    set: function set(_ref5) {
+      var prop = _ref5.prop,
+          value = _ref5.value;
 
       if (this.audioH5[prop] && !this._checkType(this.audioH5[prop], 'function')) {
         this.audioH5[prop] = value;
