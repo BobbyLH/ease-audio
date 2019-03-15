@@ -124,9 +124,9 @@ sound.volume(0.5)
 ### Options
 #### playlist `Array` `[]` *`required`*
 The play list for list model, the src(`The sources to the track to be loaded for the sound`) property is *`required`*.
-#### endAutoCut `bool`
-Set to `true` the EaseAudio going to play next track(according to playModel) when the current will have finished.
-#### playModel `string` `list-once`
+#### autocut `Boolean` or `Function`
+Set or return(`Function`) to `true` the EaseAudio going to play next track(according to playModel) when the current has have finished.
+#### playModel `String` `list-once`
 This property defines the play model that when `cut` or `end auto cut` sound will be comply. Valid levels include(If set the `loop` to `true` without set playModel property, then the play model will be `single-once`):<br>
 - `list-once`
 - `list-random`

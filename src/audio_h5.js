@@ -742,11 +742,12 @@ export class AudioH5 {
           this.isTriggerEnd = true
           this._setPlayState(playStateSet[4])
           this._fireEventQueue(e, 'onend')
-          if (this.config.endAutoCut) {
-            this._cut(true)
-          } else {
-            this.eventMethods.finish(this.playId)
-          }
+
+          return new Promise((resolve, reject) => {
+            const { autocut } = this.config || {}
+            if (this._checkType(autocut, 'boolean')) return resolve(autocut)
+            if (this._checkType(autocut, 'function')) return resolve(autocut(e))
+          }).then(isCut => isCut ? this._cut(true) : this.eventMethods.finish(this.playId))
         }
       },
       // finish state
@@ -812,11 +813,12 @@ export class AudioH5 {
             this.isTriggerEnd = true
             this._setPlayState(playStateSet[4])
             this._fireEventQueue(e, 'onend')
-            if (this.config.endAutoCut) {
-              this._cut(true)
-            } else {
-              this.eventMethods.finish(this.playId)
-            }
+
+            return new Promise((resolve, reject) => {
+              const { autocut } = this.config || {}
+              if (this._checkType(autocut, 'boolean')) return resolve(autocut)
+              if (this._checkType(autocut, 'function')) return resolve(autocut(e))
+            }).then(isCut => isCut ? this._cut(true) : this.eventMethods.finish(this.playId))
           }
         }
 
