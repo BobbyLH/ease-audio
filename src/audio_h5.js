@@ -620,16 +620,17 @@ export class AudioH5 {
   }
 
   /* cut audio */
-  _cut (endCut) {
+  _cut (autocut) {
     if (this._checkInit()) {
       if (this.playModel === 'single-once') {
         // can't cut audio if the playModel is single-once
+        this._logWarn('Cannot cut audio if the playModel is single-once')
         this.stop()
       } else {
         this.metaDataLoaded = false
         this.seekValue = null
 
-        this._setPlayIndex()
+        !autocut && this._setPlayIndex()
 
         // on finish
         if (!this.playList[this.playIndex]) {
@@ -643,7 +644,7 @@ export class AudioH5 {
 
         return this._commonLock('cutpick', () => {
           const src = this.playList[this.playIndex].src
-          if (endCut) {
+          if (autocut) {
             // resolve the IOS auto play problem
             this.audioH5.src = src
             this.audioH5.load()
@@ -743,11 +744,20 @@ export class AudioH5 {
           this._setPlayState(playStateSet[4])
           this._fireEventQueue(e, 'onend')
 
+          const currentId = this.playId
           return new Promise((resolve, reject) => {
             const { autocut } = this.config || {}
+            this._setPlayIndex()
+
             if (this._checkType(autocut, 'boolean')) return resolve(autocut)
-            if (this._checkType(autocut, 'function')) return resolve(autocut(e))
-          }).then(isCut => isCut ? this._cut(true) : this.eventMethods.finish(this.playId))
+            else if (this._checkType(autocut, 'function')) return resolve(autocut(currentId, this.playId))
+          }).then(isCut => {
+            if (isCut) return this._cut(true)
+
+            // withdrawl set playIndex operation
+            this._setPlayIndex(currentId)
+            return this.eventMethods.finish(this.playId)
+          })
         }
       },
       // finish state
@@ -814,11 +824,20 @@ export class AudioH5 {
             this._setPlayState(playStateSet[4])
             this._fireEventQueue(e, 'onend')
 
+            const currentId = this.playId
             return new Promise((resolve, reject) => {
               const { autocut } = this.config || {}
+              this._setPlayIndex()
+
               if (this._checkType(autocut, 'boolean')) return resolve(autocut)
-              if (this._checkType(autocut, 'function')) return resolve(autocut(e))
-            }).then(isCut => isCut ? this._cut(true) : this.eventMethods.finish(this.playId))
+              else if (this._checkType(autocut, 'function')) return resolve(autocut(currentId, this.playId))
+            }).then(isCut => {
+              if (isCut) return this._cut(true)
+
+              // withdrawl set playIndex operation
+              this._setPlayIndex(currentId)
+              return this.eventMethods.finish(this.playId)
+            })
           }
         }
 
