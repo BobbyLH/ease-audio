@@ -2611,19 +2611,19 @@ function () {
 
   }, {
     key: "_cut",
-    value: function _cut(endCut) {
+    value: function _cut(autocut) {
       var _this13 = this;
 
       if (this._checkInit()) {
         if (this.playModel === 'single-once') {
           // can't cut audio if the playModel is single-once
+          this._logWarn('Cannot cut audio if the playModel is single-once');
+
           this.stop();
         } else {
           this.metaDataLoaded = false;
           this.seekValue = null;
-
-          this._setPlayIndex(); // on finish
-
+          !autocut && this._setPlayIndex(); // on finish
 
           if (!this.playList[this.playIndex]) {
             this.playIndex = this.prevPlayIndex;
@@ -2638,7 +2638,7 @@ function () {
           return this._commonLock('cutpick', function () {
             var src = _this13.playList[_this13.playIndex].src;
 
-            if (endCut) {
+            if (autocut) {
               // resolve the IOS auto play problem
               _this13.audioH5.src = src;
 
@@ -2765,14 +2765,20 @@ function () {
 
             _this14._fireEventQueue(e, 'onend');
 
+            var currentId = _this14.playId;
             return new promise$1(function (resolve, reject) {
               var _ref2 = _this14.config || {},
                   autocut = _ref2.autocut;
 
-              if (_this14._checkType(autocut, 'boolean')) return resolve(autocut);
-              if (_this14._checkType(autocut, 'function')) return resolve(autocut(e));
+              _this14._setPlayIndex();
+
+              if (_this14._checkType(autocut, 'boolean')) return resolve(autocut);else if (_this14._checkType(autocut, 'function')) return resolve(autocut(currentId, _this14.playId));
             }).then(function (isCut) {
-              return isCut ? _this14._cut(true) : _this14.eventMethods.finish(_this14.playId);
+              if (isCut) return _this14._cut(true); // withdrawl set playIndex operation
+
+              _this14._setPlayIndex(currentId);
+
+              return _this14.eventMethods.finish(_this14.playId);
             });
           }
         },
@@ -2853,14 +2859,20 @@ function () {
 
               _this14._fireEventQueue(e, 'onend');
 
+              var currentId = _this14.playId;
               return new promise$1(function (resolve, reject) {
                 var _ref3 = _this14.config || {},
                     autocut = _ref3.autocut;
 
-                if (_this14._checkType(autocut, 'boolean')) return resolve(autocut);
-                if (_this14._checkType(autocut, 'function')) return resolve(autocut(e));
+                _this14._setPlayIndex();
+
+                if (_this14._checkType(autocut, 'boolean')) return resolve(autocut);else if (_this14._checkType(autocut, 'function')) return resolve(autocut(currentId, _this14.playId));
               }).then(function (isCut) {
-                return isCut ? _this14._cut(true) : _this14.eventMethods.finish(_this14.playId);
+                if (isCut) return _this14._cut(true); // withdrawl set playIndex operation
+
+                _this14._setPlayIndex(currentId);
+
+                return _this14.eventMethods.finish(_this14.playId);
               });
             }
           }
