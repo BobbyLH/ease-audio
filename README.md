@@ -30,7 +30,8 @@ In the browser:
 ### Most basic:
 ```javascript
 var sound = new EaseAudio({
-  playlist: ['sound.mp3', 'sound2.mp3']
+  playlist: ['sound.mp3', 'sound2.mp3'],
+  autocut: true
 });
 
 sound.play();
@@ -45,6 +46,10 @@ var sound = new EaseAudio({
   ],
   // pick second playlist item for initiation
   initIndex: 1,
+  autocut: (currentId, nextId) => {
+    // do something, such as http(s) request
+    return true
+  }
   volume: 1,
   playModel: 'list-once',
   preload: true,
@@ -124,7 +129,7 @@ sound.volume(0.5)
 ### Options
 #### playlist `Array` `[]` *`required`*
 The play list for list model, the src(`The sources to the track to be loaded for the sound`) property is *`required`*.
-#### autocut `Boolean` or `Function`
+#### autocut `Boolean` or `Function(currentId, nextId)`
 Set or return(`Function`) to `true` the EaseAudio going to play next track(according to playModel) when the current has have finished.
 #### playModel `String` `list-once`
 This property defines the play model that when `cut` or `end auto cut` sound will be comply. Valid levels include(If set the `loop` to `true` without set playModel property, then the play model will be `single-once`):<br>
