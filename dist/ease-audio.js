@@ -644,8 +644,6 @@ var _iterDefine = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORC
     if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
       // Set @@toStringTag to native iterators
       _setToStringTag(IteratorPrototype, TAG, true);
-      // fix for some old engines
-      if (!_library && typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
     }
   }
   // fix Array#{values, @@iterator}.name in V8 / FF
@@ -654,7 +652,7 @@ var _iterDefine = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORC
     $default = function values() { return $native.call(this); };
   }
   // Define iterator
-  if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+  if ((FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
     _hide(proto, ITERATOR, $default);
   }
   // Plug for library
@@ -2381,7 +2379,7 @@ function () {
         return src;
       }
 
-      this._logErr("The ".concat(this.playId, "s' src property is: ").concat(src, ".\nIt's necessary and must be string!"));
+      this._logErr("The playId's ".concat(this.playId, " src property is: ").concat(src, ".\nIt's necessary and must be string!"));
 
       return defaultSrc;
     }
@@ -2628,7 +2626,8 @@ function () {
           !autocut && this._setPlayIndex(); // on finish
 
           if (!this.playList[this.playIndex]) {
-            this.playIndex = this.prevPlayIndex;
+            this._setPlayIndex(this.prevPlayIndex);
+
             return this.eventMethods.finish(this.playId);
           }
 
@@ -2767,7 +2766,7 @@ function () {
 
             _this14._fireEventQueue(e, 'onend');
 
-            return autocut();
+            return autocut.call(_this14);
           }
         },
         // finish state
@@ -2847,7 +2846,7 @@ function () {
 
               _this14._fireEventQueue(e, 'onend');
 
-              return autocut();
+              return autocut.call(_this14);
             }
           }
 
@@ -2893,14 +2892,14 @@ function () {
         }).then(function (isCut) {
           if (isCut) return _this15._cut(true); // withdrawl set playIndex operation
 
-          _this15._setPlayIndex(currentId);
+          _this15._setPlayIndex(_this15.prevPlayIndex);
 
           return _this15.eventMethods.finish(_this15.playId);
         }).catch(function (err) {
           _this15._logWarn("The autocut property type should be boolean or function return boolean, now the result ".concat(err, " type was ").concat(typeof err)); // withdrawl set playIndex operation
 
 
-          _this15._setPlayIndex(currentId);
+          _this15._setPlayIndex(_this15.prevPlayIndex);
 
           return _this15.eventMethods.finish(_this15.playId);
         });
