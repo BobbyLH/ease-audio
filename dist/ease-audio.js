@@ -644,6 +644,8 @@ var _iterDefine = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORC
     if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
       // Set @@toStringTag to native iterators
       _setToStringTag(IteratorPrototype, TAG, true);
+      // fix for some old engines
+      if (!_library && typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
     }
   }
   // fix Array#{values, @@iterator}.name in V8 / FF
@@ -652,7 +654,7 @@ var _iterDefine = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORC
     $default = function values() { return $native.call(this); };
   }
   // Define iterator
-  if ((FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+  if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
     _hide(proto, ITERATOR, $default);
   }
   // Plug for library
@@ -2765,21 +2767,7 @@ function () {
 
             _this14._fireEventQueue(e, 'onend');
 
-            var currentId = _this14.playId;
-            return new promise$1(function (resolve, reject) {
-              var _ref2 = _this14.config || {},
-                  autocut = _ref2.autocut;
-
-              _this14._setPlayIndex();
-
-              if (_this14._checkType(autocut, 'boolean')) return resolve(autocut);else if (_this14._checkType(autocut, 'function')) return resolve(autocut(currentId, _this14.playId));
-            }).then(function (isCut) {
-              if (isCut) return _this14._cut(true); // withdrawl set playIndex operation
-
-              _this14._setPlayIndex(currentId);
-
-              return _this14.eventMethods.finish(_this14.playId);
-            });
+            return autocut();
           }
         },
         // finish state
@@ -2859,21 +2847,7 @@ function () {
 
               _this14._fireEventQueue(e, 'onend');
 
-              var currentId = _this14.playId;
-              return new promise$1(function (resolve, reject) {
-                var _ref3 = _this14.config || {},
-                    autocut = _ref3.autocut;
-
-                _this14._setPlayIndex();
-
-                if (_this14._checkType(autocut, 'boolean')) return resolve(autocut);else if (_this14._checkType(autocut, 'function')) return resolve(autocut(currentId, _this14.playId));
-              }).then(function (isCut) {
-                if (isCut) return _this14._cut(true); // withdrawl set playIndex operation
-
-                _this14._setPlayIndex(currentId);
-
-                return _this14.eventMethods.finish(_this14.playId);
-              });
+              return autocut();
             }
           }
 
@@ -2899,12 +2873,44 @@ function () {
         },
         play: function play(e) {},
         abort: function abort(e) {},
-        suspend: function suspend(e) {}
+        suspend: function suspend(e) {} // handle onend auto cut sound
+
       };
+
+      async function autocut() {
+        var _this15 = this;
+
+        var currentId = this.playId;
+
+        var _ref2 = this.config || {},
+            autocut = _ref2.autocut;
+
+        this._setPlayIndex();
+
+        if (this._checkType(autocut, 'function')) autocut = await autocut(currentId, this.playId);
+        return new promise$1(function (resolve, reject) {
+          _this15._checkType(autocut, 'boolean') ? resolve(autocut) : reject(autocut);
+        }).then(function (isCut) {
+          if (isCut) return _this15._cut(true); // withdrawl set playIndex operation
+
+          _this15._setPlayIndex(currentId);
+
+          return _this15.eventMethods.finish(_this15.playId);
+        }).catch(function (err) {
+          _this15._logWarn("The autocut property type should be boolean or function return boolean, now the result ".concat(err, " type was ").concat(typeof err)); // withdrawl set playIndex operation
+
+
+          _this15._setPlayIndex(currentId);
+
+          return _this15.eventMethods.finish(_this15.playId);
+        });
+      } // bind controller scope for every each event
+
 
       for (var k in this.eventMethods) {
         this.eventMethods[k] = curry(this.eventMethods[k], k);
-      }
+      } // filter useless events
+
 
       for (var _k in this.eventMethods) {
         if (uselessEvents.indexOf(_k) !== -1) continue;
@@ -2933,9 +2939,9 @@ function () {
 
   }, {
     key: "_blockEvent",
-    value: function _blockEvent(_ref4) {
-      var event = _ref4.event,
-          block = _ref4.block;
+    value: function _blockEvent(_ref3) {
+      var event = _ref3.event,
+          block = _ref3.block;
 
       if (this._checkInit()) {
         if (event && this._checkType(event, 'string')) {
@@ -2990,13 +2996,13 @@ function () {
   }, {
     key: "_commonLock",
     value: function _commonLock(tag, fn) {
-      var _this15 = this;
+      var _this16 = this;
 
       this.playLocker && this.lockTags[tag]++;
 
       this._playLockQueue(function (id) {
         return function () {
-          if (id !== _this15.lockTags[tag]) return;
+          if (id !== _this16.lockTags[tag]) return;
           fn && fn();
         };
       }(this.lockTags[tag]));
@@ -3084,9 +3090,9 @@ function () {
     }
   }, {
     key: "setProps",
-    set: function set(_ref5) {
-      var prop = _ref5.prop,
-          value = _ref5.value;
+    set: function set(_ref4) {
+      var prop = _ref4.prop,
+          value = _ref4.value;
 
       if (this.audioH5[prop] && !this._checkType(this.audioH5[prop], 'function')) {
         this.audioH5[prop] = value;
