@@ -47,8 +47,11 @@ var sound = new EaseAudio({
   // pick second playlist item for initiation
   initIndex: 1,
   autocut: (currentId, nextId) => {
-    // do something, such as http(s) request
-    return true
+    // handle async
+    return new Promise((resovle, reject) => {
+      // do something, such as http(s) request
+      resovle(true)
+    })
   }
   volume: 1,
   playModel: 'list-once',

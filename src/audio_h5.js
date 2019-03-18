@@ -744,20 +744,7 @@ export class AudioH5 {
           this._setPlayState(playStateSet[4])
           this._fireEventQueue(e, 'onend')
 
-          const currentId = this.playId
-          return new Promise((resolve, reject) => {
-            const { autocut } = this.config || {}
-            this._setPlayIndex()
-
-            if (this._checkType(autocut, 'boolean')) return resolve(autocut)
-            else if (this._checkType(autocut, 'function')) return resolve(autocut(currentId, this.playId))
-          }).then(isCut => {
-            if (isCut) return this._cut(true)
-
-            // withdrawl set playIndex operation
-            this._setPlayIndex(currentId)
-            return this.eventMethods.finish(this.playId)
-          })
+          return autocut()
         }
       },
       // finish state
@@ -824,20 +811,7 @@ export class AudioH5 {
             this._setPlayState(playStateSet[4])
             this._fireEventQueue(e, 'onend')
 
-            const currentId = this.playId
-            return new Promise((resolve, reject) => {
-              const { autocut } = this.config || {}
-              this._setPlayIndex()
-
-              if (this._checkType(autocut, 'boolean')) return resolve(autocut)
-              else if (this._checkType(autocut, 'function')) return resolve(autocut(currentId, this.playId))
-            }).then(isCut => {
-              if (isCut) return this._cut(true)
-
-              // withdrawl set playIndex operation
-              this._setPlayIndex(currentId)
-              return this.eventMethods.finish(this.playId)
-            })
+            return autocut()
           }
         }
 
@@ -854,10 +828,37 @@ export class AudioH5 {
       suspend: e => {}
     }
 
+    // handle onend auto cut sound
+    async function autocut () {
+      const currentId = this.playId
+      let { autocut } = this.config || {}
+      this._setPlayIndex()
+
+      if (this._checkType(autocut, 'function')) autocut = await autocut(currentId, this.playId)
+
+      return new Promise((resolve, reject) => {
+        this._checkType(autocut, 'boolean') ? resolve(autocut) : reject(autocut)
+      }).then(isCut => {
+        if (isCut) return this._cut(true)
+
+        // withdrawl set playIndex operation
+        this._setPlayIndex(currentId)
+        return this.eventMethods.finish(this.playId)
+      }).catch(err => {
+        this._logWarn(`The autocut property type should be boolean or function return boolean, now the result ${err} type was ${typeof err}`)
+
+        // withdrawl set playIndex operation
+        this._setPlayIndex(currentId)
+        return this.eventMethods.finish(this.playId)
+      })
+    }
+
+    // bind controller scope for every each event
     for (let k in this.eventMethods) {
       this.eventMethods[k] = curry(this.eventMethods[k], k)
     }
 
+    // filter useless events
     for (let k in this.eventMethods) {
       if (uselessEvents.indexOf(k) !== -1) continue
 
