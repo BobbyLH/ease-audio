@@ -634,7 +634,7 @@ export class AudioH5 {
 
         // on finish
         if (!this.playList[this.playIndex]) {
-          this.playIndex = this.prevPlayIndex
+          this._setPlayIndex(this.prevPlayIndex)
           return this.eventMethods.finish(this.playId)
         }
 
@@ -842,13 +842,13 @@ export class AudioH5 {
         if (isCut) return this._cut(true)
 
         // withdrawl set playIndex operation
-        this._setPlayIndex(currentId)
+        this._setPlayIndex(this.prevPlayIndex)
         return this.eventMethods.finish(this.playId)
       }).catch(err => {
         this._logWarn(`The autocut property type should be boolean or function return boolean, now the result ${err} type was ${typeof err}`)
 
         // withdrawl set playIndex operation
-        this._setPlayIndex(currentId)
+        this._setPlayIndex(this.prevPlayIndex)
         return this.eventMethods.finish(this.playId)
       })
     }
