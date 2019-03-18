@@ -442,7 +442,7 @@ export class AudioH5 {
     if (src && this._checkType(src, 'string')) {
       return src
     }
-    this._logErr(`The ${this.playId}s' src property is: ${src}.\nIt's necessary and must be string!`)
+    this._logErr(`The playId's ${this.playId} src property is: ${src}.\nIt's necessary and must be string!`)
     return defaultSrc
   }
 
@@ -744,7 +744,7 @@ export class AudioH5 {
           this._setPlayState(playStateSet[4])
           this._fireEventQueue(e, 'onend')
 
-          return autocut()
+          return autocut.call(this)
         }
       },
       // finish state
@@ -811,7 +811,7 @@ export class AudioH5 {
             this._setPlayState(playStateSet[4])
             this._fireEventQueue(e, 'onend')
 
-            return autocut()
+            return autocut.call(this)
           }
         }
 
