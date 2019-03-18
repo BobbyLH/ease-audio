@@ -442,7 +442,7 @@ export class AudioH5 {
     if (src && this._checkType(src, 'string')) {
       return src
     }
-    this._logErr(`The ${this.playId}s' src property is: ${src}.\nIt's necessary and must be string!`)
+    this._logErr(`The playId's ${this.playId} src property is: ${src}.\nIt's necessary and must be string!`)
     return defaultSrc
   }
 
@@ -634,7 +634,7 @@ export class AudioH5 {
 
         // on finish
         if (!this.playList[this.playIndex]) {
-          this.playIndex = this.prevPlayIndex
+          this._setPlayIndex(this.prevPlayIndex)
           return this.eventMethods.finish(this.playId)
         }
 
@@ -744,7 +744,7 @@ export class AudioH5 {
           this._setPlayState(playStateSet[4])
           this._fireEventQueue(e, 'onend')
 
-          return autocut()
+          return autocut.call(this)
         }
       },
       // finish state
@@ -811,7 +811,7 @@ export class AudioH5 {
             this._setPlayState(playStateSet[4])
             this._fireEventQueue(e, 'onend')
 
-            return autocut()
+            return autocut.call(this)
           }
         }
 
@@ -842,13 +842,13 @@ export class AudioH5 {
         if (isCut) return this._cut(true)
 
         // withdrawl set playIndex operation
-        this._setPlayIndex(currentId)
+        this._setPlayIndex(this.prevPlayIndex)
         return this.eventMethods.finish(this.playId)
       }).catch(err => {
         this._logWarn(`The autocut property type should be boolean or function return boolean, now the result ${err} type was ${typeof err}`)
 
         // withdrawl set playIndex operation
-        this._setPlayIndex(currentId)
+        this._setPlayIndex(this.prevPlayIndex)
         return this.eventMethods.finish(this.playId)
       })
     }
