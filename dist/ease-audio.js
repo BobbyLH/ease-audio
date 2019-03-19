@@ -644,8 +644,6 @@ var _iterDefine = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORC
     if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
       // Set @@toStringTag to native iterators
       _setToStringTag(IteratorPrototype, TAG, true);
-      // fix for some old engines
-      if (!_library && typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
     }
   }
   // fix Array#{values, @@iterator}.name in V8 / FF
@@ -654,7 +652,7 @@ var _iterDefine = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORC
     $default = function values() { return $native.call(this); };
   }
   // Define iterator
-  if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+  if ((FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
     _hide(proto, ITERATOR, $default);
   }
   // Plug for library
@@ -2888,18 +2886,29 @@ function () {
 
         this._setPlayIndex();
 
-        if (this._checkType(autocut, 'function')) autocut = await autocut(currentId, this.playId);
+        if (this._checkType(autocut, 'function')) {
+          try {
+            autocut = await autocut(currentId, this.playId);
+          } catch (err) {
+            this._logErr("autocut occur error, it's ".concat(err)); // withdrawl set playIndex operation
+
+
+            this._setPlayIndex(this.prevPlayIndex);
+
+            return this.eventMethods.finish(this.playId);
+          }
+        }
+
         return new promise$1(function (resolve, reject) {
           _this15._checkType(autocut, 'boolean') ? resolve(autocut) : reject(autocut);
         }).then(function (isCut) {
-          if (isCut) return _this15._cut(true); // withdrawl set playIndex operation
+          if (isCut) return _this15._cut(true);
 
           _this15._setPlayIndex(_this15.prevPlayIndex);
 
           return _this15.eventMethods.finish(_this15.playId);
         }).catch(function (err) {
-          _this15._logWarn("The autocut property type should be boolean or function return boolean, now the result ".concat(err, " type was ").concat(typeof err)); // withdrawl set playIndex operation
-
+          _this15._logWarn("The autocut property type should be boolean or function return boolean, now the result ".concat(err, " type was ").concat(typeof err));
 
           _this15._setPlayIndex(_this15.prevPlayIndex);
 
