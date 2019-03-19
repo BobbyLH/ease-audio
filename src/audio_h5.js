@@ -834,20 +834,28 @@ export class AudioH5 {
       let { autocut } = this.config || {}
       this._setPlayIndex()
 
-      if (this._checkType(autocut, 'function')) autocut = await autocut(currentId, this.playId)
+      if (this._checkType(autocut, 'function')) {
+        try {
+          autocut = await autocut(currentId, this.playId)
+        } catch (err) {
+          this._logErr(`autocut occur error, it's ${err}`)
+
+          // withdrawl set playIndex operation
+          this._setPlayIndex(this.prevPlayIndex)
+          return this.eventMethods.finish(this.playId)
+        }
+      }
 
       return new Promise((resolve, reject) => {
         this._checkType(autocut, 'boolean') ? resolve(autocut) : reject(autocut)
       }).then(isCut => {
         if (isCut) return this._cut(true)
 
-        // withdrawl set playIndex operation
         this._setPlayIndex(this.prevPlayIndex)
         return this.eventMethods.finish(this.playId)
       }).catch(err => {
         this._logWarn(`The autocut property type should be boolean or function return boolean, now the result ${err} type was ${typeof err}`)
 
-        // withdrawl set playIndex operation
         this._setPlayIndex(this.prevPlayIndex)
         return this.eventMethods.finish(this.playId)
       })
