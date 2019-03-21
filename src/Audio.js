@@ -37,7 +37,20 @@ export class EaseAudio {
   }
 
   get playingData () {
-    return this.audio ? this.audio.playList[this.audio.playIndex] : {}
+    let playingData = {}
+
+    if (this.audio) {
+      const playId = this.audio.playId
+      const len = this.audio.playList.length
+      for (let i = 0; i < len; i++) {
+        if (+playId === +this.audio.playList[i].playId) {
+          playingData = this.audio.playList[i]
+          break
+        }
+      }
+    }
+
+    return playingData
   }
 
   set playlist (params) {

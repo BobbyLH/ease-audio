@@ -185,6 +185,7 @@ export class AudioH5 {
       for (let i = 0; i < this.playList.length; i++) {
         if (this.playList[i].playId === playId) {
           this._setPlayIndex(i)
+          this._setPlayId()
           this.eventMethods.pick(this.playId)
           this.playErrLocker = true
           this._abortLoad()
@@ -415,6 +416,7 @@ export class AudioH5 {
       this._handlePlayList({action: 'add', list: config.playlist})
       const srcIndex = config.initIndex && this.playList[config.initIndex] ? config.initIndex : 0
       this._setPlayIndex(srcIndex)
+      this._setPlayId()
       src = this.playList[srcIndex].src
     } else {
       this._logErr('Please pass correct playlist parameters!')
@@ -506,7 +508,6 @@ export class AudioH5 {
 
     if (index === 0) {
       this.playIndex = 0
-      this.playId = (this.playList[0] && this.playList[0].playId) || this.playId
       return
     }
 
@@ -530,10 +531,15 @@ export class AudioH5 {
         this.playIndex = index || this.playIndex
     }
 
-    this.playId = (this.playList[this.playIndex] && this.playList[this.playIndex].playId) || this.playId
-
-    this._log(`setPlayIndex - playIndex: ${this.playIndex}  playId: ${this.playId}`)
+    this._log(`setPlayIndex - playIndex: ${this.playIndex}`)
     return this.playIndex
+  }
+
+  _setPlayId (isSet = true) {
+    const playId = (this.playList[this.playIndex] && this.playList[this.playIndex].playId) || this.playId
+
+    if (isSet === true) this.playId = playId
+    return playId
   }
 
   /* reset play list */
@@ -638,6 +644,7 @@ export class AudioH5 {
           return this.eventMethods.finish(this.playId)
         }
 
+        this._setPlayId()
         this.eventMethods.cut(this.playId)
         this.playErrLocker = true
         this._abortLoad()
@@ -830,13 +837,13 @@ export class AudioH5 {
 
     // handle onend auto cut sound
     async function autocut () {
-      const currentId = this.playId
       let { autocut } = this.config || {}
       this._setPlayIndex()
+      const nextId = this._setPlayId(false)
 
       if (this._checkType(autocut, 'function')) {
         try {
-          autocut = await autocut(currentId, this.playId)
+          autocut = await autocut(this.playId, nextId)
         } catch (err) {
           this._logErr(`autocut occur error, it's ${err}`)
 
