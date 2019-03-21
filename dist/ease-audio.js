@@ -2035,6 +2035,8 @@ function () {
           if (this.playList[i].playId === playId) {
             this._setPlayIndex(i);
 
+            this._setPlayId();
+
             this.eventMethods.pick(this.playId);
             this.playErrLocker = true;
 
@@ -2348,6 +2350,8 @@ function () {
 
         this._setPlayIndex(srcIndex);
 
+        this._setPlayId();
+
         src = this.playList[srcIndex].src;
       } else {
         this._logErr('Please pass correct playlist parameters!');
@@ -2457,7 +2461,6 @@ function () {
 
       if (index === 0) {
         this.playIndex = 0;
-        this.playId = this.playList[0] && this.playList[0].playId || this.playId;
         return;
       }
 
@@ -2486,11 +2489,17 @@ function () {
           this.playIndex = index || this.playIndex;
       }
 
-      this.playId = this.playList[this.playIndex] && this.playList[this.playIndex].playId || this.playId;
-
-      this._log("setPlayIndex - playIndex: ".concat(this.playIndex, "  playId: ").concat(this.playId));
+      this._log("setPlayIndex - playIndex: ".concat(this.playIndex));
 
       return this.playIndex;
+    }
+  }, {
+    key: "_setPlayId",
+    value: function _setPlayId() {
+      var isSet = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+      var playId = this.playList[this.playIndex] && this.playList[this.playIndex].playId || this.playId;
+      if (isSet === true) this.playId = playId;
+      return playId;
     }
     /* reset play list */
 
@@ -2630,6 +2639,8 @@ function () {
 
             return this.eventMethods.finish(this.playId);
           }
+
+          this._setPlayId();
 
           this.eventMethods.cut(this.playId);
           this.playErrLocker = true;
@@ -2879,16 +2890,16 @@ function () {
       async function autocut() {
         var _this15 = this;
 
-        var currentId = this.playId;
-
         var _ref2 = this.config || {},
             autocut = _ref2.autocut;
 
         this._setPlayIndex();
 
+        var nextId = this._setPlayId(false);
+
         if (this._checkType(autocut, 'function')) {
           try {
-            autocut = await autocut(currentId, this.playId);
+            autocut = await autocut(this.playId, nextId);
           } catch (err) {
             this._logErr("autocut occur error, it's ".concat(err)); // withdrawl set playIndex operation
 
@@ -3204,7 +3215,21 @@ function () {
   }, {
     key: "playingData",
     get: function get() {
-      return this.audio ? this.audio.playList[this.audio.playIndex] : {};
+      var playingData = {};
+
+      if (this.audio) {
+        var playId = this.audio.playId;
+        var len = this.audio.playList.length;
+
+        for (var i = 0; i < len; i++) {
+          if (+playId === +this.audio.playList[i].playId) {
+            playingData = this.audio.playList[i];
+            break;
+          }
+        }
+      }
+
+      return playingData;
     }
   }, {
     key: "playlist",
