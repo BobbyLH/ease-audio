@@ -644,6 +644,8 @@ var _iterDefine = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORC
     if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
       // Set @@toStringTag to native iterators
       _setToStringTag(IteratorPrototype, TAG, true);
+      // fix for some old engines
+      if (!_library && typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
     }
   }
   // fix Array#{values, @@iterator}.name in V8 / FF
@@ -652,7 +654,7 @@ var _iterDefine = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORC
     $default = function values() { return $native.call(this); };
   }
   // Define iterator
-  if ((FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+  if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
     _hide(proto, ITERATOR, $default);
   }
   // Plug for library
@@ -2408,6 +2410,7 @@ function () {
     value: function _abortLoad() {
       if (this.audioH5.src !== defaultSrc) {
         this.audioH5.src = defaultSrc;
+        this.audioH5.currentTime = 0;
         this.audioH5.load();
       }
     }
