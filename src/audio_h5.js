@@ -460,6 +460,7 @@ export class AudioH5 {
   _abortLoad () {
     if (this.audioH5.src !== defaultSrc) {
       this.audioH5.src = defaultSrc
+      this.audioH5.currentTime = 0
       this.audioH5.load()
     }
   }
