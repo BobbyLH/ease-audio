@@ -1,23 +1,35 @@
 // adapt IE add event
-export const addListener = (event, fn, dom) => {
-  if (typeof window === 'undefined') return false
-  const eventDOM = dom || window
-  if (window.addEventListener) {
-    eventDOM.addEventListener(event, fn, false)
-  } else {
-    eventDOM.attachEvent(`on${event}`, fn)
+export const addListener = (function () {
+  if (typeof window === 'undefined') return function () {}
+
+  if (!window.addEventListener) {
+    return function (event, fn, dom) {
+      const eventDOM = dom || window
+      eventDOM.attachEvent(`on${event}`, fn)
+    }
   }
-}
+
+  return function (event, fn, dom, useCapture = false) {
+    const eventDOM = dom || window
+    eventDOM.addEventListener(event, fn, useCapture)
+  }
+})()
 // adapt IE remove event
-export const removeListener = (event, fn, dom) => {
-  if (typeof window === 'undefined') return false
-  const eventDOM = dom || window
-  if (window.removeEventListener) {
-    eventDOM.removeEventListener(event, fn, false)
-  } else {
-    eventDOM.detachEvent(`on${event}`, fn)
+export const removeListener = (function () {
+  if (typeof window === 'undefined') return function () {}
+
+  if (!window.removeEventListener) {
+    return function (event, fn, dom) {
+      const eventDOM = dom || window
+      eventDOM.detachEvent(`on${event}`, fn)
+    }
   }
-}
+
+  return function (event, fn, dom, useCapture = false) {
+    const eventDOM = dom || window
+    eventDOM.removeEventListener(event, fn, useCapture)
+  }
+})()
 // prevent default
 export const preventEvent = event => {
   const e = event || (typeof window !== 'undefined' && window.event)
