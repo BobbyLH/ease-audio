@@ -17,8 +17,7 @@ export function getUA (u) {
     weibo: u.indexOf('Weibo') > -1, // 是否微博
     facebook: u.indexOf('FBAN') > -1, // 是否facebook
     twitter: u.indexOf('FBAN') > -1, // 是否twitter
-    qq: u.match(/\sQQ/i) === ' qq', // 是否QQ
-    hmlyApp: /himalaya/i.test(u) // 是否在 himalaya app
+    qq: u.match(/\sQQ/i) === ' qq' // 是否QQ
   }
   return obj
 }
