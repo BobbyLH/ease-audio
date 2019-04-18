@@ -1,7 +1,16 @@
-export function getUA (u) {
+interface Iua {
+  [propsName: string]: boolean;
+}
+
+/**
+ * generation ua object accroding to navigator.userAgent
+ * @param {string} u navigator.userAgent
+ * @return {false | Iua} ua object
+ */
+export function getUA (u: string): false | Iua {
   if (!u) return false
-  // console.log(u)
-  const obj = {
+
+  const ua: Iua = {
     edge: u.indexOf('Edge') > -1, // Edge内核
     trident: u.indexOf('Trident') > -1, // IE内核
     presto: u.indexOf('Presto') > -1, // opera内核
@@ -16,10 +25,12 @@ export function getUA (u) {
     weixin: u.indexOf('MicroMessenger') > -1, // 是否微信
     weibo: u.indexOf('Weibo') > -1, // 是否微博
     facebook: u.indexOf('FBAN') > -1, // 是否facebook
-    twitter: u.indexOf('FBAN') > -1, // 是否twitter
-    qq: u.match(/\sQQ/i) === ' qq' // 是否QQ
+    twitter: u.indexOf('Twitter') > -1, // 是否twitter
+    instagram: u.indexOf('Instagram') > -1, // 是否twitter
+    qq: !!u.match(/\sQQ/i), // 是否QQ
+    hmlyApp: /himalaya/i.test(u) // 是否在 himalaya app
   }
-  return obj
+  return ua
 }
 
 export default getUA
