@@ -61,7 +61,7 @@ enum logLevelSet {
   'silent'
 }
 
-const defaultSrc: string = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA'
+const defaultSrc: TdefaultSrc = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA'
 
 interface Iplaylist {
   src: string;
@@ -69,13 +69,27 @@ interface Iplaylist {
   [propName: string]: any;
 }
 
+type TplayState = number
+type TlogLevel = number
+type TplayId = number
+type TplayModel = number
+type TplayIndex = number
+type TprevPlayIndex = number
+type TdefaultSrc = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA'
 type Tplaylist = Array<Iplaylist>
-
 type TautocutCallback = (currentId: number, nextId: number) => boolean
-
-type Teventcallback = (e: Event | number | string) => any
-
+type TeventParameter = Event | ProgressEvent | number | string | undefined
+type Teventcallback = (e: Event) => any
+type TprogressEventCallback = (e: ProgressEvent) => any
+type TcustomEventCallback = (e: number | string | undefined) => any
+type TentireEventCallback = Teventcallback | TprogressEventCallback | TcustomEventCallback
 type TlockQueue = Array<() => any>
+type TEvent = 'play' | 'pause' | 'stop' | 'end' | 'finish' | 'load' | 'unload' | 'canplay' | 'canplaythrough' | 'progress' | 'volume' | 'seeking' | 'seeked' | 'rate' | 'timeupdate' | 'loaderror' | 'playerror' | 'cut' | 'pick'
+type TonEvent = 'onplay' | 'onpause' | 'onstop' | 'onend' | 'onfinish' | 'onload' | 'onunload' | 'oncanplay' | 'oncanplaythrough' | 'onprogress' | 'onvolume' | 'onseeking' | 'onseeked' | 'onrate' | 'ontimeupdate' | 'onloaderror' | 'onplayerror' | 'oncut' | 'onpick'
+type TAudioEventUseful = 'loadstart' | 'seeking' | 'canplaythrough' | 'playing' | 'pause' | 'ended' | 'error' | 'progress' | 'durationchange' | 'loadedmetadata' | 'loadeddata' | 'timeupdate' | 'canplay' | 'seeked' | 'volumechange' | 'ratechange';
+type TAudioEventUseless = 'finish' | 'playerror' | 'cut' | 'pick' | 'play' | 'abort' | 'suspend';
+type TAudioEvent = TAudioEventUseful | TAudioEventUseless
+type TlockTags = 'cutpick' | 'seek' | 'volume' | 'rate' | 'mute' | 'pause_wait' | 'pause_cancel';
 
 interface IupdateConfig {
   src?: string;
@@ -90,29 +104,30 @@ interface IupdateConfig {
   playbackRate?: number;
   onplay?: Teventcallback;
   onpause?: Teventcallback;
-  onstop?: Teventcallback;
+  onstop?: TcustomEventCallback;
   onend?: Teventcallback;
-  onfinish?: Teventcallback;
+  onfinish?: TcustomEventCallback;
   onload?: Teventcallback;
   onunload?: Teventcallback;
   oncanplay?: Teventcallback;
   oncanplaythrough?: Teventcallback;
-  onprogress?: Teventcallback;
+  onprogress?: TprogressEventCallback;
   onvolume?: Teventcallback;
   onseeking?: Teventcallback;
   onseeked?: Teventcallback;
   onrate?: Teventcallback;
   ontimeupdate?: Teventcallback;
-  onloaderror?: Teventcallback;
-  onplayerror?: Teventcallback;
-  oncut?: Teventcallback;
-  onpick?: Teventcallback;
+  onloaderror?: Teventcallback | TcustomEventCallback;
+  onplayerror?: Teventcallback | TcustomEventCallback;
+  oncut?: TcustomEventCallback;
+  onpick?: TcustomEventCallback;
   debug?: boolean;
   logLevel?: logLevelSet
 }
 
 interface Iconfig extends IupdateConfig {
-  playlist: Array<Iplaylist>;
+  playlist: Tplaylist;
+  initIndex?: number;
 }
 
 interface IlockTags {
@@ -131,7 +146,7 @@ interface Ibuffered {
 }
 
 interface IeventController {
-  [propName: string]: boolean
+  [propName: string]: boolean;
 }
 
 interface IeventMethods {
@@ -141,10 +156,10 @@ interface IeventMethods {
   playing: Teventcallback;
   pause: Teventcallback;
   ended: Teventcallback;
-  finish: Teventcallback;
-  error: Teventcallback;
-  playerror: Teventcallback;
-  progress: Teventcallback;
+  finish: TcustomEventCallback;
+  error: Teventcallback | TcustomEventCallback;
+  playerror: Teventcallback | TcustomEventCallback;
+  progress: TprogressEventCallback;
   durationchange: Teventcallback;
   loadedmetadata: Teventcallback;
   loadeddata: Teventcallback;
@@ -153,22 +168,33 @@ interface IeventMethods {
   seeked: Teventcallback;
   volumechange: Teventcallback;
   ratechange: Teventcallback;
-  cut: Teventcallback;
-  pick:Teventcallback;
+  cut: TcustomEventCallback;
+  pick:TcustomEventCallback;
   play: Teventcallback;
   abort: Teventcallback;
   suspend: Teventcallback;
 }
 
+interface Ieventcallback {
+  [propName: string]: Teventcallback;
+}
+
 interface IreturnParams {
   playId: number | undefined;
   playingData: Iplaylist | undefined;
-  playlist: Array<Iplaylist> | undefined;
+  playlist: Tplaylist | undefined;
 }
 
 interface IblockEvent {
   event?: string;
-  block: boolean
+  block: boolean;
+}
+
+interface IsetPlaylist {
+  action: 'add' | 'delete' | 'insert' | 'replace' | 'update' | 'reset';
+  list?: Tplaylist;
+  playId?: number;
+  params?: Object;
 }
 
 export class AudioH5 {
@@ -236,7 +262,7 @@ export class AudioH5 {
             // without correct src the sound couldn't play
             // manual trigger load error event
             const err = 'Because the error src property, manual trigger load error event'
-            return this.eventMethods && this.eventMethods.error(err)
+            return this.eventMethods && (<TcustomEventCallback>this.eventMethods.error)(err)
           }
 
           this._blockEvent({ block: false })
@@ -260,7 +286,7 @@ export class AudioH5 {
                 this.lockQueue && this.lockQueue.forEach(v => v && v())
               } else {
                 // set play error if not trigger load error
-                if (this.playState !== playStateSet[6]) {
+                if (this.playState !== playStateSet.loaderror) {
                   this.eventMethods && this.eventMethods.playerror(err)
                 }
               }
@@ -272,11 +298,11 @@ export class AudioH5 {
           if ((<HTMLAudioElement>this.audioH5).paused) {
             const err = `Playback was unable to start. This is most commonly an issue on mobile devices and Chrome where playback was not within a user interaction.`
 
-            this.eventMethods && this.eventMethods.playerror(err)
+            this.eventMethods && (<TcustomEventCallback>this.eventMethods.playerror)(err)
           }
         } catch (err) {
           // set play error if not trigger load error and playErrLocker is a falsy
-          if (!this.playErrLocker && this.playState !== playStateSet[6]) {
+          if (!this.playErrLocker && this.playState !== playStateSet.loaderror) {
             this.eventMethods && this.eventMethods.playerror(err)
           } else {
             this.playErrLocker = false
@@ -327,11 +353,11 @@ export class AudioH5 {
    * @return {number | void} playId
    */
   public toggle (): number | void {
-    if (this._checkInit() && this.playState !== playStateSet[6] && this.playState !== playStateSet[7] && this.playState !== playStateSet[8]) {
+    if (this._checkInit() && this.playState !== playStateSet.loaderror && this.playState !== playStateSet.playerror && this.playState !== playStateSet.unloaded) {
       if ((<IlockTags>this.lockTags).pause_wait) {
         (<IlockTags>this.lockTags).pause_cancel = !(<IlockTags>this.lockTags).pause_cancel
       } else {
-        if (this.playState === null || this.playState === playStateSet[2] || this.playState === playStateSet[9]) {
+        if (this.playState === null || this.playState === playStateSet.paused || this.playState === playStateSet.loaded) {
           // trigger play method
           this.play()
         } else {
@@ -368,7 +394,7 @@ export class AudioH5 {
         if ((<Tplaylist>this.playList)[i].playId === playId) {
           this._setPlayIndex(i)
           this._setPlayId()
-          (<IeventMethods>this.eventMethods).pick(this.playId)
+          this.eventMethods && this.eventMethods.pick(this.playId)
           this.playErrLocker = true
           this._abortLoad()
 
@@ -500,19 +526,21 @@ export class AudioH5 {
    * @return {number | void} playId
    */
   public stop (forbidEvent?: boolean): number | void {
-    if (this._checkInit() && this.playState !== playStateSet[3]) {
+    if (this._checkInit() && this.playState !== playStateSet.stopped) {
       this._playLockQueue(() => {
         if (!forbidEvent) {
-          this._blockEvent({block: true})
-          this._setPlayState(playStateSet[3])
+          this._blockEvent({ block: true })
+          this._setPlayState(playStateSet.stopped)
           this._fireEventQueue(this.playId, 'onstop')
         }
 
-        if (typeof (<HTMLAudioElement>this.audioH5).duration !== 'undefined') {
-          {(<HTMLAudioElement>this.audioH5).currentTime = 0}
-          {(<HTMLAudioElement>this.audioH5).pause()}
-        } else {
-          (<HTMLAudioElement>this.audioH5).muted = true
+        if (this.audioH5) {
+          if (typeof this.audioH5.duration !== 'undefined') {
+            this.audioH5.currentTime = 0
+            this.audioH5.pause()
+          } else {
+            this.audioH5.muted = true
+          }
         }
       })
 
@@ -533,7 +561,7 @@ export class AudioH5 {
 
       this._playLockQueue(() => {
         if (!forbidEvent) {
-          this._setPlayState(playStateSet[8])
+          this._setPlayState(playStateSet.unloaded)
           this._fireEventQueue(this.playId, 'onunload')
         }
 
@@ -562,38 +590,68 @@ export class AudioH5 {
     }
   }
 
-  /* add event to events queue */
-  public on (event, cb) {
+  /**
+   * add event to events queue
+   * @param {string} event TEvent
+   * @param {Function} cb TentireEventCallback
+   * 
+   * @return {boolean} whether or not successful bind event callback
+   */
+  public on (event: TEvent | TonEvent, cb: TentireEventCallback): boolean {
     if (this._checkInit() && this._checkType(event, 'string', true) && this._checkType(cb, 'function', true)) {
       const queueName = event.indexOf('on') === 0 ? event : `on${event}`
-      this._onEvent(queueName, cb)
+      return this._onEvent(<TonEvent>queueName, cb)
     }
-  }
 
-  /* remove event from events queue */
-  public off (event, cb) {
+    return false
+  }
+    
+  /**
+   * remove event from events queue
+   * @param {string} event TEvent 
+   * @param {Function} cb TentireEventCallback
+   * 
+   * @return {boolean} whether or not successful unbind event callback
+   */
+  public off (event: TEvent | TonEvent, cb: TentireEventCallback): boolean {
     if (this._checkInit() && this._checkType(event, 'string', true)) {
       const queueName = event.indexOf('on') === 0 ? event : `on${event}`
-      this._offEvent(queueName, cb)
+      return this._offEvent(<TonEvent>queueName, cb)
     }
+
+    return false
   }
 
   /* fire only one time */
-  public once (event, cb) {
+  /**
+   * fire only one time
+   * @param {string} event TEvent
+   * @param {Function} cb TentireEventCallback
+   * 
+   * @return {boolean} whether or not successful bind once event callback
+   */
+  public once (event: TEvent | TonEvent, cb: TentireEventCallback): boolean {
     if (this._checkInit() && this._checkType(event, 'string', true) && this._checkType(cb, 'function', true)) {
       const queueName = event.indexOf('on') === 0 ? event : `on${event}`
       const funcName = `EASE_AUDIO_${queueName.toUpperCase()}_ONCE_CALLBACK`
-      const once = e => {
-        cb && cb(e)
-        this._offEvent(queueName, once, funcName)
+      const once: TentireEventCallback = (e: TeventParameter) => {
+        cb && cb(<any>e)
+        this._offEvent(queueName as TonEvent, once, funcName)
       }
-      this._onEvent(queueName, once, funcName)
+      return this._onEvent(queueName as TonEvent, once, funcName)
     }
+
+    return false
   }
 
-  /* set play list */
-  public playlist (data) {
-    const {action, list, playId, params} = data
+  /**
+   * set play list
+   * @param {IsetPlaylist} data 
+   * 
+   * @return {IreturnParams | void}
+   */
+  public playlist (data: IsetPlaylist): IreturnParams | void {
+    const { action, list, playId, params } = data
     if (this._checkInit() && this._checkType(action, 'string', true) && (!list || this._checkType(list, 'array', true)) && (!playId || this._checkType(playId, 'number', true)) && (!params || this._checkType(params, 'object', true))) {
       this._handlePlayList(data)
 
@@ -602,25 +660,34 @@ export class AudioH5 {
   }
 
   /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+  // private methods
+  // ---------------
+  // ---------------
+  // ---------------
   private config: Iconfig | undefined;
-  private playState: string | null | undefined;
+  private playState: TplayState | null | undefined;
   private debug: boolean | undefined;
-  private logLevel: number | undefined;
+  private logLevel: TlogLevel | undefined;
   private idCounter: number | undefined;
   private lockQueue: TlockQueue | undefined;
   private playLocker: boolean | undefined;
   private playErrLocker: boolean | undefined;
   private lockTags: IlockTags | undefined;
-  private playId: number | undefined;
-  private playModel: number | undefined;
-  private playIndex: number | undefined;
-  private prevPlayIndex: number | undefined;
+  private playId: TplayId | undefined;
+  private playModel: TplayModel | undefined;
+  private playIndex: TplayIndex | undefined;
+  private prevPlayIndex: TprevPlayIndex | undefined;
   private playList: Tplaylist | undefined;
   private buffered: Array<Ibuffered> | undefined;
   private eventController: IeventController | undefined;
   private eventMethods: IeventMethods | undefined;
-
-  private _initial (config: Iconfig) {
+  /**
+   * initial audio
+   * @param {Iconfig} config 
+   * 
+   * @return {void}
+   */
+  private _initial (config: Iconfig): void {
     const logLevelIndex = config.logLevel || (config.logLevel === 0 && 0) || 'error'
     const playModelIndex = config.playModel || (config.playModel === 0 && 0) || (config.loop && 'list-loop') ||'list-once'
 
@@ -670,7 +737,7 @@ export class AudioH5 {
           }
         })
       }
-      this._handlePlayList({action: 'add', list: config.playlist})
+      this._handlePlayList({ action: 'add', list: config.playlist })
       const srcIndex = config.initIndex && this.playList[config.initIndex] ? config.initIndex : 0
       this._setPlayIndex(srcIndex)
       this._setPlayId()
@@ -680,10 +747,16 @@ export class AudioH5 {
     }
 
     // create Audio Object
-    this._createAudio({...config, src})
+    this._createAudio({ ...config, src })
   }
 
-  private _createAudio (config: Iconfig) {
+  /**
+   * create HMTL Audio Object
+   * @param {Iconfig} config 
+   * 
+   * @return {void}
+   */
+  private _createAudio (config: Iconfig): void {
     if (typeof window !== 'undefined' && !this.audioH5) {
       this.isInit = true
 
@@ -700,7 +773,13 @@ export class AudioH5 {
 
   }
 
-  private _srcAssemble (src) {
+  /**
+   * The src compatible process
+   * @param {string} src
+   * 
+   * @return {string | TdefaultSrc} return src or defaultSrc
+   */
+  private _srcAssemble (src?: string): string | TdefaultSrc {
     if (src && this._checkType(src, 'string')) {
       return src
     }
@@ -708,10 +787,21 @@ export class AudioH5 {
     return defaultSrc
   }
 
-  private _updateConfig (params: IupdateConfig) {
+  /**
+   * update config
+   * @param {IupdateConfig} params
+   * 
+   * @return {void}
+   */
+  private _updateConfig (params: IupdateConfig): void {
     Object.assign(this.config, params)
   }
 
+  /**
+   * return formatted parameters
+   * 
+   * @return {IreturnParams}
+   */
   private _returnParams (): IreturnParams {
     return {
       playId: this.playId,
@@ -720,71 +810,87 @@ export class AudioH5 {
     }
   }
 
-  /* abort load sound */
-  private _abortLoad () {
-    if (this.audioH5.src !== defaultSrc) {
+  /**
+   * abort load sound
+   * 
+   * @return {void}
+   */
+  private _abortLoad (): void {
+    if (this.audioH5 && this.audioH5.src !== defaultSrc) {
       this.audioH5.src = defaultSrc
       this.audioH5.currentTime = 0
       this.audioH5.load()
     }
   }
 
-  /* set play state */
-  private _setPlayState (state) {
-    if (this._checkType(state, 'string', true) && this.playState !== state) {
+  /**
+   * set play state
+   * @param {TplayState} state
+   * 
+   * @return {TplayState | false}
+   */
+  private _setPlayState (state: TplayState): TplayState | false {
+    if (this.audioH5 && this._checkType(state, 'number', true) && this.playState !== state) {
       const readyState = this.audioH5.readyState
       const isReady = readyState > 2
       const paused = this.audioH5.paused
-      const stopped = this.playState === playStateSet[3]
-      const ended = this.playState === playStateSet[4]
-      const finished = this.playState === playStateSet[5]
-      const unloaded = this.playState === playStateSet[8]
+      const stopped = this.playState === playStateSet.stopped
+      const ended = this.playState === playStateSet.ended
+      const finished = this.playState === playStateSet.finished
+      const unloaded = this.playState === playStateSet.unloaded
       const seeking = this.audioH5.seeking
 
       // filter impossible state
       switch (state) {
-        case playStateSet[0]:
+        case playStateSet.loading:
           // could not be loading: ready and not finished
           if (!finished && isReady) return false
           break
-        case playStateSet[1]:
+        case playStateSet.playing:
           // could not be playing: paused or unloaded or seeking or not ready when not finished
           if (!finished && (paused || unloaded || seeking || !isReady)) return false
           break
-        case playStateSet[2]:
+        case playStateSet.paused:
           // could not be paused: stopped or ended or finished
           if (stopped || ended || finished || unloaded) return false
           break
       }
 
-      this._logInfo(`setPlayState - ${state}`)
+      this._logInfo(`setPlayState - ${playStateSet[state]}`)
       this.playState = state
       return this.playState
     }
+
+    return false
   }
 
-  /* set play index */
-  private _setPlayIndex (index) {
-    const playModel = this.playModel
-    const maxIndex = this.playList.length - 1
+  /**
+   * set play index
+   * @param {TplayIndex} index
+   * 
+   * @return {TplayIndex}
+   */
+  private _setPlayIndex (index?: TplayIndex): TplayIndex {
+    const playModel = <TplayModel>this.playModel
+    const maxIndex = (this.playList as Tplaylist).length - 1
 
     // reserve playIndex
     this.prevPlayIndex = this.playIndex
 
     if (index === 0) {
       this.playIndex = 0
-      return
+      return this.playIndex
     }
 
-    switch (playModel) {
+    switch (playModelSet[playModel]) {
       case 'list-once':
-        this.playIndex = index || (maxIndex >= this.playIndex ? ++this.playIndex : this.playIndex)
+        this.playIndex = index || (maxIndex >= <TplayIndex>this.playIndex ? ++(<TplayIndex>this.playIndex) : this.playIndex)
         break
       case 'list-random':
         this.playIndex = index || Math.round(Math.random() * maxIndex)
         break
       case 'list-loop':
-        this.playIndex = index || (maxIndex > this.playIndex ? ++this.playIndex : 0)
+        this.playIndex = index || (maxIndex > <TplayIndex>this.playIndex ? ++(<TplayIndex>this.playIndex) : 0)
         break
       case 'single-once':
         this.playIndex = index || this.playIndex
@@ -796,40 +902,49 @@ export class AudioH5 {
         this.playIndex = index || this.playIndex
     }
 
+    !this.playIndex && (this.playIndex = 0)
     this._log(`setPlayIndex - playIndex: ${this.playIndex}`)
     return this.playIndex
   }
 
-  private _setPlayId (isSet = true) {
-    const playId = (this.playList[this.playIndex] && this.playList[this.playIndex].playId) || this.playId
+  /**
+   * set playId
+   * @param {boolean} isSet
+   * 
+   * @return {TplayId}
+   */
+  private _setPlayId (isSet: boolean | void = true): TplayId {
+    const playId = (this.playList && this.playList[<TplayIndex>this.playIndex] && this.playList[<TplayIndex>this.playIndex].playId) || <TplayId>this.playId
 
     if (isSet === true) this.playId = playId
     return playId
   }
 
-  /* reset play list */
-  private _resetPlayList () {
-    this.playList = []
-    this._setPlayIndex(0)
-  }
+  /**
+   * handle play list
+   * @param {IsetPlaylist} data 
+   * 
+   * @return {void}
+   */
+  private _handlePlayList (data: IsetPlaylist): void {
+    const { action, list, playId, params } = data
+    const playlist = new Array(...(this.playList || []))
 
-  /* handle play list */
-  private _handlePlayList ({action, list, playId, params}) {
     switch (action) {
       case 'add':
-        this.playList = [...this.playList, ...list.map(v => {
-          if (this._checkType(v, 'object')) {
-            v.playId = this.idCounter
-            this.idCounter++
-            return v
-          }
-        })]
+        if (!list) return
+        Array.prototype.forEach.call(list, (v: Iplaylist, k: number, thisArr: Tplaylist) => {
+          !this.idCounter && (this.idCounter = 1000)
+          v.playId = this.idCounter
+          this.idCounter++
+          thisArr[k] = v
+        })
+        this.playList = Array.prototype.concat.call(playlist, list)
         break
       case 'delete':
         if (playId) {
-          for (let i = 0; i < this.playList.length; i++) {
-            if (this.playList[i].playId === playId) {
-              const playlist = new Array(...this.playList)
+          for (let i = 0; i < playlist.length; i++) {
+            if (playlist[i].playId === playId) {
               playlist.splice(i, 1)
               this.playList = [...playlist]
               break
@@ -839,10 +954,10 @@ export class AudioH5 {
         break
       case 'insert':
         if (playId && list) {
-          for (let i = 0; i < this.playList.length; i++) {
-            if (this.playList[i].playId === playId) {
-              const playlist = new Array(...this.playList)
+          for (let i = 0; i < playlist.length; i++) {
+            if (playlist[i].playId === playId) {
               playlist.splice(i, 0, ...list.map(v => {
+                !this.idCounter && (this.idCounter = 1000)
                 v.playId = this.idCounter
                 this.idCounter++
                 return v
@@ -855,10 +970,10 @@ export class AudioH5 {
         break
       case 'replace':
         if (playId && list) {
-          for (let i = 0; i < this.playList.length; i++) {
-            if (this.playList[i].playId === playId) {
-              const playlist = new Array(...this.playList)
+          for (let i = 0; i < playlist.length; i++) {
+            if (playlist[i].playId === playId) {
               playlist.splice(i, 1, ...list.map(v => {
+                !this.idCounter && (this.idCounter = 1000)
                 v.playId = this.idCounter
                 this.idCounter++
                 return v
@@ -871,10 +986,9 @@ export class AudioH5 {
         break
       case 'update':
         if (playId && params) {
-          for (let i = 0; i < this.playList.length; i++) {
-            if (this.playList[i].playId === playId) {
-              const playlist = new Array(...this.playList)
-              const newData = {...this.playList[i], ...params}
+          for (let i = 0; i < playlist.length; i++) {
+            if (playlist[i].playId === playId) {
+              const newData = { ...playlist[i], ...params }
               playlist.splice(i, 1, newData)
               this.playList = [...playlist]
               break
@@ -885,15 +999,28 @@ export class AudioH5 {
       case 'reset':
         this._resetPlayList()
         break
-      default:
-        this._resetPlayList()
     }
   }
 
-  /* cut audio */
-  private _cut (autocut?: boolean) {
+  /**
+   * reset play list
+   * 
+   * @return {void}
+   */
+  private _resetPlayList () {
+    this.playList = new Array(0)
+    this._setPlayIndex(0)
+  }
+
+  /**
+   * cut audio
+   * @param {boolean} autocut
+   * 
+   * @return {void}
+   */
+  private _cut (autocut?: boolean): void {
     if (this._checkInit()) {
-      if (this.playModel === 'single-once') {
+      if (this.playModel === playModelSet['single-once']) {
         // can't cut audio if the playModel is single-once
         this._logWarn('Cannot cut audio if the playModel is single-once')
         this.stop()
@@ -904,25 +1031,27 @@ export class AudioH5 {
         !autocut && this._setPlayIndex()
 
         // on finish
-        if (!this.playList[this.playIndex]) {
+        if (this.playList && !this.playList[<TplayIndex>this.playIndex]) {
           this._setPlayIndex(this.prevPlayIndex)
-          return this.eventMethods.finish(this.playId)
+          return this.eventMethods && this.eventMethods.finish(this.playId)
         }
 
         this._setPlayId()
-        this.eventMethods.cut(this.playId)
+        this.eventMethods && this.eventMethods.cut(this.playId)
         this.playErrLocker = true
         this._abortLoad()
 
         return this._commonLock('cutpick', () => {
-          const src = this.playList[this.playIndex].src
+          const src = (this.playList as Tplaylist)[<TplayIndex>this.playIndex].src
           if (autocut) {
-            // resolve the IOS auto play problem
-            this.audioH5.src = src
-            this.audioH5.load()
+            if (this.audioH5 && src) {
+              // resolve the IOS auto play problem
+              this.audioH5.src = src
+              this.audioH5.load()
+            }
           } else {
             this.unload(true)
-            const config = {...this.config, src}
+            const config = Object.assign(this.config, { src })
             this._createAudio(config)
             this._registerEvent(config)
           }
@@ -933,67 +1062,127 @@ export class AudioH5 {
     }
   }
 
-  /* generate received event callback queue */
-  private _onEvent (event, cb, name) {
-    if (supportEvents.indexOf(event) !== -1) {
-      if (!this[event]) this[event] = {}
-      this[event][name || cb.name || `anonymous-${new Date().getTime()}`] = cb
+  protected onplay: Ieventcallback | Object | null | undefined;
+  protected onpause: Ieventcallback | Object | null | undefined;
+  protected onstop: Ieventcallback | Object | null | undefined;
+  protected onend: Ieventcallback | Object | null | undefined;
+  protected onfinish: Ieventcallback | Object | null | undefined;
+  protected onload: Ieventcallback | Object | null | undefined;
+  protected onunload: Ieventcallback | Object | null | undefined;
+  protected oncanplay: Ieventcallback | Object | null | undefined;
+  protected oncanplaythrough: Ieventcallback | Object | null | undefined;
+  protected onprogress: Ieventcallback | Object | null | undefined;
+  protected onvolume: Ieventcallback | Object | null | undefined;
+  protected onseeking: Ieventcallback | Object | null | undefined;
+  protected onseeked: Ieventcallback | Object | null | undefined;
+  protected onrate: Ieventcallback | Object | null | undefined;
+  protected ontimeupdate: Ieventcallback | Object | null | undefined;
+  protected onloaderror: Ieventcallback | Object | null | undefined;
+  protected onplayerror: Ieventcallback | Object | null | undefined;
+  protected oncut: Ieventcallback | Object | null | undefined;
+  protected onpick: Ieventcallback | Object | null | undefined;
+  /**
+   * generate received event callback queue
+   * @param {string} event TonEvent
+   * @param {Function} cb TentireEventCallback
+   * @param {string} name the special name for same events
+   * 
+   * @return {boolean} whether or not successful bind event callback
+   */
+  private _onEvent (event: TonEvent, cb: TentireEventCallback, name?: string): boolean {
+    if (!isNaN(supportEvents[event])) {
+      try {
+        if (!this[event]) this[event] = Object.create(null)
+        (this[event] as Ieventcallback)[name || cb.name || `anonymous-${new Date().getTime()}`] = cb
+        return true
+      } catch (error) {
+        this._logErr(error)
+      }
     }
+
+    return false
   }
 
-  /* delete received event callback queue */
-  private _offEvent (event, cb, name) {
-    if (supportEvents.indexOf(event) !== -1) {
-      if (!cb) this[event] = null
-      else if (name || cb.name) delete this[event][name || cb.name]
+  /**
+   * delete received event callback queue
+   * @param {string} event TonEvent
+   * @param {Function} cb TentireEventCallback
+   * @param {string} name the special name for same events
+   * 
+   * @return {boolean} whether or not successful unbind event callback
+   */
+  private _offEvent (event: TonEvent, cb?: TentireEventCallback, name?: string): boolean {
+    if (!isNaN(supportEvents[event])) {
+      try {
+        if (!cb) this[event] = null
+        else if (name || cb.name) delete (this[event] as Ieventcallback)[name || cb.name]
+        return true
+      } catch (error) {
+        this._logErr(error)
+      }
     }
+
+    return false
   }
 
-  /* fire event callback queue */
-  private _fireEventQueue (e, eventQueue) {
+  /**
+   * fire event callback queue
+   * @param {TeventParameter} e 
+   * @param {TonEvent} eventQueue 
+   * 
+   * @return {void}
+   */
+  private _fireEventQueue (e: TeventParameter, eventQueue: TonEvent): void {
     if (this[eventQueue]) {
       for (let k in this[eventQueue]) {
-        this[eventQueue][k] && this[eventQueue][k](e)
+        (this[eventQueue] as Ieventcallback)[k] && (this[eventQueue] as Ieventcallback)[k](<any>e)
       }
     }
   }
 
-  /* register Audio Event */
-  private _registerEvent (config) {
-    const curry = (cb, eventName) => e => {
+  private isTriggerEnd: boolean | undefined;
+  /**
+   * register Audio Event
+   * @param {Iconfig} config 
+   */
+  private _registerEvent (config: Iconfig) {
+    const curry = (cb: TentireEventCallback, eventName: TAudioEvent): TentireEventCallback => (e: TeventParameter) => {
       if (!this._triggerEventController(eventName)) return
-      return cb && cb(e)
+      return cb && cb(<any>e)
     }
 
     /* bindind received event callbacks */
     const configKeys = Object.keys(config)
     configKeys.forEach(v => {
       if (v.indexOf('on') === 0) {
-        const funcName = `EASE_AUDIO_${v.toUpperCase()}_INITIAL_CALLBACK`
-        this._onEvent(v, config[v], funcName)
+        const cb = config[<TonEvent>v]
+        if (cb && this._checkType(cb, 'function', true)) {
+          const funcName = `EASE_AUDIO_${v.toUpperCase()}_INITIAL_CALLBACK`
+          this._onEvent(<TonEvent>v, <TentireEventCallback>cb, funcName)
+        }
       }
     })
 
     this.eventMethods = {
       // loading state
       loadstart: e => {
-        if (this.audioH5.src === defaultSrc) return
-        this._setPlayState(playStateSet[0])
+        if (this.audioH5 && this.audioH5.src === defaultSrc) return
+        this._setPlayState(playStateSet.loading)
         this._fireEventQueue(e, 'onload')
       },
       seeking: e => {
-        if (this.audioH5.src !== defaultSrc && this.playState !== playStateSet[2]) this._setPlayState(playStateSet[0])
+        if (this.audioH5 && this.audioH5.src !== defaultSrc && this.playState !== playStateSet.paused) this._setPlayState(playStateSet.loading)
         this._fireEventQueue(e, 'onseeking')
       },
       // loaded state
       canplaythrough: e => {
-        if (this.audioH5.src === defaultSrc) return
-        this.playState === playStateSet[0] && this._setPlayState(playStateSet[9])
+        if (this.audioH5 && this.audioH5.src === defaultSrc) return
+        this.playState === playStateSet.loading && this._setPlayState(playStateSet.loaded)
         this._fireEventQueue(e, 'oncanplaythrough')
       },
       // playing state
       playing: e => {
-        this._setPlayState(playStateSet[1])
+        this._setPlayState(playStateSet.playing)
         this._fireEventQueue(e, 'onplay')
 
         // if playing then set the isTriggerEnd to false
@@ -1003,7 +1192,7 @@ export class AudioH5 {
       pause: e => {
         // resolve ios cannot trigger onend but onpause event
         if (!this.isTriggerEnd) {
-          this._setPlayState(playStateSet[2])
+          this._setPlayState(playStateSet.paused)
           this._fireEventQueue(e, 'onpause')
         }
       },
@@ -1013,32 +1202,32 @@ export class AudioH5 {
           this.isTriggerEnd = false
         } else {
           this.isTriggerEnd = true
-          this._setPlayState(playStateSet[4])
+          this._setPlayState(playStateSet.ended)
           this._fireEventQueue(e, 'onend')
 
-          return autocut.call(this)
+          return this._autocut()
         }
       },
       // finish state
       // The Audio not really exist this event, just for intergration
       finish: e => {
-        this._setPlayState(playStateSet[5])
+        this._setPlayState(playStateSet.finished)
         this._fireEventQueue(e, 'onfinish')
       },
       // loaderror state
-      error: e => {
-        this._setPlayState(playStateSet[6])
+      error: (e: Event) => {
+        this._setPlayState(playStateSet.loaderror)
         this._fireEventQueue(e, 'onloaderror')
       },
       // playerror state
       // The Audio not really exist this event, just for intergration
-      playerror: e => {
-        this._setPlayState(playStateSet[7])
+      playerror: (e: Event) => {
+        this._setPlayState(playStateSet.playerror)
         this._fireEventQueue(e, 'onplayerror')
       },
       // others
       progress: e => {
-        const ranges = e.target.buffered
+        const ranges = (e.target as HTMLMediaElement).buffered
         const total = (e.total || 1)
         let buffered = 0
         let loaded = (e.loaded || 0)
@@ -1046,17 +1235,17 @@ export class AudioH5 {
 
         if (ranges && ranges.length) {
           for (let i = 0, j = ranges.length; i < j; i++) {
-            this.buffered.push({
+            this.buffered && this.buffered.push({
               'start': ranges.start(i) * 1000,
               'end': ranges.end(i) * 1000
             })
           }
           buffered = (ranges.end(0) - ranges.start(0)) * 1000
-          loaded = Math.min(1, buffered / (e.target.duration * 1000))
+          loaded = Math.min(1, buffered / ((e.target as HTMLMediaElement).duration * 1000))
           progress = loaded / total
         }
 
-        this._fireEventQueue({e, progress}, 'onprogress')
+        this._fireEventQueue(Object.assign(e, { progress }), 'onprogress')
       },
       durationchange: e => {},
       loadedmetadata: e => {
@@ -1066,24 +1255,24 @@ export class AudioH5 {
       loadeddata: e => {},
       timeupdate: e => {
         // playState is loading but actually is playing
-        if (this.playState === playStateSet[0]) {
+        if (this.playState === playStateSet.loading) {
           this._logInfo("timeupdate's playing")
-          this._setPlayState(playStateSet[1])
+          this._setPlayState(playStateSet.playing)
           this._fireEventQueue(e, 'onplay')
         }
 
         // Depending on currentTime and duration to mimic end event
-        const isEnd = this.audioH5.duration && +this.audioH5.currentTime >= +this.audioH5.duration
+        const isEnd = this.audioH5 && this.audioH5.duration && +this.audioH5.currentTime >= +this.audioH5.duration
         if (isEnd) {
           if (this.isTriggerEnd) {
             this.isTriggerEnd = false
           } else {
             this._logInfo("timeupdate's ended")
             this.isTriggerEnd = true
-            this._setPlayState(playStateSet[4])
+            this._setPlayState(playStateSet.ended)
             this._fireEventQueue(e, 'onend')
 
-            return autocut.call(this)
+            return this._autocut()
           }
         }
 
@@ -1100,61 +1289,29 @@ export class AudioH5 {
       suspend: e => {}
     }
 
-    // handle onend auto cut sound
-    async function autocut () {
-      let { autocut } = this.config || {}
-      this._setPlayIndex()
-      const nextId = this._setPlayId(false)
-
-      if (this._checkType(autocut, 'function')) {
-        try {
-          autocut = await autocut(this.playId, nextId)
-        } catch (err) {
-          this._logErr(`autocut occur error, it's ${err}`)
-
-          // withdrawl set playIndex operation
-          this._setPlayIndex(this.prevPlayIndex)
-          return this.eventMethods.finish(this.playId)
-        }
-      }
-
-      return new Promise((resolve, reject) => {
-        this._checkType(autocut, 'boolean') ? resolve(autocut) : reject(autocut)
-      }).then(isCut => {
-        if (isCut) return this._cut(true)
-
-        this._setPlayIndex(this.prevPlayIndex)
-        return this.eventMethods.finish(this.playId)
-      }).catch(err => {
-        this._logWarn(`The autocut property type should be boolean or function return boolean, now the result ${err} type was ${typeof err}`)
-
-        this._setPlayIndex(this.prevPlayIndex)
-        return this.eventMethods.finish(this.playId)
-      })
-    }
-
-    // bind controller scope for every each event
     for (let k in this.eventMethods) {
-      this.eventMethods[k] = curry(this.eventMethods[k], k)
+      // filter useless events
+      if (uselessEvents[<TAudioEvent | any>k] !== 'undefined') continue
+
+      // bind controller scope for every each event
+      this.eventMethods[<TAudioEventUseful>k] = curry(this.eventMethods[<TAudioEventUseful>k], <TAudioEventUseful>k)
+      this._bindEvent(this.eventMethods[<TAudioEventUseful>k], <TAudioEventUseful>k)
     }
 
-    // filter useless events
-    for (let k in this.eventMethods) {
-      if (uselessEvents.indexOf(k) !== -1) continue
-
-      this._bindEvent(this.eventMethods[k], k)
-    }
-
-    this._blockEvent({block: false})
+    this._blockEvent({ block: false })
   }
 
-  /* unregister Audio Event */
-  private _unregisterEvent () {
+  /**
+   * unregister Audio Event
+   * 
+   * @return {void}
+   */
+  private _unregisterEvent (): void {
     if (this._checkInit()) {
       for (let k in this.eventMethods) {
-        if (uselessEvents.indexOf(k) !== -1) continue
+        if (uselessEvents[<TAudioEvent | any>k] !== 'undefined') continue
 
-        this._removeEvent(this.eventMethods[k], k)
+        this._removeEvent(this.eventMethods[<TAudioEventUseful>k], <TAudioEventUseful>k)
       }
     }
   }
@@ -1178,22 +1335,39 @@ export class AudioH5 {
     }
   }
 
-  /* whether or not trigger event callback */
-  private _triggerEventController (event) {
-    if (!this.eventController[event]) return false
+  /**
+   * whether or not trigger event callback
+   * @param {TAudioEvent} event
+   * 
+   * @return {boolean} the event whether or not be blocked
+   */
+  private _triggerEventController (event: TAudioEvent): boolean {
+    if (this.eventController && !this.eventController[event]) return false
     this._log(`trigger ${event} event`)
 
     return true
   }
 
-  /* bind event */
-  private _bindEvent (cb, event) {
+  /**
+   * bind event
+   * @param {TentireEventCallback} cb 
+   * @param {TAudioEvent} event 
+   * 
+   * @return {void}
+   */
+  private _bindEvent (cb: TentireEventCallback, event: TAudioEvent): void {
     if (!this._checkType(event, 'string')) return this._logErr(`bindEvent - bind event name is not string`)
     this._checkType(cb, 'function', true) && addListener(event, cb, this.audioH5)
   }
 
-  /* remove event */
-  private _removeEvent (cb, event) {
+  /**
+   * remove event
+   * @param {TentireEventCallback} cb 
+   * @param {TAudioEvent} event 
+   * 
+   * @return {void}
+   */
+  private _removeEvent (cb: TentireEventCallback, event: TAudioEvent): void {
     if (!this._checkType(event, 'string')) return this._logErr(`removeEvent - unbind event name is not string`)
     this._checkType(cb, 'function', true) && removeListener(event, cb, this.audioH5)
   }
@@ -1212,17 +1386,69 @@ export class AudioH5 {
     return fn && fn()
   }
 
-  /* trigger lockqueue general method */
-  private _commonLock (tag, fn) {
-    this.playLocker && this.lockTags[tag]++
+  /**
+   * trigger lockqueue general method
+   * @param tag 
+   * @param fn 
+   * 
+   * @return {void}
+   */
+  private _commonLock (tag: TlockTags, fn: Function): void {
+    if (this.playLocker) {
+      const lockTags = (<IlockTags>this.lockTags)[tag]
+      typeof lockTags === 'number' && ((<IlockTags>this.lockTags)[tag] = lockTags + 1)
+    }
+
     this._playLockQueue((id => () => {
-      if (id !== this.lockTags[tag]) return
+      if (id !== (<IlockTags>this.lockTags)[tag]) return
 
       fn && fn()
-    })(this.lockTags[tag]))
+    })((<IlockTags>this.lockTags)[tag]))
   }
 
+  /**
+   * handle onend auto cut sound
+   * 
+   * @return {any}
+   */
+  private async _autocut () {
+    let autocut = (<Iconfig>this.config).autocut
+
+    this._setPlayIndex()
+    const nextId = this._setPlayId(false)
+
+    if (this._checkType(autocut, 'function')) {
+      try {
+        autocut = await (<TautocutCallback>autocut)(<TplayId>this.playId, nextId)
+      } catch (err) {
+        this._logErr(`autocut occur error, it's ${err}`)
+
+        // withdrawl set playIndex operation
+        this._setPlayIndex(this.prevPlayIndex)
+        return (<IeventMethods>this.eventMethods).finish(this.playId)
+      }
+    }
+
+    return new Promise((resolve, reject) => {
+      this._checkType(autocut, 'boolean') ? resolve(autocut) : reject(autocut)
+    }).then(isCut => {
+      if (isCut) return this._cut(true)
+
+      this._setPlayIndex(this.prevPlayIndex)
+      return (<IeventMethods>this.eventMethods).finish(this.playId)
+    }).catch(err => {
+      this._logWarn(`The autocut property type should be boolean or function return boolean, now the result ${err} type was ${typeof err}`)
+
+      this._setPlayIndex(this.prevPlayIndex)
+      return (<IeventMethods>this.eventMethods).finish(this.playId)
+    })
+  }
   /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+  // protected methods
+  // ---------------
+  // ---------------
+  // ---------------
+
   /**
    * check element type whether or not match the type parameter
    * @param {any} element 
