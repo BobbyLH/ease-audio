@@ -1,4 +1,37 @@
-import { addListener, removeListener, getType, isIE } from '../utils'
+import { addListener, removeListener, getType, isIE } from '../utils/index'
+import {
+  Iplaylist,
+  TplayState,
+  TplayStateStr,
+  TlogLevel,
+  TplayId,
+  TplayModel,
+  TplayModelStr,
+  TplayIndex,
+  TprevPlayIndex,
+  TdefaultSrc,
+  Tplaylist,
+  TautocutCallback,
+  TeventParameter,
+  TcustomEventCallback,
+  TentireEventCallback,
+  TlockQueue,
+  TEvent,
+  TonEvent,
+  TAudioEventUseful,
+  TAudioEvent,
+  TlockTags,
+  IupdateConfig,
+  Iconfig,
+  IlockTags,
+  Ibuffered,
+  IeventController,
+  IeventMethods,
+  Ieventcallback,
+  IreturnParams,
+  IblockEvent,
+  IsetPlaylist
+} from './audio.d'
 
 enum playStateSet {
   'loading',
@@ -63,140 +96,6 @@ enum logLevelSet {
 
 const defaultSrc: TdefaultSrc = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA'
 
-interface Iplaylist {
-  src: string;
-  playId?: number;
-  [propName: string]: any;
-}
-
-type TplayState = number
-type TlogLevel = number
-type TplayId = number
-type TplayModel = number
-type TplayIndex = number
-type TprevPlayIndex = number
-type TdefaultSrc = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA'
-type Tplaylist = Array<Iplaylist>
-type TautocutCallback = (currentId: number, nextId: number) => boolean
-type TeventParameter = Event | ProgressEvent | number | string | undefined
-type Teventcallback = (e: Event) => any
-type TprogressEventCallback = (e: ProgressEvent) => any
-type TcustomEventCallback = (e: number | string | undefined) => any
-type TentireEventCallback = Teventcallback | TprogressEventCallback | TcustomEventCallback
-type TlockQueue = Array<() => any>
-type TEvent = 'play' | 'pause' | 'stop' | 'end' | 'finish' | 'load' | 'unload' | 'canplay' | 'canplaythrough' | 'progress' | 'volume' | 'seeking' | 'seeked' | 'rate' | 'timeupdate' | 'loaderror' | 'playerror' | 'cut' | 'pick'
-type TonEvent = 'onplay' | 'onpause' | 'onstop' | 'onend' | 'onfinish' | 'onload' | 'onunload' | 'oncanplay' | 'oncanplaythrough' | 'onprogress' | 'onvolume' | 'onseeking' | 'onseeked' | 'onrate' | 'ontimeupdate' | 'onloaderror' | 'onplayerror' | 'oncut' | 'onpick'
-type TAudioEventUseful = 'loadstart' | 'seeking' | 'canplaythrough' | 'playing' | 'pause' | 'ended' | 'error' | 'progress' | 'durationchange' | 'loadedmetadata' | 'loadeddata' | 'timeupdate' | 'canplay' | 'seeked' | 'volumechange' | 'ratechange';
-type TAudioEventUseless = 'finish' | 'playerror' | 'cut' | 'pick' | 'play' | 'abort' | 'suspend';
-type TAudioEvent = TAudioEventUseful | TAudioEventUseless
-type TlockTags = 'cutpick' | 'seek' | 'volume' | 'rate' | 'mute' | 'pause_wait' | 'pause_cancel';
-
-interface IupdateConfig {
-  src?: string;
-  autocut?: boolean | TautocutCallback;
-  playModel?: playModelSet;
-  volume?: number;
-  loop?: boolean;
-  preload?: boolean;
-  autoplay?: boolean;
-  mute?: boolean;
-  rate?: number;
-  playbackRate?: number;
-  onplay?: Teventcallback;
-  onpause?: Teventcallback;
-  onstop?: TcustomEventCallback;
-  onend?: Teventcallback;
-  onfinish?: TcustomEventCallback;
-  onload?: Teventcallback;
-  onunload?: Teventcallback;
-  oncanplay?: Teventcallback;
-  oncanplaythrough?: Teventcallback;
-  onprogress?: TprogressEventCallback;
-  onvolume?: Teventcallback;
-  onseeking?: Teventcallback;
-  onseeked?: Teventcallback;
-  onrate?: Teventcallback;
-  ontimeupdate?: Teventcallback;
-  onloaderror?: Teventcallback | TcustomEventCallback;
-  onplayerror?: Teventcallback | TcustomEventCallback;
-  oncut?: TcustomEventCallback;
-  onpick?: TcustomEventCallback;
-  debug?: boolean;
-  logLevel?: logLevelSet
-}
-
-interface Iconfig extends IupdateConfig {
-  playlist: Tplaylist;
-  initIndex?: number;
-}
-
-interface IlockTags {
-  cutpick: number;
-  seek: number;
-  volume: number;
-  rate: number;
-  mute: number;
-  pause_wait: boolean;
-  pause_cancel: boolean;
-}
-
-interface Ibuffered {
-  start: number;
-  end: number;
-}
-
-interface IeventController {
-  [propName: string]: boolean;
-}
-
-interface IeventMethods {
-  loadstart: Teventcallback;
-  seeking: Teventcallback;
-  canplaythrough: Teventcallback;
-  playing: Teventcallback;
-  pause: Teventcallback;
-  ended: Teventcallback;
-  finish: TcustomEventCallback;
-  error: Teventcallback | TcustomEventCallback;
-  playerror: Teventcallback | TcustomEventCallback;
-  progress: TprogressEventCallback;
-  durationchange: Teventcallback;
-  loadedmetadata: Teventcallback;
-  loadeddata: Teventcallback;
-  timeupdate: Teventcallback;
-  canplay: Teventcallback;
-  seeked: Teventcallback;
-  volumechange: Teventcallback;
-  ratechange: Teventcallback;
-  cut: TcustomEventCallback;
-  pick:TcustomEventCallback;
-  play: Teventcallback;
-  abort: Teventcallback;
-  suspend: Teventcallback;
-}
-
-interface Ieventcallback {
-  [propName: string]: Teventcallback;
-}
-
-interface IreturnParams {
-  playId: number | undefined;
-  playingData: Iplaylist | undefined;
-  playlist: Tplaylist | undefined;
-}
-
-interface IblockEvent {
-  event?: string;
-  block: boolean;
-}
-
-interface IsetPlaylist {
-  action: 'add' | 'delete' | 'insert' | 'replace' | 'update' | 'reset';
-  list?: Tplaylist;
-  playId?: number;
-  params?: Object;
-}
-
 export class AudioH5 {
   public isInit: boolean;
   public audioH5: HTMLAudioElement | undefined | void
@@ -230,17 +129,53 @@ export class AudioH5 {
    * 
    * @return {number} the audio's duration
    */
-  public get duration () {
+  public get duration (): number {
     return this.audioH5 ? this.audioH5.duration : 0
+  }
+
+  /**
+   * networkState getter
+   * 
+   * @return {number}
+   */
+  public get networkState (): number {
+    return this.audioH5 ? this.audioH5.networkState : 0
+  }
+
+  /**
+   * get playList
+   * 
+   * @return {Tplaylist}
+   */
+  public get playlists (): Tplaylist | Array<void> {
+    return this.playList || []
+  }
+
+  /**
+   * get playId
+   * 
+   * @return {TplayId}
+   */
+  public get playid (): TplayId {
+    return this.playId || 1000
+  }
+
+  /**
+   * get playstate
+   * 
+   * @return {TplayStateStr | null}
+   */
+  public get playstate (): TplayStateStr | null {
+    return !this.playState && this.playState !== 0 ? null : playStateSet[this.playState || 0] as TplayStateStr
   }
 
   /**
    * init Audio
    * @param {Iconfig} config
    * 
-   * @returns {IreturnParams}
+   * @returns {IreturnParams | void}
    */
-  public init (config: Iconfig) {
+  public init (config: Iconfig): IreturnParams | void {
     if (!this.isInit && config && this._checkType(config, 'object') && JSON.stringify(config) !== '{}') {
       this._initial(config)
       this._registerEvent(config)
@@ -574,18 +509,17 @@ export class AudioH5 {
 
   /**
    * method - model - set or get playModel
-   * @param {playModelSet} model
+   * @param {TplayModelStr} model
    * 
    * @return {string | void} playModel
    */
-  public model (model?: playModelSet): playModelSet | void {
+  public model (model?: TplayModelStr): TplayModelStr | void {
     if (this._checkInit()) {
       // model contain: list-once, list-random, list-loop, single-once, single-loop
-      const playModel = model && playModelSet[model]
-      if (playModel) {
-        this.playModel = typeof playModel === 'number' ? playModel : model
+      if (model) {
+        this.playModel = playModelSet[model]
       } else {
-        return this.playModel
+        return (playModelSet[this.playModel || 0]) as TplayModelStr
       }
     }
   }
@@ -613,7 +547,7 @@ export class AudioH5 {
    * 
    * @return {boolean} whether or not successful unbind event callback
    */
-  public off (event: TEvent | TonEvent, cb: TentireEventCallback): boolean {
+  public off (event: TEvent | TonEvent, cb?: TentireEventCallback): boolean {
     if (this._checkInit() && this._checkType(event, 'string', true)) {
       const queueName = event.indexOf('on') === 0 ? event : `on${event}`
       return this._offEvent(<TonEvent>queueName, cb)
@@ -665,7 +599,7 @@ export class AudioH5 {
   // ---------------
   // ---------------
   private config: Iconfig | undefined;
-  private playState: TplayState | null | undefined;
+  private playState: number | null | undefined;
   private debug: boolean | undefined;
   private logLevel: TlogLevel | undefined;
   private idCounter: number | undefined;
@@ -688,19 +622,10 @@ export class AudioH5 {
    * @return {void}
    */
   private _initial (config: Iconfig): void {
-    const logLevelIndex = config.logLevel || (config.logLevel === 0 && 0) || 'error'
-    const playModelIndex = config.playModel || (config.playModel === 0 && 0) || (config.loop && 'list-loop') ||'list-once'
-
-    let logLevel = logLevelSet[logLevelIndex]
-    logLevel = (logLevel !== 'undefined' && typeof logLevel === 'number' ? logLevel : config.logLevel) || logLevelSet['error']
-
-    let playModel = playModelSet[playModelIndex]
-    playModel = (playModel !== 'undefined' && typeof playModel === 'number' ? playModel : config.playModel) || (config.loop && playModelSet['list-loop']) || playModelSet['list-once']
-
     this.config = config // preserve initial config
     this.playState = null
     this.debug = config.debug || false
-    this.logLevel = logLevel
+    this.logLevel = (config.logLevel && logLevelSet[config.logLevel]) || logLevelSet['error']
     this.idCounter = 1000
     this.lockQueue = new Array(0)
     this.playLocker = false
@@ -715,7 +640,7 @@ export class AudioH5 {
       pause_cancel: false
     }
     this.playId = 1000
-    this.playModel = playModel
+    this.playModel = (config.playModel && playModelSet[config.playModel]) || (config.loop && playModelSet['list-loop']) || playModelSet['list-once']
     this.playIndex = 0
     this.prevPlayIndex = 0
     this.playList = new Array(0)
@@ -1409,9 +1334,9 @@ export class AudioH5 {
   /**
    * handle onend auto cut sound
    * 
-   * @return {any}
+   * @return {Promise<any> | any}
    */
-  private async _autocut () {
+  private async _autocut (): Promise<any> {
     let autocut = (<Iconfig>this.config).autocut
 
     this._setPlayIndex()

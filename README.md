@@ -138,11 +138,11 @@ The index in playlist which will be picked to initialize
 Set or return(`Function`) to `true` the EaseAudio going to play next track(according to playModel) when the current has have finished.
 #### playModel `String` `list-once`
 This property defines the play model that when `cut` or `end auto cut` sound will be comply. Valid levels include(If set the `loop` to `true` without set playModel property, then the play model will be `single-once`):<br>
-- `list-once(0)`
-- `list-random(1)`
-- `list-loop(2)`
-- `single-once(3)`
-- `single-loop(4)`
+- `list-once`
+- `list-random`
+- `list-loop`
+- `single-once`
+- `single-loop`
 #### volume `Number` `1.0`
 The volume of the specific track, from `0.0` to `1.0`.
 #### loop `Boolean` `false`
@@ -191,11 +191,11 @@ Fires when the sound is unable to play. The first parameter is the error message
 Set to `true` will log the debug information.
 #### logLevel `string` `error`
 This property defines the level of messages that the EaseAudio will log. Valid levels include:<br>
-- `detail(0)`
-- `info(1)`
-- `warn(2)`
-- `error(3)`
-- `silent(4)`
+- `detail`
+- `info`
+- `warn`
+- `error`
+- `silent`
 
 
 ### Methods
