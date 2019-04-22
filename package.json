@@ -14,7 +14,7 @@
     "html5 audio"
   ],
   "main": "dist/ease-audio.js",
-  "typings": "dist/index.d.ts",
+  "typings": "dist/type/src/index.d.ts",
   "scripts": {
     "dev": "webpack-dashboard -p 3300 -- node demo/server.js",
     "static": "rollup -c build/rollup.config.js --watch",
