@@ -132,17 +132,17 @@ interface IeventMethods {
 }
 
 interface Ieventcallback {
-  [propName: string]: Teventcallback;
+  [propName: string]: TentireEventCallback;
 }
 
 interface IreturnParams {
-  playId: number | undefined;
+  playId: TplayId | undefined;
   playingData: Iplaylist | undefined;
   playlist: Tplaylist | undefined;
 }
 
 interface IblockEvent {
-  event?: string;
+  event?: TAudioEvent;
   block: boolean;
 }
 

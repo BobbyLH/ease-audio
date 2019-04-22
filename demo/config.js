@@ -17,17 +17,13 @@ module.exports = {
     path: path.resolve(__dirname),
     publicPath: '/'
   },
-  resolve: {
-    extensions: ['.ts', '.js']
-  },
   module: {
     rules: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
         use: [
-          {loader: 'babel-loader'},
-          {loader: 'ts-loader'}
+          {loader: 'babel-loader'}
         ]
       }
     ]

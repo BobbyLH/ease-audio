@@ -534,7 +534,10 @@ export class AudioH5 {
   public on (event: TEvent | TonEvent, cb: TentireEventCallback): boolean {
     if (this._checkInit() && this._checkType(event, 'string', true) && this._checkType(cb, 'function', true)) {
       const queueName = event.indexOf('on') === 0 ? event : `on${event}`
-      return this._onEvent(<TonEvent>queueName, cb)
+      const result = this._onEvent(<TonEvent>queueName, cb)
+
+      if (!result) this._logWarn(`The [${event}] event bind failed`)
+      return result
     }
 
     return false
@@ -550,7 +553,10 @@ export class AudioH5 {
   public off (event: TEvent | TonEvent, cb?: TentireEventCallback): boolean {
     if (this._checkInit() && this._checkType(event, 'string', true)) {
       const queueName = event.indexOf('on') === 0 ? event : `on${event}`
-      return this._offEvent(<TonEvent>queueName, cb)
+      const result = this._offEvent(<TonEvent>queueName, cb)
+
+      if (!result) this._logWarn(`The [${event}] event unbind failed`)
+      return result
     }
 
     return false
@@ -570,9 +576,14 @@ export class AudioH5 {
       const funcName = `EASE_AUDIO_${queueName.toUpperCase()}_ONCE_CALLBACK`
       const once: TentireEventCallback = (e: TeventParameter) => {
         cb && cb(<any>e)
-        this._offEvent(queueName as TonEvent, once, funcName)
+        const result = this._offEvent(queueName as TonEvent, once, funcName)
+        if (!result) this._logWarn(`The [${event}] once event unbind failed`)
       }
-      return this._onEvent(queueName as TonEvent, once, funcName)
+
+      const result = this._onEvent(queueName as TonEvent, once, funcName)
+
+      if (!result) this._logWarn(`The [${event}] once event bind failed`)
+      return result
     }
 
     return false
@@ -1017,12 +1028,17 @@ export class AudioH5 {
   private _onEvent (event: TonEvent, cb: TentireEventCallback, name?: string): boolean {
     if (!isNaN(supportEvents[event])) {
       try {
-        if (!this[event]) this[event] = Object.create(null)
-        (this[event] as Ieventcallback)[name || cb.name || `anonymous-${new Date().getTime()}`] = cb
+        const funcName = name || cb.name || `anonymous-${new Date().getTime()}`
+        if (!this[event]) {
+          this[event] = Object.create(null)
+        }
+        (this[event] as Ieventcallback)[funcName] = cb
         return true
       } catch (error) {
         this._logErr(error)
       }
+    } else {
+      this._logWarn(`The [${event}] is not support event`)
     }
 
     return false
@@ -1045,6 +1061,8 @@ export class AudioH5 {
       } catch (error) {
         this._logErr(error)
       }
+    } else {
+      this._logWarn(`The [${event}] is not support event`)
     }
 
     return false
@@ -1083,7 +1101,8 @@ export class AudioH5 {
         const cb = config[<TonEvent>v]
         if (cb && this._checkType(cb, 'function', true)) {
           const funcName = `EASE_AUDIO_${v.toUpperCase()}_INITIAL_CALLBACK`
-          this._onEvent(<TonEvent>v, <TentireEventCallback>cb, funcName)
+          const result = this._onEvent(<TonEvent>v, <TentireEventCallback>cb, funcName)
+          if (!result) this._logErr(`The [${v}] event initial bind failed`)
         }
       }
     })
@@ -1216,7 +1235,7 @@ export class AudioH5 {
 
     for (let k in this.eventMethods) {
       // filter useless events
-      if (uselessEvents[<TAudioEvent | any>k] !== 'undefined') continue
+      if (uselessEvents[<TAudioEvent | any>k] !== undefined) continue
 
       // bind controller scope for every each event
       this.eventMethods[<TAudioEventUseful>k] = curry(this.eventMethods[<TAudioEventUseful>k], <TAudioEventUseful>k)
@@ -1267,7 +1286,7 @@ export class AudioH5 {
    * @return {boolean} the event whether or not be blocked
    */
   private _triggerEventController (event: TAudioEvent): boolean {
-    if (this.eventController && !this.eventController[event]) return false
+    if (this.eventController && this.eventController[event] === false) return false
     this._log(`trigger ${event} event`)
 
     return true
@@ -1464,7 +1483,7 @@ export class AudioH5 {
    * 
    * @return {void}
    */
-  protected _logOptimize (msg: string | Object, method: 'log' | 'info' | 'warn' | 'error') {
+  protected _logOptimize (msg: string | Object, method: 'log' | 'info' | 'warn' | 'error'): void {
     const logger: Function = console[method] || console.log
     const prefix: string = `[EASE_AUDIO_H5 ${method.toUpperCase()}]:`
 
