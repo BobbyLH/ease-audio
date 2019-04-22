@@ -124,7 +124,7 @@ export class EaseAudio {
     try {
       if (typeof window !== 'undefined') {
         const usingWebAudio = config.usingWebAudio
-        if (usingWebAudio && (AudioContext || webkitAudioContext)) {
+        if (usingWebAudio && AudioContext) {
           return new AudioCtx(config)
         } else if (Audio) {
           return new AudioH5(config)

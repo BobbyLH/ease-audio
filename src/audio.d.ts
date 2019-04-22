@@ -4,18 +4,22 @@ interface Iplaylist {
   [propName: string]: any;
 }
 
-type TplayState = number
-type TlogLevel = number
 type TplayId = number
-type TplayModel = number
 type TplayIndex = number
 type TprevPlayIndex = number
+
+type TplayState = number
 type TplayStateStr = 'loading' | 'playing' | 'paused' | 'stopped' | 'ended' | 'finished' | 'loaderror' | 'playerror' | 'unloaded' | 'loaded'
 type TplayStateSet = TplayState | TplayStateStr
+
+type TplayModel = number
 type TplayModelStr = 'list-once' | 'list-random' | 'list-loop' | 'single-once' | 'single-loop'
 type TplayModelSet = TplayModel | TplayModelStr
+
+type TlogLevel = number
 type TlogLevelStr = 'detail' | 'info' | 'warn' | 'error' | 'silent'
 type TlogLevelSet = TlogLevel | TlogLevelStr
+
 type TdefaultSrc = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA'
 type Tplaylist = Array<Iplaylist>
 type TautocutCallback = (currentId: number, nextId: number) => boolean
@@ -171,17 +175,17 @@ interface IAudio {
 }
 
 export {
+  TplayState,
   TplayStateSet,
   TplayStateStr,
+  TplayModel,
   TplayModelSet,
   TplayModelStr,
+  TlogLevel,
   TlogLevelSet,
   TlogLevelStr,
   Iplaylist,
-  TplayState,
-  TlogLevel,
   TplayId,
-  TplayModel,
   TplayIndex,
   TprevPlayIndex,
   TdefaultSrc,

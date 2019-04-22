@@ -1,14 +1,12 @@
-"use strict";
-exports.__esModule = true;
 /**
  * generation ua object accroding to navigator.userAgent
  * @param {string} u navigator.userAgent
  * @return {false | Iua} ua object
  */
-function getUA(u) {
+export function getUA(u) {
     if (!u)
         return false;
-    var ua = {
+    const ua = {
         edge: u.indexOf('Edge') > -1,
         trident: u.indexOf('Trident') > -1,
         presto: u.indexOf('Presto') > -1,
@@ -30,5 +28,5 @@ function getUA(u) {
     };
     return ua;
 }
-exports.getUA = getUA;
-exports["default"] = getUA;
+export default getUA;
+//# sourceMappingURL=getUA.js.map

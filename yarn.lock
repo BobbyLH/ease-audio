@@ -292,11 +292,6 @@
   version "10.12.18"
   resolved "http://xnpm.ximalaya.com/@types%2fnode/-/node-10.12.18.tgz#1d3ca764718915584fcd9f6344621b7672665c67"
 
-"@types/webaudioapi@^0.0.27":
-  version "0.0.27"
-  resolved "http://xnpm.ximalaya.com/@types%2fwebaudioapi/-/webaudioapi-0.0.27.tgz#8a3f98eaa07cb577be2dae22311d37c3b545f74f"
-  integrity sha1-ij+Y6qB8tXe+La4iMR03w7VF908=
-
 "@webassemblyjs/ast@1.7.11":
   version "1.7.11"
   resolved "http://xnpm.ximalaya.com/@webassemblyjs%2fast/-/ast-1.7.11.tgz#b988582cafbb2b095e8b556526f30c90d057cace"
