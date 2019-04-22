@@ -123,7 +123,7 @@ export class EaseAudio {
 
     try {
       if (typeof window !== 'undefined') {
-        const usingWebAudio = config.usingWebAudio
+        const usingWebAudio = config && config.usingWebAudio
         if (usingWebAudio && AudioContext) {
           return new AudioCtx(config)
         } else if (Audio) {
