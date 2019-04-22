@@ -3,7 +3,7 @@ const webpack = require('webpack')
 
 module.exports = [{
   entry: {
-    index: './src/index.ts'
+    index: 'js//src/index.ts'
   },
   output: {
     filename: 'ease-audio.min.js',
@@ -20,8 +20,7 @@ module.exports = [{
         test: /\.ts$/,
         exclude: /node_modules/,
         use: [
-          {loader: 'babel-loader'},
-          {loader: 'ts-loader'}
+          {loader: 'babel-loader'}
         ]
       }
     ]
