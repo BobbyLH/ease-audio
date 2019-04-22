@@ -874,63 +874,18 @@ var nonIterableSpread = _nonIterableSpread;function _toConsumableArray(arr) {
   return arrayWithoutHoles(arr) || iterableToArray(arr) || nonIterableSpread();
 }
 
-var toConsumableArray = _toConsumableArray;// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
-_export(_export.S, 'Object', { create: _objectCreate });var $Object$1 = _core.Object;
-var create = function create(P, D) {
-  return $Object$1.create(P, D);
-};var create$1 = create;var f$3 = Object.getOwnPropertySymbols;
+var toConsumableArray = _toConsumableArray;// 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
 
-var _objectGops = {
-	f: f$3
-};// 19.1.2.1 Object.assign(target, source, ...)
+var $getOwnPropertyDescriptor = _objectGopd.f;
 
-
-
-
-
-var $assign = Object.assign;
-
-// should work with symbols and should have deterministic property order (V8 bug)
-var _objectAssign = !$assign || _fails(function () {
-  var A = {};
-  var B = {};
-  // eslint-disable-next-line no-undef
-  var S = Symbol();
-  var K = 'abcdefghijklmnopqrst';
-  A[S] = 7;
-  K.split('').forEach(function (k) { B[k] = k; });
-  return $assign({}, A)[S] != 7 || Object.keys($assign({}, B)).join('') != K;
-}) ? function assign(target, source) { // eslint-disable-line no-unused-vars
-  var T = _toObject(target);
-  var aLen = arguments.length;
-  var index = 1;
-  var getSymbols = _objectGops.f;
-  var isEnum = _objectPie.f;
-  while (aLen > index) {
-    var S = _iobject(arguments[index++]);
-    var keys = getSymbols ? _objectKeys(S).concat(getSymbols(S)) : _objectKeys(S);
-    var length = keys.length;
-    var j = 0;
-    var key;
-    while (length > j) if (isEnum.call(S, key = keys[j++])) T[key] = S[key];
-  } return T;
-} : $assign;// 19.1.3.1 Object.assign(target, source)
-
-
-_export(_export.S + _export.F, 'Object', { assign: _objectAssign });var assign = _core.Object.assign;var assign$1 = assign;var HAS_INSTANCE = _wks('hasInstance');
-var FunctionProto = Function.prototype;
-// 19.2.3.6 Function.prototype[@@hasInstance](V)
-if (!(HAS_INSTANCE in FunctionProto)) _objectDp.f(FunctionProto, HAS_INSTANCE, { value: function (O) {
-  if (typeof this != 'function' || !_isObject(O)) return false;
-  if (!_isObject(this.prototype)) return O instanceof this;
-  // for environment w/o native `@@hasInstance` logic enough `instanceof`, but add this:
-  while (O = _objectGpo(O)) if (this.prototype === O) return true;
-  return false;
-} });var f$4 = _wks;
-
-var _wksExt = {
-	f: f$4
-};var hasInstance = _wksExt.f('hasInstance');var hasInstance$1 = hasInstance;var _meta = createCommonjsModule(function (module) {
+_objectSap('getOwnPropertyDescriptor', function () {
+  return function getOwnPropertyDescriptor(it, key) {
+    return $getOwnPropertyDescriptor(_toIobject(it), key);
+  };
+});var $Object$1 = _core.Object;
+var getOwnPropertyDescriptor = function getOwnPropertyDescriptor(it, key) {
+  return $Object$1.getOwnPropertyDescriptor(it, key);
+};var getOwnPropertyDescriptor$1 = getOwnPropertyDescriptor;var _meta = createCommonjsModule(function (module) {
 var META = _uid('meta');
 
 
@@ -989,10 +944,18 @@ var _meta_1 = _meta.KEY;
 var _meta_2 = _meta.NEED;
 var _meta_3 = _meta.fastKey;
 var _meta_4 = _meta.getWeak;
-var _meta_5 = _meta.onFreeze;var defineProperty$2 = _objectDp.f;
+var _meta_5 = _meta.onFreeze;var f$3 = _wks;
+
+var _wksExt = {
+	f: f$3
+};var defineProperty$2 = _objectDp.f;
 var _wksDefine = function (name) {
   var $Symbol = _core.Symbol || (_core.Symbol = {});
   if (name.charAt(0) != '_' && !(name in $Symbol)) defineProperty$2($Symbol, name, { value: _wksExt.f(name) });
+};var f$4 = Object.getOwnPropertySymbols;
+
+var _objectGops = {
+	f: f$4
 };// all enumerable object keys, includes symbols
 
 
@@ -1140,7 +1103,7 @@ var $propertyIsEnumerable = function propertyIsEnumerable(key) {
   if (this === ObjectProto$1 && _has(AllSymbols, key) && !_has(OPSymbols, key)) return false;
   return E || !_has(this, key) || !_has(AllSymbols, key) || _has(this, HIDDEN) && this[HIDDEN][key] ? E : true;
 };
-var $getOwnPropertyDescriptor = function getOwnPropertyDescriptor(it, key) {
+var $getOwnPropertyDescriptor$1 = function getOwnPropertyDescriptor(it, key) {
   it = _toIobject(it);
   key = _toPrimitive(key, true);
   if (it === ObjectProto$1 && _has(AllSymbols, key) && !_has(OPSymbols, key)) return;
@@ -1185,7 +1148,7 @@ if (!USE_NATIVE) {
     return this._k;
   });
 
-  _objectGopd.f = $getOwnPropertyDescriptor;
+  _objectGopd.f = $getOwnPropertyDescriptor$1;
   _objectDp.f = $defineProperty;
   _objectGopn.f = _objectGopnExt.f = $getOwnPropertyNames;
   _objectPie.f = $propertyIsEnumerable;
@@ -1233,7 +1196,7 @@ _export(_export.S + _export.F * !USE_NATIVE, 'Object', {
   // 19.1.2.3 Object.defineProperties(O, Properties)
   defineProperties: $defineProperties,
   // 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
-  getOwnPropertyDescriptor: $getOwnPropertyDescriptor,
+  getOwnPropertyDescriptor: $getOwnPropertyDescriptor$1,
   // 19.1.2.7 Object.getOwnPropertyNames(O)
   getOwnPropertyNames: $getOwnPropertyNames,
   // 19.1.2.8 Object.getOwnPropertySymbols(O)
@@ -1271,7 +1234,90 @@ _setToStringTag($Symbol, 'Symbol');
 // 20.2.1.9 Math[@@toStringTag]
 _setToStringTag(Math, 'Math', true);
 // 24.3.3 JSON[@@toStringTag]
-_setToStringTag(_global.JSON, 'JSON', true);_wksDefine('asyncIterator');_wksDefine('observable');var symbol = _core.Symbol;var symbol$1 = symbol;function _instanceof(left, right) {
+_setToStringTag(_global.JSON, 'JSON', true);var getOwnPropertySymbols = _core.Object.getOwnPropertySymbols;var getOwnPropertySymbols$1 = getOwnPropertySymbols;function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    defineProperty$1(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+}
+
+var defineProperty$3 = _defineProperty;function _objectSpread(target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i] != null ? arguments[i] : {};
+
+    var ownKeys = keys$1(source);
+
+    if (typeof getOwnPropertySymbols$1 === 'function') {
+      ownKeys = ownKeys.concat(getOwnPropertySymbols$1(source).filter(function (sym) {
+        return getOwnPropertyDescriptor$1(source, sym).enumerable;
+      }));
+    }
+
+    ownKeys.forEach(function (key) {
+      defineProperty$3(target, key, source[key]);
+    });
+  }
+
+  return target;
+}
+
+var objectSpread = _objectSpread;// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
+_export(_export.S, 'Object', { create: _objectCreate });var $Object$2 = _core.Object;
+var create = function create(P, D) {
+  return $Object$2.create(P, D);
+};var create$1 = create;// 19.1.2.1 Object.assign(target, source, ...)
+
+
+
+
+
+var $assign = Object.assign;
+
+// should work with symbols and should have deterministic property order (V8 bug)
+var _objectAssign = !$assign || _fails(function () {
+  var A = {};
+  var B = {};
+  // eslint-disable-next-line no-undef
+  var S = Symbol();
+  var K = 'abcdefghijklmnopqrst';
+  A[S] = 7;
+  K.split('').forEach(function (k) { B[k] = k; });
+  return $assign({}, A)[S] != 7 || Object.keys($assign({}, B)).join('') != K;
+}) ? function assign(target, source) { // eslint-disable-line no-unused-vars
+  var T = _toObject(target);
+  var aLen = arguments.length;
+  var index = 1;
+  var getSymbols = _objectGops.f;
+  var isEnum = _objectPie.f;
+  while (aLen > index) {
+    var S = _iobject(arguments[index++]);
+    var keys = getSymbols ? _objectKeys(S).concat(getSymbols(S)) : _objectKeys(S);
+    var length = keys.length;
+    var j = 0;
+    var key;
+    while (length > j) if (isEnum.call(S, key = keys[j++])) T[key] = S[key];
+  } return T;
+} : $assign;// 19.1.3.1 Object.assign(target, source)
+
+
+_export(_export.S + _export.F, 'Object', { assign: _objectAssign });var assign = _core.Object.assign;var assign$1 = assign;var HAS_INSTANCE = _wks('hasInstance');
+var FunctionProto = Function.prototype;
+// 19.2.3.6 Function.prototype[@@hasInstance](V)
+if (!(HAS_INSTANCE in FunctionProto)) _objectDp.f(FunctionProto, HAS_INSTANCE, { value: function (O) {
+  if (typeof this != 'function' || !_isObject(O)) return false;
+  if (!_isObject(this.prototype)) return O instanceof this;
+  // for environment w/o native `@@hasInstance` logic enough `instanceof`, but add this:
+  while (O = _objectGpo(O)) if (this.prototype === O) return true;
+  return false;
+} });var hasInstance = _wksExt.f('hasInstance');var hasInstance$1 = hasInstance;_wksDefine('asyncIterator');_wksDefine('observable');var symbol = _core.Symbol;var symbol$1 = symbol;function _instanceof(left, right) {
   if (right != null && typeof symbol$1 !== "undefined" && right[hasInstance$1]) {
     return right[hasInstance$1](left);
   } else {
@@ -1279,10 +1325,7 @@ _setToStringTag(_global.JSON, 'JSON', true);_wksDefine('asyncIterator');_wksDefi
   }
 }
 
-var _instanceof_1 = _instanceof;var $JSON$1 = _core.JSON || (_core.JSON = { stringify: JSON.stringify });
-var stringify = function stringify(it) { // eslint-disable-line no-unused-vars
-  return $JSON$1.stringify.apply($JSON$1, arguments);
-};var stringify$1 = stringify;var _anInstance = function (it, Constructor, name, forbiddenField) {
+var _instanceof_1 = _instanceof;var _anInstance = function (it, Constructor, name, forbiddenField) {
   if (!(it instanceof Constructor) || (forbiddenField !== undefined && forbiddenField in it)) {
     throw TypeError(name + ': incorrect invocation!');
   } return it;
@@ -1802,7 +1845,10 @@ _export(_export.S, 'Promise', { 'try': function (callbackfn) {
   var result = _perform(callbackfn);
   (result.e ? promiseCapability.reject : promiseCapability.resolve)(result.v);
   return promiseCapability.promise;
-} });var promise = _core.Promise;var promise$1 = promise;function getUA(u) {
+} });var promise = _core.Promise;var promise$1 = promise;var $JSON$1 = _core.JSON || (_core.JSON = { stringify: JSON.stringify });
+var stringify = function stringify(it) { // eslint-disable-line no-unused-vars
+  return $JSON$1.stringify.apply($JSON$1, arguments);
+};var stringify$1 = stringify;function getUA(u) {
   if (!u) return false;
   var ua = {
     edge: u.indexOf('Edge') > -1,
@@ -1870,34 +1916,7 @@ var isEdge = ua && ua.edge;var addListener = function () {
   if (typeof ele !== 'object') return typeof ele;
   var len = Object.prototype.toString.call(ele).length - 1;
   return Object.prototype.toString.call(ele).slice(8, len).toLowerCase();
-};var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
-  return new (P || (P = promise$1))(function (resolve, reject) {
-    function fulfilled(value) {
-      try {
-        step(generator.next(value));
-      } catch (e) {
-        reject(e);
-      }
-    }
-
-    function rejected(value) {
-      try {
-        step(generator["throw"](value));
-      } catch (e) {
-        reject(e);
-      }
-    }
-
-    function step(result) {
-      result.done ? resolve(result.value) : new P(function (resolve) {
-        resolve(result.value);
-      }).then(fulfilled, rejected);
-    }
-
-    step((generator = generator.apply(thisArg, _arguments || [])).next());
-  });
-};
-var playStateSet;
+};var playStateSet;
 
 (function (playStateSet) {
   playStateSet[playStateSet["loading"] = 0] = "loading";
@@ -2466,7 +2485,7 @@ function () {
         this._logErr('Please pass correct playlist parameters!');
       }
 
-      this._createAudio(assign$1({}, config, {
+      this._createAudio(objectSpread({}, config, {
         src: src
       }));
     }
@@ -2683,7 +2702,7 @@ function () {
           if (playId && params) {
             for (var _i3 = 0; _i3 < playlist.length; _i3++) {
               if (playlist[_i3].playId === playId) {
-                var newData = assign$1({}, playlist[_i3], params);
+                var newData = objectSpread({}, playlist[_i3], params);
 
                 playlist.splice(_i3, 1, newData);
                 this.playList = toConsumableArray(playlist);
@@ -3066,43 +3085,41 @@ function () {
     }
   }, {
     key: "_autocut",
-    value: function _autocut() {
-      return __awaiter(this, void 0, void 0, function* () {
-        var _this16 = this;
+    value: async function _autocut() {
+      var _this16 = this;
 
-        var autocut = this.config.autocut;
+      var autocut = this.config.autocut;
 
-        this._setPlayIndex();
+      this._setPlayIndex();
 
-        var nextId = this._setPlayId(false);
+      var nextId = this._setPlayId(false);
 
-        if (this._checkType(autocut, 'function')) {
-          try {
-            autocut = yield autocut(this.playId, nextId);
-          } catch (err) {
-            this._logErr("autocut occur error, it's ".concat(err));
+      if (this._checkType(autocut, 'function')) {
+        try {
+          autocut = await autocut(this.playId, nextId);
+        } catch (err) {
+          this._logErr("autocut occur error, it's ".concat(err));
 
-            this._setPlayIndex(this.prevPlayIndex);
+          this._setPlayIndex(this.prevPlayIndex);
 
-            return this.eventMethods.finish(this.playId);
-          }
+          return this.eventMethods.finish(this.playId);
         }
+      }
 
-        return new promise$1(function (resolve, reject) {
-          _this16._checkType(autocut, 'boolean') ? resolve(autocut) : reject(autocut);
-        }).then(function (isCut) {
-          if (isCut) return _this16._cut(true);
+      return new promise$1(function (resolve, reject) {
+        _this16._checkType(autocut, 'boolean') ? resolve(autocut) : reject(autocut);
+      }).then(function (isCut) {
+        if (isCut) return _this16._cut(true);
 
-          _this16._setPlayIndex(_this16.prevPlayIndex);
+        _this16._setPlayIndex(_this16.prevPlayIndex);
 
-          return _this16.eventMethods.finish(_this16.playId);
-        }).catch(function (err) {
-          _this16._logWarn("The autocut property type should be boolean or function return boolean, now the result ".concat(err, " type was ").concat(typeof err));
+        return _this16.eventMethods.finish(_this16.playId);
+      }).catch(function (err) {
+        _this16._logWarn("The autocut property type should be boolean or function return boolean, now the result ".concat(err, " type was ").concat(typeof err));
 
-          _this16._setPlayIndex(_this16.prevPlayIndex);
+        _this16._setPlayIndex(_this16.prevPlayIndex);
 
-          return _this16.eventMethods.finish(_this16.playId);
-        });
+        return _this16.eventMethods.finish(_this16.playId);
       });
     }
   }, {
