@@ -15,7 +15,7 @@ var global = module.exports = typeof window != 'undefined' && window.Math == Mat
   : Function('return this')();
 if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
 });var _core = createCommonjsModule(function (module) {
-var core = module.exports = { version: '2.6.3' };
+var core = module.exports = { version: '2.6.2' };
 if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
 });
 var _core_1 = _core.version;var _aFunction = function (it) {
@@ -183,20 +183,31 @@ function _createClass(Constructor, protoProps, staticProps) {
 var createClass = _createClass;var AudioCtx =
 /*#__PURE__*/
 function () {
-  function AudioCtx() {
+  function AudioCtx(config) {
     classCallCheck(this, AudioCtx);
-
-    this.audioCtx = typeof window !== 'undefined' && new (window.AudioContext || window.webkitAudioContext)();
-    this.audioDom = typeof window !== 'undefined' && new window.Audio();
-    this.audio = this.audioCtx.createMediaElementSource(this.audioDom);
   }
 
   createClass(AudioCtx, [{
+    key: "init",
+    value: function init() {}
+  }, {
     key: "play",
     value: function play() {}
   }, {
     key: "pause",
     value: function pause() {}
+  }, {
+    key: "toggle",
+    value: function toggle() {}
+  }, {
+    key: "load",
+    value: function load() {}
+  }, {
+    key: "seek",
+    value: function seek() {}
+  }, {
+    key: "volume",
+    value: function volume() {}
   }, {
     key: "stop",
     value: function stop() {}
@@ -204,8 +215,32 @@ function () {
     key: "unload",
     value: function unload() {}
   }, {
-    key: "seek",
-    value: function seek() {}
+    key: "on",
+    value: function on() {}
+  }, {
+    key: "off",
+    value: function off() {}
+  }, {
+    key: "once",
+    value: function once() {}
+  }, {
+    key: "cut",
+    value: function cut() {}
+  }, {
+    key: "pick",
+    value: function pick() {}
+  }, {
+    key: "rate",
+    value: function rate() {}
+  }, {
+    key: "model",
+    value: function model() {}
+  }, {
+    key: "mute",
+    value: function mute() {}
+  }, {
+    key: "playlist",
+    value: function playlist() {}
   }]);
 
   return AudioCtx;
@@ -843,18 +878,59 @@ var toConsumableArray = _toConsumableArray;// 19.1.2.2 / 15.2.3.5 Object.create(
 _export(_export.S, 'Object', { create: _objectCreate });var $Object$1 = _core.Object;
 var create = function create(P, D) {
   return $Object$1.create(P, D);
-};var create$1 = create;// 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
+};var create$1 = create;var f$3 = Object.getOwnPropertySymbols;
 
-var $getOwnPropertyDescriptor = _objectGopd.f;
+var _objectGops = {
+	f: f$3
+};// 19.1.2.1 Object.assign(target, source, ...)
 
-_objectSap('getOwnPropertyDescriptor', function () {
-  return function getOwnPropertyDescriptor(it, key) {
-    return $getOwnPropertyDescriptor(_toIobject(it), key);
-  };
-});var $Object$2 = _core.Object;
-var getOwnPropertyDescriptor = function getOwnPropertyDescriptor(it, key) {
-  return $Object$2.getOwnPropertyDescriptor(it, key);
-};var getOwnPropertyDescriptor$1 = getOwnPropertyDescriptor;var _meta = createCommonjsModule(function (module) {
+
+
+
+
+var $assign = Object.assign;
+
+// should work with symbols and should have deterministic property order (V8 bug)
+var _objectAssign = !$assign || _fails(function () {
+  var A = {};
+  var B = {};
+  // eslint-disable-next-line no-undef
+  var S = Symbol();
+  var K = 'abcdefghijklmnopqrst';
+  A[S] = 7;
+  K.split('').forEach(function (k) { B[k] = k; });
+  return $assign({}, A)[S] != 7 || Object.keys($assign({}, B)).join('') != K;
+}) ? function assign(target, source) { // eslint-disable-line no-unused-vars
+  var T = _toObject(target);
+  var aLen = arguments.length;
+  var index = 1;
+  var getSymbols = _objectGops.f;
+  var isEnum = _objectPie.f;
+  while (aLen > index) {
+    var S = _iobject(arguments[index++]);
+    var keys = getSymbols ? _objectKeys(S).concat(getSymbols(S)) : _objectKeys(S);
+    var length = keys.length;
+    var j = 0;
+    var key;
+    while (length > j) if (isEnum.call(S, key = keys[j++])) T[key] = S[key];
+  } return T;
+} : $assign;// 19.1.3.1 Object.assign(target, source)
+
+
+_export(_export.S + _export.F, 'Object', { assign: _objectAssign });var assign = _core.Object.assign;var assign$1 = assign;var HAS_INSTANCE = _wks('hasInstance');
+var FunctionProto = Function.prototype;
+// 19.2.3.6 Function.prototype[@@hasInstance](V)
+if (!(HAS_INSTANCE in FunctionProto)) _objectDp.f(FunctionProto, HAS_INSTANCE, { value: function (O) {
+  if (typeof this != 'function' || !_isObject(O)) return false;
+  if (!_isObject(this.prototype)) return O instanceof this;
+  // for environment w/o native `@@hasInstance` logic enough `instanceof`, but add this:
+  while (O = _objectGpo(O)) if (this.prototype === O) return true;
+  return false;
+} });var f$4 = _wks;
+
+var _wksExt = {
+	f: f$4
+};var hasInstance = _wksExt.f('hasInstance');var hasInstance$1 = hasInstance;var _meta = createCommonjsModule(function (module) {
 var META = _uid('meta');
 
 
@@ -913,18 +989,10 @@ var _meta_1 = _meta.KEY;
 var _meta_2 = _meta.NEED;
 var _meta_3 = _meta.fastKey;
 var _meta_4 = _meta.getWeak;
-var _meta_5 = _meta.onFreeze;var f$3 = _wks;
-
-var _wksExt = {
-	f: f$3
-};var defineProperty$2 = _objectDp.f;
+var _meta_5 = _meta.onFreeze;var defineProperty$2 = _objectDp.f;
 var _wksDefine = function (name) {
   var $Symbol = _core.Symbol || (_core.Symbol = {});
   if (name.charAt(0) != '_' && !(name in $Symbol)) defineProperty$2($Symbol, name, { value: _wksExt.f(name) });
-};var f$4 = Object.getOwnPropertySymbols;
-
-var _objectGops = {
-	f: f$4
 };// all enumerable object keys, includes symbols
 
 
@@ -1072,7 +1140,7 @@ var $propertyIsEnumerable = function propertyIsEnumerable(key) {
   if (this === ObjectProto$1 && _has(AllSymbols, key) && !_has(OPSymbols, key)) return false;
   return E || !_has(this, key) || !_has(AllSymbols, key) || _has(this, HIDDEN) && this[HIDDEN][key] ? E : true;
 };
-var $getOwnPropertyDescriptor$1 = function getOwnPropertyDescriptor(it, key) {
+var $getOwnPropertyDescriptor = function getOwnPropertyDescriptor(it, key) {
   it = _toIobject(it);
   key = _toPrimitive(key, true);
   if (it === ObjectProto$1 && _has(AllSymbols, key) && !_has(OPSymbols, key)) return;
@@ -1117,7 +1185,7 @@ if (!USE_NATIVE) {
     return this._k;
   });
 
-  _objectGopd.f = $getOwnPropertyDescriptor$1;
+  _objectGopd.f = $getOwnPropertyDescriptor;
   _objectDp.f = $defineProperty;
   _objectGopn.f = _objectGopnExt.f = $getOwnPropertyNames;
   _objectPie.f = $propertyIsEnumerable;
@@ -1165,7 +1233,7 @@ _export(_export.S + _export.F * !USE_NATIVE, 'Object', {
   // 19.1.2.3 Object.defineProperties(O, Properties)
   defineProperties: $defineProperties,
   // 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
-  getOwnPropertyDescriptor: $getOwnPropertyDescriptor$1,
+  getOwnPropertyDescriptor: $getOwnPropertyDescriptor,
   // 19.1.2.7 Object.getOwnPropertyNames(O)
   getOwnPropertyNames: $getOwnPropertyNames,
   // 19.1.2.8 Object.getOwnPropertySymbols(O)
@@ -1203,51 +1271,7 @@ _setToStringTag($Symbol, 'Symbol');
 // 20.2.1.9 Math[@@toStringTag]
 _setToStringTag(Math, 'Math', true);
 // 24.3.3 JSON[@@toStringTag]
-_setToStringTag(_global.JSON, 'JSON', true);var getOwnPropertySymbols = _core.Object.getOwnPropertySymbols;var getOwnPropertySymbols$1 = getOwnPropertySymbols;function _defineProperty(obj, key, value) {
-  if (key in obj) {
-    defineProperty$1(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-}
-
-var defineProperty$3 = _defineProperty;function _objectSpread(target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i] != null ? arguments[i] : {};
-
-    var ownKeys = keys$1(source);
-
-    if (typeof getOwnPropertySymbols$1 === 'function') {
-      ownKeys = ownKeys.concat(getOwnPropertySymbols$1(source).filter(function (sym) {
-        return getOwnPropertyDescriptor$1(source, sym).enumerable;
-      }));
-    }
-
-    ownKeys.forEach(function (key) {
-      defineProperty$3(target, key, source[key]);
-    });
-  }
-
-  return target;
-}
-
-var objectSpread = _objectSpread;var HAS_INSTANCE = _wks('hasInstance');
-var FunctionProto = Function.prototype;
-// 19.2.3.6 Function.prototype[@@hasInstance](V)
-if (!(HAS_INSTANCE in FunctionProto)) _objectDp.f(FunctionProto, HAS_INSTANCE, { value: function (O) {
-  if (typeof this != 'function' || !_isObject(O)) return false;
-  if (!_isObject(this.prototype)) return O instanceof this;
-  // for environment w/o native `@@hasInstance` logic enough `instanceof`, but add this:
-  while (O = _objectGpo(O)) if (this.prototype === O) return true;
-  return false;
-} });var hasInstance = _wksExt.f('hasInstance');var hasInstance$1 = hasInstance;_wksDefine('asyncIterator');_wksDefine('observable');var symbol = _core.Symbol;var symbol$1 = symbol;function _instanceof(left, right) {
+_setToStringTag(_global.JSON, 'JSON', true);_wksDefine('asyncIterator');_wksDefine('observable');var symbol = _core.Symbol;var symbol$1 = symbol;function _instanceof(left, right) {
   if (right != null && typeof symbol$1 !== "undefined" && right[hasInstance$1]) {
     return right[hasInstance$1](left);
   } else {
@@ -1255,7 +1279,10 @@ if (!(HAS_INSTANCE in FunctionProto)) _objectDp.f(FunctionProto, HAS_INSTANCE, {
   }
 }
 
-var _instanceof_1 = _instanceof;var _anInstance = function (it, Constructor, name, forbiddenField) {
+var _instanceof_1 = _instanceof;var $JSON$1 = _core.JSON || (_core.JSON = { stringify: JSON.stringify });
+var stringify = function stringify(it) { // eslint-disable-line no-unused-vars
+  return $JSON$1.stringify.apply($JSON$1, arguments);
+};var stringify$1 = stringify;var _anInstance = function (it, Constructor, name, forbiddenField) {
   if (!(it instanceof Constructor) || (forbiddenField !== undefined && forbiddenField in it)) {
     throw TypeError(name + ': incorrect invocation!');
   } return it;
@@ -1775,89 +1802,172 @@ _export(_export.S, 'Promise', { 'try': function (callbackfn) {
   var result = _perform(callbackfn);
   (result.e ? promiseCapability.reject : promiseCapability.resolve)(result.v);
   return promiseCapability.promise;
-} });var promise = _core.Promise;var promise$1 = promise;var $JSON$1 = _core.JSON || (_core.JSON = { stringify: JSON.stringify });
-var stringify = function stringify(it) { // eslint-disable-line no-unused-vars
-  return $JSON$1.stringify.apply($JSON$1, arguments);
-};var stringify$1 = stringify;function getUA(u) {
-  if (!u) return false; // console.log(u)
-
-  var obj = {
+} });var promise = _core.Promise;var promise$1 = promise;function getUA(u) {
+  if (!u) return false;
+  var ua = {
     edge: u.indexOf('Edge') > -1,
-    // Edge内核
     trident: u.indexOf('Trident') > -1,
-    // IE内核
     presto: u.indexOf('Presto') > -1,
-    // opera内核
     webKit: u.indexOf('AppleWebKit') > -1,
-    // 苹果、谷歌内核
     gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') === -1,
-    // 火狐内核
     mobile: !!u.match(/AppleWebKit.*Mobile.*/) || !!u.match(/Mobile/g),
-    // 是否为移动终端
     ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/),
-    // ios终端
     android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1,
-    // android终端或者uc浏览器
     iPhone: u.indexOf('iPhone') > -1,
-    // 是否为iPhone或者QQHD浏览器
     iPad: u.indexOf('iPad') > -1,
-    // 是否iPad
     webApp: u.indexOf('Safari') === -1,
-    // 是否web程序，没有头部与底部
     weixin: u.indexOf('MicroMessenger') > -1,
-    // 是否微信
     weibo: u.indexOf('Weibo') > -1,
-    // 是否微博
     facebook: u.indexOf('FBAN') > -1,
-    // 是否facebook
-    twitter: u.indexOf('FBAN') > -1,
-    // 是否twitter
-    qq: u.match(/\sQQ/i) === ' qq',
-    // 是否QQ
-    hmlyApp: /himalaya/i.test(u) // 是否在 himalaya app
-
+    twitter: u.indexOf('Twitter') > -1,
+    instagram: u.indexOf('Instagram') > -1,
+    qq: !!u.match(/\sQQ/i),
+    hmlyApp: /himalaya/i.test(u)
   };
-  return obj;
+  return ua;
 }var ua;
 
-try {
-  ua = typeof window !== 'undefined' && window.navigator && window.navigator.userAgent;
-} catch (error) {
-  console.error("[isIE]: ".concat(error));
+if (typeof window !== 'undefined') {
+  try {
+    ua = getUA(window.navigator.userAgent);
+  } catch (error) {
+    console.error("[IE]: ".concat(error));
+  }
 }
 
-var isIE = ua ? getUA(ua).trident : false;
-var isEdge = ua ? getUA(ua).edge : false;// adapt IE add event
-var addListener = function addListener(event, fn, dom) {
-  if (typeof window === 'undefined') return false;
-  var eventDOM = dom || window;
+var isIE = ua && ua.trident;
+var isEdge = ua && ua.edge;var addListener = function () {
+  if (typeof window === 'undefined') return function () {};
 
-  if (window.addEventListener) {
-    eventDOM.addEventListener(event, fn, false);
-  } else {
-    eventDOM.attachEvent("on".concat(event), fn);
+  if (!window.addEventListener) {
+    return function (event, fn, dom) {
+      var eventDOM = dom || window;
+      eventDOM.attachEvent("on".concat(event), fn);
+    };
   }
-}; // adapt IE remove event
 
-var removeListener = function removeListener(event, fn, dom) {
-  if (typeof window === 'undefined') return false;
-  var eventDOM = dom || window;
+  return function (event, fn, dom) {
+    var useCapture = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+    var eventDOM = dom || window;
+    eventDOM.addEventListener(event, fn, useCapture);
+  };
+}();var removeListener = function () {
+  if (typeof window === 'undefined') return function () {};
 
-  if (window.removeEventListener) {
-    eventDOM.removeEventListener(event, fn, false);
-  } else {
-    eventDOM.detachEvent("on".concat(event), fn);
+  if (!window.removeEventListener) {
+    return function (event, fn, dom) {
+      var eventDOM = dom || window;
+      eventDOM.detachEvent("on".concat(event), fn);
+    };
   }
-}; // prevent default
-var getType = function getType(obj) {
-  if (typeof obj !== 'object') return typeof obj;
-  var len = Object.prototype.toString.call(obj).length - 1;
-  return Object.prototype.toString.call(obj).slice(8, len).toLowerCase();
-};var playStateSet = ['loading', 'playing', 'paused', 'stopped', 'ended', 'finished', 'loaderror', 'playerror', 'unloaded', 'loaded'];
-var playModelSet = ['list-once', 'list-random', 'list-loop', 'single-once', 'single-loop'];
-var supportEvents = ['onplay', 'onpause', 'onstop', 'onend', 'onfinish', 'onload', 'onunload', 'oncanplay', 'oncanplaythrough', 'onprogress', 'onvolume', 'onseeking', 'onseeked', 'onrate', 'ontimeupdate', 'onloaderror', 'onplayerror', 'oncut', 'onpick'];
-var uselessEvents = ['finish', 'playerror', 'cut', 'pick', 'play', 'abort', 'suspend'];
-var logLevel = ['detail', 'info', 'warn', 'error', 'silent'];
+
+  return function (event, fn, dom) {
+    var useCapture = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+    var eventDOM = dom || window;
+    eventDOM.removeEventListener(event, fn, useCapture);
+  };
+}();var getType = function getType(ele) {
+  if (typeof ele !== 'object') return typeof ele;
+  var len = Object.prototype.toString.call(ele).length - 1;
+  return Object.prototype.toString.call(ele).slice(8, len).toLowerCase();
+};var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
+  return new (P || (P = promise$1))(function (resolve, reject) {
+    function fulfilled(value) {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    }
+
+    function rejected(value) {
+      try {
+        step(generator["throw"](value));
+      } catch (e) {
+        reject(e);
+      }
+    }
+
+    function step(result) {
+      result.done ? resolve(result.value) : new P(function (resolve) {
+        resolve(result.value);
+      }).then(fulfilled, rejected);
+    }
+
+    step((generator = generator.apply(thisArg, _arguments || [])).next());
+  });
+};
+var playStateSet;
+
+(function (playStateSet) {
+  playStateSet[playStateSet["loading"] = 0] = "loading";
+  playStateSet[playStateSet["playing"] = 1] = "playing";
+  playStateSet[playStateSet["paused"] = 2] = "paused";
+  playStateSet[playStateSet["stopped"] = 3] = "stopped";
+  playStateSet[playStateSet["ended"] = 4] = "ended";
+  playStateSet[playStateSet["finished"] = 5] = "finished";
+  playStateSet[playStateSet["loaderror"] = 6] = "loaderror";
+  playStateSet[playStateSet["playerror"] = 7] = "playerror";
+  playStateSet[playStateSet["unloaded"] = 8] = "unloaded";
+  playStateSet[playStateSet["loaded"] = 9] = "loaded";
+})(playStateSet || (playStateSet = {}));
+
+var playModelSet;
+
+(function (playModelSet) {
+  playModelSet[playModelSet["list-once"] = 0] = "list-once";
+  playModelSet[playModelSet["list-random"] = 1] = "list-random";
+  playModelSet[playModelSet["list-loop"] = 2] = "list-loop";
+  playModelSet[playModelSet["single-once"] = 3] = "single-once";
+  playModelSet[playModelSet["single-loop"] = 4] = "single-loop";
+})(playModelSet || (playModelSet = {}));
+
+var supportEvents;
+
+(function (supportEvents) {
+  supportEvents[supportEvents["onplay"] = 0] = "onplay";
+  supportEvents[supportEvents["onpause"] = 1] = "onpause";
+  supportEvents[supportEvents["onstop"] = 2] = "onstop";
+  supportEvents[supportEvents["onend"] = 3] = "onend";
+  supportEvents[supportEvents["onfinish"] = 4] = "onfinish";
+  supportEvents[supportEvents["onload"] = 5] = "onload";
+  supportEvents[supportEvents["onunload"] = 6] = "onunload";
+  supportEvents[supportEvents["oncanplay"] = 7] = "oncanplay";
+  supportEvents[supportEvents["oncanplaythrough"] = 8] = "oncanplaythrough";
+  supportEvents[supportEvents["onprogress"] = 9] = "onprogress";
+  supportEvents[supportEvents["onvolume"] = 10] = "onvolume";
+  supportEvents[supportEvents["onseeking"] = 11] = "onseeking";
+  supportEvents[supportEvents["onseeked"] = 12] = "onseeked";
+  supportEvents[supportEvents["onrate"] = 13] = "onrate";
+  supportEvents[supportEvents["ontimeupdate"] = 14] = "ontimeupdate";
+  supportEvents[supportEvents["onloaderror"] = 15] = "onloaderror";
+  supportEvents[supportEvents["onplayerror"] = 16] = "onplayerror";
+  supportEvents[supportEvents["oncut"] = 17] = "oncut";
+  supportEvents[supportEvents["onpick"] = 18] = "onpick";
+})(supportEvents || (supportEvents = {}));
+
+var uselessEvents;
+
+(function (uselessEvents) {
+  uselessEvents[uselessEvents["finish"] = 0] = "finish";
+  uselessEvents[uselessEvents["playerror"] = 1] = "playerror";
+  uselessEvents[uselessEvents["cut"] = 2] = "cut";
+  uselessEvents[uselessEvents["pick"] = 3] = "pick";
+  uselessEvents[uselessEvents["play"] = 4] = "play";
+  uselessEvents[uselessEvents["abort"] = 5] = "abort";
+  uselessEvents[uselessEvents["suspend"] = 6] = "suspend";
+})(uselessEvents || (uselessEvents = {}));
+
+var logLevelSet;
+
+(function (logLevelSet) {
+  logLevelSet[logLevelSet["detail"] = 0] = "detail";
+  logLevelSet[logLevelSet["info"] = 1] = "info";
+  logLevelSet[logLevelSet["warn"] = 2] = "warn";
+  logLevelSet[logLevelSet["error"] = 3] = "error";
+  logLevelSet[logLevelSet["silent"] = 4] = "silent";
+})(logLevelSet || (logLevelSet = {}));
+
 var defaultSrc = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
 var AudioH5 =
 /*#__PURE__*/
@@ -1876,7 +1986,7 @@ function () {
     this.seek = this.seek.bind(this);
     this.rate = this.rate.bind(this);
     this.volume = this.volume.bind(this);
-    this.muted = this.muted.bind(this);
+    this.mute = this.mute.bind(this);
     this.stop = this.stop.bind(this);
     this.unload = this.unload.bind(this);
     this.model = this.model.bind(this);
@@ -1907,10 +2017,8 @@ function () {
         if (!this.playLocker) {
           try {
             if (this.audioH5.src === defaultSrc) {
-              // without correct src the sound couldn't play
-              // manual trigger load error event
               var err = 'Because the error src property, manual trigger load error event';
-              return this.eventMethods.error(err);
+              return this.eventMethods && this.eventMethods.error(err);
             }
 
             this._blockEvent({
@@ -1922,49 +2030,45 @@ function () {
             if (play && typeof promise$1 !== 'undefined' && (_instanceof_1(play, promise$1) || typeof play.then === 'function')) {
               this.playLocker = true;
               play.then(function () {
-                _this.playLocker = false; // this controller must be set before trigger lock queue
+                _this.playLocker = false;
 
-                _this.lockQueue.forEach(function (v) {
-                  return v && v();
-                });
+                if (_this.lockQueue) {
+                  _this.lockQueue.forEach(function (v) {
+                    return v && v();
+                  });
 
-                _this.lockQueue.splice(0);
+                  _this.lockQueue.splice(0);
+                }
               }).catch(function (err) {
                 _this.playLocker = false;
 
                 if (_this.playErrLocker) {
-                  // trigger lock queue if the playErrLocker is a truthy
                   _this.playErrLocker = false;
-
-                  _this.lockQueue.forEach(function (v) {
+                  _this.lockQueue && _this.lockQueue.forEach(function (v) {
                     return v && v();
                   });
                 } else {
-                  // set play error if not trigger load error
-                  if (_this.playState !== playStateSet[6]) {
-                    _this.eventMethods.playerror(err);
+                  if (_this.playState !== playStateSet.loaderror) {
+                    _this.eventMethods && _this.eventMethods.playerror(err);
                   }
                 }
 
-                _this.lockQueue.splice(0);
+                _this.lockQueue && _this.lockQueue.splice(0);
               });
-            } // If the sound is still paused, then we can assume there was a playback issue.
-
+            }
 
             if (this.audioH5.paused) {
               var _err = "Playback was unable to start. This is most commonly an issue on mobile devices and Chrome where playback was not within a user interaction.";
-              this.eventMethods.playerror(_err);
+              this.eventMethods && this.eventMethods.playerror(_err);
             }
           } catch (err) {
-            // set play error if not trigger load error and playErrLocker is a falsy
-            if (!this.playErrLocker && this.playState !== playStateSet[6]) {
-              this.eventMethods.playerror(err);
+            if (!this.playErrLocker && this.playState !== playStateSet.loaderror) {
+              this.eventMethods && this.eventMethods.playerror(err);
             } else {
               this.playErrLocker = false;
             }
           }
-        } else if (this.lockTags.pause_wait) {
-          // trigger play when the playLock means cancel pause
+        } else if (this.lockTags && this.lockTags.pause_wait) {
           this.lockTags.pause_cancel = true;
         }
 
@@ -1977,7 +2081,6 @@ function () {
       var _this2 = this;
 
       if (this._checkInit()) {
-        // the pause method in lockQueue allow only one
         if (!this.lockTags.pause_wait) {
           this._playLockQueue(function (playLock) {
             _this2.lockTags.pause_wait = playLock;
@@ -1993,7 +2096,6 @@ function () {
             };
           }(this.playLocker));
         } else {
-          // trigger pause when the playLock means allow pause
           this.lockTags.pause_cancel = false;
         }
 
@@ -2003,12 +2105,11 @@ function () {
   }, {
     key: "toggle",
     value: function toggle() {
-      if (this._checkInit() && this.playState !== playStateSet[6] && this.playState !== playStateSet[7] && this.playState !== playStateSet[8]) {
+      if (this._checkInit() && this.playState !== playStateSet.loaderror && this.playState !== playStateSet.playerror && this.playState !== playStateSet.unloaded) {
         if (this.lockTags.pause_wait) {
           this.lockTags.pause_cancel = !this.lockTags.pause_cancel;
         } else {
-          if (this.playState === null || this.playState === playStateSet[2] || this.playState === playStateSet[9]) {
-            // trigger play method
+          if (this.playState === null || this.playState === playStateSet.paused || this.playState === playStateSet.loaded) {
             this.play();
           } else {
             this.pause();
@@ -2039,7 +2140,7 @@ function () {
 
             this._setPlayId();
 
-            this.eventMethods.pick(this.playId);
+            this.eventMethods && this.eventMethods.pick(this.playId);
             this.playErrLocker = true;
 
             this._abortLoad();
@@ -2049,7 +2150,7 @@ function () {
 
               var src = _this3.playList[_this3.playIndex].src;
 
-              var config = objectSpread({}, _this3.config, {
+              var config = assign$1(_this3.config, {
                 src: src
               });
 
@@ -2087,7 +2188,6 @@ function () {
 
       if (this._checkInit()) {
         if (this._checkType(val, 'number')) {
-          // IE cannot set currentTime when the metaData is loading
           if (isIE && !this.metaDataLoaded) {
             this.seekValue = val;
             return;
@@ -2139,8 +2239,12 @@ function () {
           if (val < 0) val = 0;
 
           this._commonLock('volume', function () {
-            _this7.audioH5.muted = false;
-            _this7.audioH5.volume = val;
+            {
+              _this7.audioH5.muted = false;
+            }
+            {
+              _this7.audioH5.volume = val;
+            }
           });
 
           this._updateConfig({
@@ -2152,18 +2256,18 @@ function () {
       }
     }
   }, {
-    key: "muted",
-    value: function muted(bool) {
+    key: "mute",
+    value: function mute(bool) {
       var _this8 = this;
 
       if (this._checkInit()) {
-        if (this._checkType(bool, 'boolean', true)) {
+        if (this._checkType(bool, 'boolean')) {
           this._commonLock('mute', function () {
             return _this8.audioH5.muted = bool;
           });
 
           this._updateConfig({
-            muted: bool
+            mute: bool
           });
         } else {
           return this.audioH5.muted;
@@ -2175,24 +2279,26 @@ function () {
     value: function stop(forbidEvent) {
       var _this9 = this;
 
-      if (this._checkInit() && this.playState !== playStateSet[3]) {
+      if (this._checkInit() && this.playState !== playStateSet.stopped) {
         this._playLockQueue(function () {
           if (!forbidEvent) {
             _this9._blockEvent({
               block: true
             });
 
-            _this9._setPlayState(playStateSet[3]);
+            _this9._setPlayState(playStateSet.stopped);
 
             _this9._fireEventQueue(_this9.playId, 'onstop');
           }
 
-          if (!isNaN('' + _this9.audioH5.duration)) {
-            _this9.audioH5.currentTime = 0;
+          if (_this9.audioH5) {
+            if (typeof _this9.audioH5.duration !== 'undefined') {
+              _this9.audioH5.currentTime = 0;
 
-            _this9.audioH5.pause();
-          } else {
-            _this9.audioH5.muted = true;
+              _this9.audioH5.pause();
+            } else {
+              _this9.audioH5.muted = true;
+            }
           }
         });
 
@@ -2211,7 +2317,7 @@ function () {
 
         this._playLockQueue(function () {
           if (!forbidEvent) {
-            _this10._setPlayState(playStateSet[8]);
+            _this10._setPlayState(playStateSet.unloaded);
 
             _this10._fireEventQueue(_this10.playId, 'onunload');
           }
@@ -2223,44 +2329,37 @@ function () {
         });
       }
     }
-    /* set play model */
-
   }, {
     key: "model",
     value: function model(_model) {
       if (this._checkInit()) {
-        if (playModelSet.indexOf(_model) !== -1) {
-          // model contain: list-once, list-random, list-loop, single-once, single-loop
-          this.playModel = _model;
+        if (_model) {
+          this.playModel = playModelSet[_model];
         } else {
-          return this.playModel;
+          return playModelSet[this.playModel || 0];
         }
       }
     }
-    /* add event to events queue */
-
   }, {
     key: "on",
     value: function on(event, cb) {
       if (this._checkInit() && this._checkType(event, 'string', true) && this._checkType(cb, 'function', true)) {
         var queueName = event.indexOf('on') === 0 ? event : "on".concat(event);
-
-        this._onEvent(queueName, cb);
+        return this._onEvent(queueName, cb);
       }
-    }
-    /* remove event from events queue */
 
+      return false;
+    }
   }, {
     key: "off",
     value: function off(event, cb) {
       if (this._checkInit() && this._checkType(event, 'string', true)) {
         var queueName = event.indexOf('on') === 0 ? event : "on".concat(event);
-
-        this._offEvent(queueName, cb);
+        return this._offEvent(queueName, cb);
       }
-    }
-    /* fire only one time */
 
+      return false;
+    }
   }, {
     key: "once",
     value: function once(event, cb) {
@@ -2276,11 +2375,11 @@ function () {
           _this11._offEvent(queueName, once, funcName);
         };
 
-        this._onEvent(queueName, once, funcName);
+        return this._onEvent(queueName, once, funcName);
       }
-    }
-    /* set play list */
 
+      return false;
+    }
   }, {
     key: "playlist",
     value: function playlist(data) {
@@ -2295,23 +2394,19 @@ function () {
         return this._returnParams();
       }
     }
-    /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
-
   }, {
     key: "_initial",
     value: function _initial(config) {
-      this.config = config; // preserve initial config
-
+      this.config = config;
       this.playState = null;
       this.debug = config.debug || false;
-      this.logLevel = logLevel.indexOf(config.logLevel) !== -1 && config.logLevel || logLevel[3];
+      this.logLevel = config.logLevel && logLevelSet[config.logLevel] || logLevelSet['error'];
       this.idCounter = 1000;
       this.lockQueue = new Array(0);
       this.playLocker = false;
       this.playErrLocker = false;
       this.lockTags = {
         cutpick: 0,
-        // The tag for cut or pick in lockQueue because they are only be triggered alternatively
         seek: 0,
         volume: 0,
         rate: 0,
@@ -2320,14 +2415,13 @@ function () {
         pause_cancel: false
       };
       this.playId = 1000;
-      this.playModel = playModelSet.indexOf(config.playModel) !== -1 && config.playModel || config.loop && playModelSet[3] || playModelSet[0];
+      this.playModel = config.playModel && playModelSet[config.playModel] || config.loop && playModelSet['list-loop'] || playModelSet['list-once'];
       this.playIndex = 0;
       this.prevPlayIndex = 0;
       this.playList = new Array(0);
       this.buffered = new Array(0);
-      this.eventController = new Array(0);
-      this.eventMethods = create$1(null); // playlist convert to src
-
+      this.eventController = create$1(null);
+      this.eventMethods = create$1(null);
       var src;
 
       if (config.playlist && this._checkType(config.playlist, 'array')) {
@@ -2357,26 +2451,27 @@ function () {
         src = this.playList[srcIndex].src;
       } else {
         this._logErr('Please pass correct playlist parameters!');
-      } // create Audio Object
+      }
 
-
-      this._createAudio(objectSpread({}, config, {
+      this._createAudio(assign$1({}, config, {
         src: src
       }));
     }
   }, {
     key: "_createAudio",
     value: function _createAudio(config) {
-      this.isInit = true;
-      this.audioH5 = typeof window !== 'undefined' && new window.Audio();
-      this.audioH5.autoplay = config.autoplay || false;
-      this.audioH5.loop = config.loop || false;
-      this.audioH5.src = this._srcAssemble(config.src);
-      this.audioH5.preload = config.preload || true;
-      this.audioH5.volume = config.volume || (config.volume === 0 ? 0 : 1);
-      this.audioH5.muted = config.muted || false;
-      this.audioH5.playbackRate = config.rate || config.playbackRate || 1;
-      this.audioH5.controls = false;
+      if (typeof window !== 'undefined' && !this.audioH5) {
+        this.isInit = true;
+        this.audioH5 = new Audio();
+        this.audioH5.autoplay = config.autoplay || false;
+        this.audioH5.loop = config.loop || false;
+        this.audioH5.src = this._srcAssemble(config.src);
+        this.audioH5.preload = config.preload === false ? 'none' : 'auto';
+        this.audioH5.volume = config.volume || (config.volume === 0 ? 0 : 1);
+        this.audioH5.muted = config.mute || false;
+        this.audioH5.playbackRate = config.rate || config.playbackRate || 1;
+        this.audioH5.controls = false;
+      }
     }
   }, {
     key: "_srcAssemble",
@@ -2392,82 +2487,74 @@ function () {
   }, {
     key: "_updateConfig",
     value: function _updateConfig(params) {
-      this.config = objectSpread({}, this.config, params);
+      assign$1(this.config, params);
     }
   }, {
     key: "_returnParams",
     value: function _returnParams() {
       return {
         playId: this.playId,
-        playingData: this.playList[this.playIndex],
+        playingData: this.playList && this.playList[this.playIndex || 0],
         playlist: this.playList
       };
     }
-    /* abort load sound */
-
   }, {
     key: "_abortLoad",
     value: function _abortLoad() {
-      if (this.audioH5.src !== defaultSrc) {
+      if (this.audioH5 && this.audioH5.src !== defaultSrc) {
         this.audioH5.src = defaultSrc;
         this.audioH5.currentTime = 0;
         this.audioH5.load();
       }
     }
-    /* set play state */
-
   }, {
     key: "_setPlayState",
     value: function _setPlayState(state) {
-      if (this._checkType(state, 'string', true) && this.playState !== state) {
+      if (this.audioH5 && this._checkType(state, 'number', true) && this.playState !== state) {
         var readyState = this.audioH5.readyState;
         var isReady = readyState > 2;
         var paused = this.audioH5.paused;
-        var stopped = this.playState === playStateSet[3];
-        var ended = this.playState === playStateSet[4];
-        var finished = this.playState === playStateSet[5];
-        var unloaded = this.playState === playStateSet[8];
-        var seeking = this.audioH5.seeking; // filter impossible state
+        var stopped = this.playState === playStateSet.stopped;
+        var ended = this.playState === playStateSet.ended;
+        var finished = this.playState === playStateSet.finished;
+        var unloaded = this.playState === playStateSet.unloaded;
+        var seeking = this.audioH5.seeking;
 
         switch (state) {
-          case playStateSet[0]:
-            // could not be loading: ready and not finished
+          case playStateSet.loading:
             if (!finished && isReady) return false;
             break;
 
-          case playStateSet[1]:
-            // could not be playing: paused or unloaded or seeking or not ready when not finished
+          case playStateSet.playing:
             if (!finished && (paused || unloaded || seeking || !isReady)) return false;
             break;
 
-          case playStateSet[2]:
-            // could not be paused: stopped or ended or finished
+          case playStateSet.paused:
             if (stopped || ended || finished || unloaded) return false;
             break;
         }
 
-        this._logInfo("setPlayState - ".concat(state));
+        this._logInfo("setPlayState - ".concat(playStateSet[state]));
 
         this.playState = state;
         return this.playState;
       }
-    }
-    /* set play index */
 
+      return false;
+    }
   }, {
     key: "_setPlayIndex",
     value: function _setPlayIndex(index) {
       var playModel = this.playModel;
-      var maxIndex = this.playList.length - 1; // reserve playIndex
-
+      var maxIndex = this.playList.length - 1;
       this.prevPlayIndex = this.playIndex;
 
       if (index === 0) {
         this.playIndex = 0;
-        return;
+        return this.playIndex;
       }
 
-      switch (playModel) {
+      switch (playModelSet[playModel]) {
         case 'list-once':
           this.playIndex = index || (maxIndex >= this.playIndex ? ++this.playIndex : this.playIndex);
           break;
@@ -2492,6 +2579,8 @@ function () {
           this.playIndex = index || this.playIndex;
       }
 
+      !this.playIndex && (this.playIndex = 0);
+
       this._log("setPlayIndex - playIndex: ".concat(this.playIndex));
 
       return this.playIndex;
@@ -2500,48 +2589,38 @@ function () {
     key: "_setPlayId",
     value: function _setPlayId() {
       var isSet = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-      var playId = this.playList[this.playIndex] && this.playList[this.playIndex].playId || this.playId;
+      var playId = this.playList && this.playList[this.playIndex] && this.playList[this.playIndex].playId || this.playId;
       if (isSet === true) this.playId = playId;
       return playId;
     }
-    /* reset play list */
-
-  }, {
-    key: "_resetPlayList",
-    value: function _resetPlayList() {
-      this.playList = [];
-
-      this._setPlayIndex(0);
-    }
-    /* handle play list */
-
   }, {
     key: "_handlePlayList",
-    value: function _handlePlayList(_ref) {
+    value: function _handlePlayList(data) {
       var _this12 = this;
 
-      var action = _ref.action,
-          list = _ref.list,
-          playId = _ref.playId,
-          params = _ref.params;
+      var action = data.action,
+          list = data.list,
+          playId = data.playId,
+          params = data.params;
+
+      var playlist = construct$3(Array, toConsumableArray(this.playList || []));
 
       switch (action) {
         case 'add':
-          this.playList = [].concat(toConsumableArray(this.playList), toConsumableArray(list.map(function (v) {
-            if (_this12._checkType(v, 'object')) {
-              v.playId = _this12.idCounter;
-              _this12.idCounter++;
-              return v;
-            }
-          })));
+          if (!list) return;
+          Array.prototype.forEach.call(list, function (v, k, thisArr) {
+            !_this12.idCounter && (_this12.idCounter = 1000);
+            v.playId = _this12.idCounter;
+            _this12.idCounter++;
+            thisArr[k] = v;
+          });
+          this.playList = Array.prototype.concat.call(playlist, list);
           break;
 
         case 'delete':
           if (playId) {
-            for (var i = 0; i < this.playList.length; i++) {
-              if (this.playList[i].playId === playId) {
-                var playlist = construct$3(Array, toConsumableArray(this.playList));
-
+            for (var i = 0; i < playlist.length; i++) {
+              if (playlist[i].playId === playId) {
                 playlist.splice(i, 1);
                 this.playList = toConsumableArray(playlist);
                 break;
@@ -2553,17 +2632,15 @@ function () {
 
         case 'insert':
           if (playId && list) {
-            for (var _i = 0; _i < this.playList.length; _i++) {
-              if (this.playList[_i].playId === playId) {
-                var _playlist = construct$3(Array, toConsumableArray(this.playList));
-
-                _playlist.splice.apply(_playlist, [_i, 0].concat(toConsumableArray(list.map(function (v) {
+            for (var _i = 0; _i < playlist.length; _i++) {
+              if (playlist[_i].playId === playId) {
+                playlist.splice.apply(playlist, [_i, 0].concat(toConsumableArray(list.map(function (v) {
+                  !_this12.idCounter && (_this12.idCounter = 1000);
                   v.playId = _this12.idCounter;
                   _this12.idCounter++;
                   return v;
                 }))));
-
-                this.playList = toConsumableArray(_playlist);
+                this.playList = toConsumableArray(playlist);
                 break;
               }
             }
@@ -2573,17 +2650,15 @@ function () {
 
         case 'replace':
           if (playId && list) {
-            for (var _i2 = 0; _i2 < this.playList.length; _i2++) {
-              if (this.playList[_i2].playId === playId) {
-                var _playlist2 = construct$3(Array, toConsumableArray(this.playList));
-
-                _playlist2.splice.apply(_playlist2, [_i2, 1].concat(toConsumableArray(list.map(function (v) {
+            for (var _i2 = 0; _i2 < playlist.length; _i2++) {
+              if (playlist[_i2].playId === playId) {
+                playlist.splice.apply(playlist, [_i2, 1].concat(toConsumableArray(list.map(function (v) {
+                  !_this12.idCounter && (_this12.idCounter = 1000);
                   v.playId = _this12.idCounter;
                   _this12.idCounter++;
                   return v;
                 }))));
-
-                this.playList = toConsumableArray(_playlist2);
+                this.playList = toConsumableArray(playlist);
                 break;
               }
             }
@@ -2593,15 +2668,12 @@ function () {
 
         case 'update':
           if (playId && params) {
-            for (var _i3 = 0; _i3 < this.playList.length; _i3++) {
-              if (this.playList[_i3].playId === playId) {
-                var _playlist3 = construct$3(Array, toConsumableArray(this.playList));
+            for (var _i3 = 0; _i3 < playlist.length; _i3++) {
+              if (playlist[_i3].playId === playId) {
+                var newData = assign$1({}, playlist[_i3], params);
 
-                var newData = objectSpread({}, this.playList[_i3], params);
-
-                _playlist3.splice(_i3, 1, newData);
-
-                this.playList = toConsumableArray(_playlist3);
+                playlist.splice(_i3, 1, newData);
+                this.playList = toConsumableArray(playlist);
                 break;
               }
             }
@@ -2613,39 +2685,39 @@ function () {
           this._resetPlayList();
 
           break;
-
-        default:
-          this._resetPlayList();
-
       }
     }
-    /* cut audio */
+  }, {
+    key: "_resetPlayList",
+    value: function _resetPlayList() {
+      this.playList = new Array(0);
 
+      this._setPlayIndex(0);
+    }
   }, {
     key: "_cut",
     value: function _cut(autocut) {
       var _this13 = this;
 
       if (this._checkInit()) {
-        if (this.playModel === 'single-once') {
-          // can't cut audio if the playModel is single-once
+        if (this.playModel === playModelSet['single-once']) {
           this._logWarn('Cannot cut audio if the playModel is single-once');
 
           this.stop();
         } else {
           this.metaDataLoaded = false;
           this.seekValue = null;
-          !autocut && this._setPlayIndex(); // on finish
+          !autocut && this._setPlayIndex();
 
-          if (!this.playList[this.playIndex]) {
+          if (this.playList && !this.playList[this.playIndex]) {
             this._setPlayIndex(this.prevPlayIndex);
 
-            return this.eventMethods.finish(this.playId);
+            return this.eventMethods && this.eventMethods.finish(this.playId);
           }
 
           this._setPlayId();
 
-          this.eventMethods.cut(this.playId);
+          this.eventMethods && this.eventMethods.cut(this.playId);
           this.playErrLocker = true;
 
           this._abortLoad();
@@ -2654,14 +2726,15 @@ function () {
             var src = _this13.playList[_this13.playIndex].src;
 
             if (autocut) {
-              // resolve the IOS auto play problem
-              _this13.audioH5.src = src;
+              if (_this13.audioH5 && src) {
+                _this13.audioH5.src = src;
 
-              _this13.audioH5.load();
+                _this13.audioH5.load();
+              }
             } else {
               _this13.unload(true);
 
-              var config = objectSpread({}, _this13.config, {
+              var config = assign$1(_this13.config, {
                 src: src
               });
 
@@ -2675,27 +2748,34 @@ function () {
         }
       }
     }
-    /* generate received event callback queue */
-
   }, {
     key: "_onEvent",
     value: function _onEvent(event, cb, name) {
-      if (supportEvents.indexOf(event) !== -1) {
-        if (!this[event]) this[event] = {};
-        this[event][name || cb.name || "anonymous-".concat(new Date().getTime())] = cb;
+      if (!isNaN(supportEvents[event])) {
+        try {
+          if (!this[event]) this[event] = create$1(null)(this[event])[name || cb.name || "anonymous-".concat(new Date().getTime())] = cb;
+          return true;
+        } catch (error) {
+          this._logErr(error);
+        }
       }
-    }
-    /* delete received event callback queue */
 
+      return false;
+    }
   }, {
     key: "_offEvent",
     value: function _offEvent(event, cb, name) {
-      if (supportEvents.indexOf(event) !== -1) {
-        if (!cb) this[event] = null;else if (name || cb.name) delete this[event][name || cb.name];
+      if (!isNaN(supportEvents[event])) {
+        try {
+          if (!cb) this[event] = null;else if (name || cb.name) delete this[event][name || cb.name];
+          return true;
+        } catch (error) {
+          this._logErr(error);
+        }
       }
-    }
-    /* fire event callback queue */
 
+      return false;
+    }
   }, {
     key: "_fireEventQueue",
     value: function _fireEventQueue(e, eventQueue) {
@@ -2705,8 +2785,6 @@ function () {
         }
       }
     }
-    /* register Audio Event */
-
   }, {
     key: "_registerEvent",
     value: function _registerEvent(config) {
@@ -2718,92 +2796,81 @@ function () {
           return cb && cb(e);
         };
       };
-      /* bindind received event callbacks */
-
 
       var configKeys = keys$1(config);
 
       configKeys.forEach(function (v) {
         if (v.indexOf('on') === 0) {
-          var funcName = "EASE_AUDIO_".concat(v.toUpperCase(), "_INITIAL_CALLBACK");
+          var cb = config[v];
 
-          _this14._onEvent(v, config[v], funcName);
+          if (cb && _this14._checkType(cb, 'function', true)) {
+            var funcName = "EASE_AUDIO_".concat(v.toUpperCase(), "_INITIAL_CALLBACK");
+
+            _this14._onEvent(v, cb, funcName);
+          }
         }
       });
       this.eventMethods = {
-        // loading state
         loadstart: function loadstart(e) {
-          if (_this14.audioH5.src === defaultSrc) return;
+          if (_this14.audioH5 && _this14.audioH5.src === defaultSrc) return;
 
-          _this14._setPlayState(playStateSet[0]);
+          _this14._setPlayState(playStateSet.loading);
 
           _this14._fireEventQueue(e, 'onload');
         },
         seeking: function seeking(e) {
-          if (_this14.audioH5.src !== defaultSrc && _this14.playState !== playStateSet[2]) _this14._setPlayState(playStateSet[0]);
+          if (_this14.audioH5 && _this14.audioH5.src !== defaultSrc && _this14.playState !== playStateSet.paused) _this14._setPlayState(playStateSet.loading);
 
           _this14._fireEventQueue(e, 'onseeking');
         },
-        // loaded state
         canplaythrough: function canplaythrough(e) {
-          if (_this14.audioH5.src === defaultSrc) return;
-          _this14.playState === playStateSet[0] && _this14._setPlayState(playStateSet[9]);
+          if (_this14.audioH5 && _this14.audioH5.src === defaultSrc) return;
+          _this14.playState === playStateSet.loading && _this14._setPlayState(playStateSet.loaded);
 
           _this14._fireEventQueue(e, 'oncanplaythrough');
         },
-        // playing state
         playing: function playing(e) {
-          _this14._setPlayState(playStateSet[1]);
+          _this14._setPlayState(playStateSet.playing);
 
-          _this14._fireEventQueue(e, 'onplay'); // if playing then set the isTriggerEnd to false
-
+          _this14._fireEventQueue(e, 'onplay');
 
           if (_this14.isTriggerEnd) _this14.isTriggerEnd = false;
         },
-        // paused state
         pause: function pause(e) {
-          // resolve ios cannot trigger onend but onpause event
           if (!_this14.isTriggerEnd) {
-            _this14._setPlayState(playStateSet[2]);
+            _this14._setPlayState(playStateSet.paused);
 
             _this14._fireEventQueue(e, 'onpause');
           }
         },
-        // ended state
         ended: function ended(e) {
           if (_this14.isTriggerEnd) {
             _this14.isTriggerEnd = false;
           } else {
             _this14.isTriggerEnd = true;
 
-            _this14._setPlayState(playStateSet[4]);
+            _this14._setPlayState(playStateSet.ended);
 
             _this14._fireEventQueue(e, 'onend');
 
-            return autocut.call(_this14);
+            return _this14._autocut();
           }
         },
-        // finish state
-        // The Audio not really exist this event, just for intergration
         finish: function finish(e) {
-          _this14._setPlayState(playStateSet[5]);
+          _this14._setPlayState(playStateSet.finished);
 
           _this14._fireEventQueue(e, 'onfinish');
         },
-        // loaderror state
         error: function error(e) {
-          _this14._setPlayState(playStateSet[6]);
+          _this14._setPlayState(playStateSet.loaderror);
 
           _this14._fireEventQueue(e, 'onloaderror');
         },
-        // playerror state
-        // The Audio not really exist this event, just for intergration
         playerror: function playerror(e) {
-          _this14._setPlayState(playStateSet[7]);
+          _this14._setPlayState(playStateSet.playerror);
 
           _this14._fireEventQueue(e, 'onplayerror');
         },
-        // others
         progress: function progress(e) {
           var ranges = e.target.buffered;
           var total = e.total || 1;
@@ -2813,7 +2880,7 @@ function () {
 
           if (ranges && ranges.length) {
             for (var i = 0, j = ranges.length; i < j; i++) {
-              _this14.buffered.push({
+              _this14.buffered && _this14.buffered.push({
                 'start': ranges.start(i) * 1000,
                 'end': ranges.end(i) * 1000
               });
@@ -2824,10 +2891,9 @@ function () {
             progress = loaded / total;
           }
 
-          _this14._fireEventQueue({
-            e: e,
+          _this14._fireEventQueue(assign$1(e, {
             progress: progress
-          }, 'onprogress');
+          }), 'onprogress');
         },
         durationchange: function durationchange(e) {},
         loadedmetadata: function loadedmetadata(e) {
@@ -2836,17 +2902,15 @@ function () {
         },
         loadeddata: function loadeddata(e) {},
         timeupdate: function timeupdate(e) {
-          // playState is loading but actually is playing
-          if (_this14.playState === playStateSet[0]) {
+          if (_this14.playState === playStateSet.loading) {
             _this14._logInfo("timeupdate's playing");
 
-            _this14._setPlayState(playStateSet[1]);
+            _this14._setPlayState(playStateSet.playing);
 
             _this14._fireEventQueue(e, 'onplay');
-          } // Depending on currentTime and duration to mimic end event
+          }
 
-
-          var isEnd = _this14.audioH5.duration && +_this14.audioH5.currentTime >= +_this14.audioH5.duration;
+          var isEnd = _this14.audioH5 && _this14.audioH5.duration && +_this14.audioH5.currentTime >= +_this14.audioH5.duration;
 
           if (isEnd) {
             if (_this14.isTriggerEnd) {
@@ -2856,11 +2920,11 @@ function () {
 
               _this14.isTriggerEnd = true;
 
-              _this14._setPlayState(playStateSet[4]);
+              _this14._setPlayState(playStateSet.ended);
 
               _this14._fireEventQueue(e, 'onend');
 
-              return autocut.call(_this14);
+              return _this14._autocut();
             }
           }
 
@@ -2886,88 +2950,38 @@ function () {
         },
         play: function play(e) {},
         abort: function abort(e) {},
-        suspend: function suspend(e) {} // handle onend auto cut sound
-
+        suspend: function suspend(e) {}
       };
 
-      async function autocut() {
-        var _this15 = this;
-
-        var _ref2 = this.config || {},
-            autocut = _ref2.autocut;
-
-        this._setPlayIndex();
-
-        var nextId = this._setPlayId(false);
-
-        if (this._checkType(autocut, 'function')) {
-          try {
-            autocut = await autocut(this.playId, nextId);
-          } catch (err) {
-            this._logErr("autocut occur error, it's ".concat(err)); // withdrawl set playIndex operation
-
-
-            this._setPlayIndex(this.prevPlayIndex);
-
-            return this.eventMethods.finish(this.playId);
-          }
-        }
-
-        return new promise$1(function (resolve, reject) {
-          _this15._checkType(autocut, 'boolean') ? resolve(autocut) : reject(autocut);
-        }).then(function (isCut) {
-          if (isCut) return _this15._cut(true);
-
-          _this15._setPlayIndex(_this15.prevPlayIndex);
-
-          return _this15.eventMethods.finish(_this15.playId);
-        }).catch(function (err) {
-          _this15._logWarn("The autocut property type should be boolean or function return boolean, now the result ".concat(err, " type was ").concat(typeof err));
-
-          _this15._setPlayIndex(_this15.prevPlayIndex);
-
-          return _this15.eventMethods.finish(_this15.playId);
-        });
-      } // bind controller scope for every each event
-
-
       for (var k in this.eventMethods) {
+        if (uselessEvents[k] !== 'undefined') continue;
         this.eventMethods[k] = curry(this.eventMethods[k], k);
-      } // filter useless events
 
-
-      for (var _k in this.eventMethods) {
-        if (uselessEvents.indexOf(_k) !== -1) continue;
-
-        this._bindEvent(this.eventMethods[_k], _k);
+        this._bindEvent(this.eventMethods[k], k);
       }
 
       this._blockEvent({
         block: false
       });
     }
-    /* unregister Audio Event */
-
   }, {
     key: "_unregisterEvent",
     value: function _unregisterEvent() {
       if (this._checkInit()) {
         for (var k in this.eventMethods) {
-          if (uselessEvents.indexOf(k) !== -1) continue;
+          if (uselessEvents[k] !== 'undefined') continue;
 
           this._removeEvent(this.eventMethods[k], k);
         }
       }
     }
-    /* not remove but block event callback */
-
   }, {
     key: "_blockEvent",
-    value: function _blockEvent(_ref3) {
-      var event = _ref3.event,
-          block = _ref3.block;
-
+    value: function _blockEvent(params) {
       if (this._checkInit()) {
+        var event = params.event,
+            block = params.block;
+
         if (event && this._checkType(event, 'string')) {
           this.eventController[event] = !block;
         } else {
@@ -2977,35 +2991,27 @@ function () {
         }
       }
     }
-    /* whether or not trigger event callback */
-
   }, {
     key: "_triggerEventController",
     value: function _triggerEventController(event) {
-      if (!this.eventController[event]) return false;
+      if (this.eventController && !this.eventController[event]) return false;
 
       this._log("trigger ".concat(event, " event"));
 
       return true;
     }
-    /* bind event */
-
   }, {
     key: "_bindEvent",
     value: function _bindEvent(cb, event) {
       if (!this._checkType(event, 'string')) return this._logErr("bindEvent - bind event name is not string");
       this._checkType(cb, 'function', true) && addListener(event, cb, this.audioH5);
     }
-    /* remove event */
-
   }, {
     key: "_removeEvent",
     value: function _removeEvent(cb, event) {
       if (!this._checkType(event, 'string')) return this._logErr("removeEvent - unbind event name is not string");
       this._checkType(cb, 'function', true) && removeListener(event, cb, this.audioH5);
     }
-    /* playLock queue handle */
-
   }, {
     key: "_playLockQueue",
     value: function _playLockQueue(fn) {
@@ -3015,30 +3021,72 @@ function () {
 
       return fn && fn();
     }
-    /* trigger lockqueue general method */
-
   }, {
     key: "_commonLock",
     value: function _commonLock(tag, fn) {
-      var _this16 = this;
+      var _this15 = this;
 
-      this.playLocker && this.lockTags[tag]++;
+      if (this.playLocker) {
+        var lockTags = this.lockTags[tag];
+        typeof lockTags === 'number' && (this.lockTags[tag] = lockTags + 1);
+      }
 
       this._playLockQueue(function (id) {
         return function () {
-          if (id !== _this16.lockTags[tag]) return;
+          if (id !== _this15.lockTags[tag]) return;
           fn && fn();
         };
       }(this.lockTags[tag]));
     }
-    /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+  }, {
+    key: "_autocut",
+    value: function _autocut() {
+      return __awaiter(this, void 0, void 0, function* () {
+        var _this16 = this;
 
-    /* check type */
+        var autocut = this.config.autocut;
 
+        this._setPlayIndex();
+
+        var nextId = this._setPlayId(false);
+
+        if (this._checkType(autocut, 'function')) {
+          try {
+            autocut = yield autocut(this.playId, nextId);
+          } catch (err) {
+            this._logErr("autocut occur error, it's ".concat(err));
+
+            this._setPlayIndex(this.prevPlayIndex);
+
+            return this.eventMethods.finish(this.playId);
+          }
+        }
+
+        return new promise$1(function (resolve, reject) {
+          _this16._checkType(autocut, 'boolean') ? resolve(autocut) : reject(autocut);
+        }).then(function (isCut) {
+          if (isCut) return _this16._cut(true);
+
+          _this16._setPlayIndex(_this16.prevPlayIndex);
+
+          return _this16.eventMethods.finish(_this16.playId);
+        }).catch(function (err) {
+          _this16._logWarn("The autocut property type should be boolean or function return boolean, now the result ".concat(err, " type was ").concat(typeof err));
+
+          _this16._setPlayIndex(_this16.prevPlayIndex);
+
+          return _this16.eventMethods.finish(_this16.playId);
+        });
+      });
+    }
   }, {
     key: "_checkType",
     value: function _checkType(element, type, logErr) {
-      if (typeof type !== 'string') return this._logWarn('checkType - The type must be string');
+      if (typeof type !== 'string') {
+        this._logWarn('checkType - The {type} parameter must be string');
+
+        return false;
+      }
 
       if (getType(element) !== type) {
         logErr && this._logErr("Your parameter(".concat(element, ") type is ").concat(getType(element), ", please pass the ").concat(type, " type"));
@@ -3047,8 +3095,6 @@ function () {
 
       return true;
     }
-    /* check whether or not init Audio */
-
   }, {
     key: "_checkInit",
     value: function _checkInit() {
@@ -3060,40 +3106,30 @@ function () {
 
       return true;
     }
-    /* detail logger */
-
   }, {
     key: "_log",
     value: function _log(detail) {
-      var canLog = this.logLevel !== 'silent' && this.logLevel === 'detail';
-      return canLog && this.debug && this._logOptimize(detail, 'log');
+      var canLog = this.logLevel !== logLevelSet['silent'] && this.logLevel === logLevelSet['detail'];
+      canLog && this.debug && this._logOptimize(detail, 'log');
     }
-    /* info logger */
-
   }, {
     key: "_logInfo",
     value: function _logInfo(info) {
-      var canLog = this.logLevel !== 'silent' && this.logLevel !== 'error' && this.logLevel !== 'warn';
-      return canLog && this.debug && this._logOptimize(info, 'info');
+      var canLog = this.logLevel !== logLevelSet['silent'] && this.logLevel !== logLevelSet['error'] && this.logLevel !== logLevelSet['warn'];
+      canLog && this.debug && this._logOptimize(info, 'info');
     }
-    /* warn logger */
-
   }, {
     key: "_logWarn",
     value: function _logWarn(warn) {
-      var canLog = this.logLevel !== 'silent' && this.logLevel !== 'error';
-      return canLog && this.debug && this._logOptimize(warn, 'warn');
+      var canLog = this.logLevel !== logLevelSet['silent'] && this.logLevel !== logLevelSet['error'];
+      canLog && this.debug && this._logOptimize(warn, 'warn');
     }
-    /* error logger */
-
   }, {
     key: "_logErr",
     value: function _logErr(error) {
-      var canLog = this.logLevel !== 'silent';
-      return canLog && this.debug && this._logOptimize(error, 'error');
+      var canLog = this.logLevel !== logLevelSet['silent'];
+      canLog && this.debug && this._logOptimize(error, 'error');
     }
-    /* console log optimize */
-
   }, {
     key: "_logOptimize",
     value: function _logOptimize(msg, method) {
@@ -3102,10 +3138,11 @@ function () {
 
       if ((this._checkType(msg, 'object') || this._checkType(msg, 'array')) && console.table) {
         logger(prefix);
-        return console.table(msg);
+        console.table(msg);
+        return;
       }
 
-      return logger(prefix, msg);
+      logger(prefix, msg);
     }
   }, {
     key: "duration",
@@ -3113,18 +3150,24 @@ function () {
       return this.audioH5 ? this.audioH5.duration : 0;
     }
   }, {
-    key: "setProps",
-    set: function set(_ref4) {
-      var prop = _ref4.prop,
-          value = _ref4.value;
-
-      if (this.audioH5[prop] && !this._checkType(this.audioH5[prop], 'function')) {
-        this.audioH5[prop] = value;
-
-        this._updateConfig({
-          prop: value
-        });
-      }
+    key: "networkState",
+    get: function get() {
+      return this.audioH5 ? this.audioH5.networkState : 0;
+    }
+  }, {
+    key: "playlists",
+    get: function get() {
+      return this.playList || [];
+    }
+  }, {
+    key: "playid",
+    get: function get() {
+      return this.playId || 1000;
+    }
+  }, {
+    key: "playstate",
+    get: function get() {
+      return !this.playState && this.playState !== 0 ? null : playStateSet[this.playState || 0];
     }
   }]);
 
@@ -3148,7 +3191,7 @@ function () {
     this.seek = this.audio.seek;
     this.rate = this.audio.rate;
     this.volume = this.audio.volume;
-    this.muted = this.audio.muted;
+    this.mute = this.audio.mute;
 
     this.stop = function () {
       return _this.audio.stop();
@@ -3175,27 +3218,31 @@ function () {
         load: initFunc,
         seek: initFunc,
         volume: initFunc,
-        muted: initFunc,
+        mute: initFunc,
         stop: initFunc,
         unload: initFunc,
         on: initFunc,
         off: initFunc,
-        once: initFunc
+        once: initFunc,
+        model: initFunc,
+        cut: initFunc,
+        pick: initFunc,
+        rate: initFunc,
+        playlist: initFunc
       };
-
-      var _ref = config || {},
-          usingWebAudio = _ref.usingWebAudio;
 
       try {
         if (typeof window !== 'undefined') {
-          if (usingWebAudio && (window.AudioContext || window.webkitAudioContext)) {
-            audio = new AudioCtx(config);
-          } else if (window.Audio) {
-            audio = new AudioH5(config);
+          var usingWebAudio = config.usingWebAudio;
+
+          if (usingWebAudio && AudioContext) {
+            return new AudioCtx(config);
+          } else if (Audio) {
+            return new AudioH5(config);
           }
         }
       } catch (err) {
-        console.error('[EASE_AUDIO ERROR]:', err);
+        console.error('[EASE_AUDIO CREATE AUDIO ERROR]:', err);
       }
 
       return audio;
@@ -3208,12 +3255,12 @@ function () {
   }, {
     key: "playState",
     get: function get() {
-      return this.audio ? this.audio.playState : null;
+      return this.audio ? this.audio.playstate : null;
     }
   }, {
     key: "playId",
     get: function get() {
-      return this.audio ? this.audio.playId : 1000;
+      return this.audio ? this.audio.playid : 1000;
     }
   }, {
     key: "playingData",
@@ -3221,12 +3268,13 @@ function () {
       var playingData = {};
 
       if (this.audio) {
-        var playId = this.audio.playId;
-        var len = this.audio.playList.length;
+        var playId = this.audio.playid;
+        var playList = this.audio.playlists;
+        var len = playList.length;
 
         for (var i = 0; i < len; i++) {
-          if (+playId === +this.audio.playList[i].playId) {
-            playingData = this.audio.playList[i];
+          if (+playId === +playList[i].playId) {
+            playingData = playList[i];
             break;
           }
         }
@@ -3237,10 +3285,10 @@ function () {
   }, {
     key: "playlist",
     set: function set(params) {
-      this.audio && this.audio.playlist(params);
+      this.audio && this.audio.playlist && this.audio.playlist(params);
     },
     get: function get() {
-      return this.audio ? this.audio.playList : [];
+      return this.audio ? this.audio.playlists : [];
     }
   }, {
     key: "networkState",

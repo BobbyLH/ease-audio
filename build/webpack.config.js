@@ -3,7 +3,7 @@ const webpack = require('webpack')
 
 module.exports = [{
   entry: {
-    index: './src/index.js'
+    index: './js/src/index.js'
   },
   output: {
     filename: 'ease-audio.min.js',

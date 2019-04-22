@@ -1,6 +1,6 @@
 {
   "name": "ease-audio",
-  "version": "0.1.8",
+  "version": "0.1.9-beta.0",
   "description": "The Audio Player Project",
   "keywords": [
     "ease",
@@ -12,11 +12,13 @@
     "html5 audio"
   ],
   "main": "dist/ease-audio.js",
+  "typings": "dist/type/src/index.d.ts",
   "scripts": {
     "dev": "webpack-dashboard -p 3300 -- node demo/server.js",
     "static": "rollup -c build/rollup.config.js --watch",
-    "beta": "npm run build_branch && npm run build_rollup && npm run build_webpack && npm run build_version_beta && npm run build_git",
-    "build": "npm run build_branch && npm run build_rollup && npm run build_webpack && npm run build_version && npm run build_git",
+    "build": "npm run build_branch && npm run build_tsc && npm run build_rollup && npm run build_webpack && npm run build_version && npm run build_git",
+    "build_beta": "npm run build_branch && npm run build_tsc && npm run build_rollup && npm run build_webpack && npm run build_version_beta && npm run build_git",
+    "build_tsc": "tsc --build tsconfig.json",
     "build_branch": "node build/branch",
     "build_version": "node build/version",
     "build_version_beta": "node build/version.beta",
@@ -58,6 +60,8 @@
     "rollup-plugin-node-resolve": "^4.0.0",
     "shelljs": "^0.8.3",
     "simple-git": "^1.107.0",
+    "ts-node": "^8.1.0",
+    "typescript": "^3.4.4",
     "webpack": "^4.27.1",
     "webpack-cli": "^3.1.2",
     "webpack-dashboard": "^2.0.0",

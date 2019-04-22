@@ -132,6 +132,8 @@ sound.volume(0.5)
 ### Options
 #### playlist `Array` `[]` *`required`*
 The play list for list model, the src(`The sources to the track to be loaded for the sound`) property is *`required`*.
+#### initIndex `Number` `0`
+The index in playlist which will be picked to initialize
 #### autocut `Boolean` or `Function(currentId, nextId)`
 Set or return(`Function`) to `true` the EaseAudio going to play next track(according to playModel) when the current has have finished.
 #### playModel `String` `list-once`
