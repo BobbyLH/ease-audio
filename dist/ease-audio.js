@@ -2345,7 +2345,11 @@ function () {
     value: function on(event, cb) {
       if (this._checkInit() && this._checkType(event, 'string', true) && this._checkType(cb, 'function', true)) {
         var queueName = event.indexOf('on') === 0 ? event : "on".concat(event);
-        return this._onEvent(queueName, cb);
+
+        var result = this._onEvent(queueName, cb);
+
+        if (!result) this._logWarn("The [".concat(event, "] event bind failed"));
+        return result;
       }
 
       return false;
@@ -2355,7 +2359,11 @@ function () {
     value: function off(event, cb) {
       if (this._checkInit() && this._checkType(event, 'string', true)) {
         var queueName = event.indexOf('on') === 0 ? event : "on".concat(event);
-        return this._offEvent(queueName, cb);
+
+        var result = this._offEvent(queueName, cb);
+
+        if (!result) this._logWarn("The [".concat(event, "] event unbind failed"));
+        return result;
       }
 
       return false;
@@ -2372,10 +2380,15 @@ function () {
         var once = function once(e) {
           cb && cb(e);
 
-          _this11._offEvent(queueName, once, funcName);
+          var result = _this11._offEvent(queueName, once, funcName);
+
+          if (!result) _this11._logWarn("The [".concat(event, "] once event unbind failed"));
         };
 
-        return this._onEvent(queueName, once, funcName);
+        var result = this._onEvent(queueName, once, funcName);
+
+        if (!result) this._logWarn("The [".concat(event, "] once event bind failed"));
+        return result;
       }
 
       return false;
@@ -2753,11 +2766,19 @@ function () {
     value: function _onEvent(event, cb, name) {
       if (!isNaN(supportEvents[event])) {
         try {
-          if (!this[event]) this[event] = create$1(null)(this[event])[name || cb.name || "anonymous-".concat(new Date().getTime())] = cb;
+          var funcName = name || cb.name || "anonymous-".concat(new Date().getTime());
+
+          if (!this[event]) {
+            this[event] = create$1(null);
+          }
+
+          this[event][funcName] = cb;
           return true;
         } catch (error) {
           this._logErr(error);
         }
+      } else {
+        this._logWarn("The [".concat(event, "] is not support event"));
       }
 
       return false;
@@ -2772,6 +2793,8 @@ function () {
         } catch (error) {
           this._logErr(error);
         }
+      } else {
+        this._logWarn("The [".concat(event, "] is not support event"));
       }
 
       return false;
@@ -2806,7 +2829,9 @@ function () {
           if (cb && _this14._checkType(cb, 'function', true)) {
             var funcName = "EASE_AUDIO_".concat(v.toUpperCase(), "_INITIAL_CALLBACK");
 
-            _this14._onEvent(v, cb, funcName);
+            var result = _this14._onEvent(v, cb, funcName);
+
+            if (!result) _this14._logErr("The [".concat(v, "] event initial bind failed"));
           }
         }
       });
@@ -2954,7 +2979,7 @@ function () {
       };
 
       for (var k in this.eventMethods) {
-        if (uselessEvents[k] !== 'undefined') continue;
+        if (uselessEvents[k] !== undefined) continue;
         this.eventMethods[k] = curry(this.eventMethods[k], k);
 
         this._bindEvent(this.eventMethods[k], k);
@@ -2994,7 +3019,7 @@ function () {
   }, {
     key: "_triggerEventController",
     value: function _triggerEventController(event) {
-      if (this.eventController && !this.eventController[event]) return false;
+      if (this.eventController && this.eventController[event] === false) return false;
 
       this._log("trigger ".concat(event, " event"));
 
@@ -3233,7 +3258,7 @@ function () {
 
       try {
         if (typeof window !== 'undefined') {
-          var usingWebAudio = config.usingWebAudio;
+          var usingWebAudio = config && config.usingWebAudio;
 
           if (usingWebAudio && AudioContext) {
             return new AudioCtx(config);
