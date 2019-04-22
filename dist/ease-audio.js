@@ -2844,7 +2844,8 @@ function () {
           _this14._fireEventQueue(e, 'onload');
         },
         seeking: function seeking(e) {
-          if (_this14.audioH5 && _this14.audioH5.src !== defaultSrc && _this14.playState !== playStateSet.paused) _this14._setPlayState(playStateSet.loading);
+          if (_this14.audioH5 && _this14.audioH5.src === defaultSrc) return;
+          _this14.playState !== playStateSet.paused && _this14._setPlayState(playStateSet.loading);
 
           _this14._fireEventQueue(e, 'onseeking');
         },
