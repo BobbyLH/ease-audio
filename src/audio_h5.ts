@@ -187,9 +187,9 @@ export class AudioH5 {
   /**
    * method - play
    * 
-   * @return {number | void} playId
+   * @return {TplayId | void} playId
    */
-  public play (): number | void {
+  public play (): TplayId | void {
     if (this._checkInit()) {
       if (!this.playLocker) {
         try {
@@ -255,9 +255,9 @@ export class AudioH5 {
   /**
    * method - pause
    * 
-   * @return {number | void} playId
+   * @return {TplayId | void} playId
    */
-  public pause (): number | void {
+  public pause (): TplayId | void {
     if (this._checkInit()) {
       // the pause method in lockQueue allow only one
       if (!(<IlockTags>this.lockTags).pause_wait) {
@@ -285,9 +285,9 @@ export class AudioH5 {
   /**
    * method - toggle - switch between play and pause
    * 
-   * @return {number | void} playId
+   * @return {TplayId | void} playId
    */
-  public toggle (): number | void {
+  public toggle (): TplayId | void {
     if (this._checkInit() && this.playState !== playStateSet.loaderror && this.playState !== playStateSet.playerror && this.playState !== playStateSet.unloaded) {
       if ((<IlockTags>this.lockTags).pause_wait) {
         (<IlockTags>this.lockTags).pause_cancel = !(<IlockTags>this.lockTags).pause_cancel
@@ -355,9 +355,9 @@ export class AudioH5 {
   /**
    * method - load - manual load song
    * 
-   * @return {number | void} playId
+   * @return {TplayId | void} playId
    */
-  public load (): number | void {
+  public load (): TplayId | void {
     if (this._checkInit()) {
       this._playLockQueue(() => (<HTMLAudioElement>this.audioH5).load())
 
@@ -458,9 +458,9 @@ export class AudioH5 {
    * method - stop - stop the playing song
    * @param {boolean} forbidEvent
    * 
-   * @return {number | void} playId
+   * @return {TplayId | void} playId
    */
-  public stop (forbidEvent?: boolean): number | void {
+  public stop (forbidEvent?: boolean): TplayId | void {
     if (this._checkInit() && this.playState !== playStateSet.stopped) {
       this._playLockQueue(() => {
         if (!forbidEvent) {
@@ -511,7 +511,7 @@ export class AudioH5 {
    * method - model - set or get playModel
    * @param {TplayModelStr} model
    * 
-   * @return {string | void} playModel
+   * @return {TplayModelStr | void} playModel
    */
   public model (model?: TplayModelStr): TplayModelStr | void {
     if (this._checkInit()) {
@@ -1115,7 +1115,8 @@ export class AudioH5 {
         this._fireEventQueue(e, 'onload')
       },
       seeking: e => {
-        if (this.audioH5 && this.audioH5.src !== defaultSrc && this.playState !== playStateSet.paused) this._setPlayState(playStateSet.loading)
+        if (this.audioH5 && this.audioH5.src === defaultSrc) return
+        this.playState !== playStateSet.paused && this._setPlayState(playStateSet.loading)
         this._fireEventQueue(e, 'onseeking')
       },
       // loaded state
