@@ -4,32 +4,38 @@ import {
   Iconfig,
   IsetPlaylist,
   Tplaylist,
+  FAnyMethod,
+  FEventBind,
+  FEventUnBind,
+  Finit,
+  Fpick,
+  Fcut,
+  Fmodel,
   FHandleAudio,
-  TEaseAudioMethod,
   IAudio
 } from './audio.d'
 
 export class EaseAudio {
   public audio: AudioH5 | AudioCtx | IAudio;
-  public init: TEaseAudioMethod;
-  public play: TEaseAudioMethod;
-  public pause: TEaseAudioMethod;
-  public toggle: TEaseAudioMethod;
-  public cut: TEaseAudioMethod;
-  public pick: TEaseAudioMethod;
-  public load: TEaseAudioMethod;
-  public seek: TEaseAudioMethod;
-  public rate: TEaseAudioMethod;
-  public volume: TEaseAudioMethod;
-  public mute: TEaseAudioMethod;
-  public stop: TEaseAudioMethod;
-  public unload: TEaseAudioMethod;
-  public on: TEaseAudioMethod;
-  public off: TEaseAudioMethod;
-  public once: TEaseAudioMethod;
-  public model: TEaseAudioMethod;
+  public init: Finit | FAnyMethod;
+  public play: FHandleAudio | FAnyMethod;
+  public pause: FHandleAudio | FAnyMethod;
+  public toggle: FHandleAudio | FAnyMethod;
+  public cut: Fcut | FAnyMethod;
+  public pick: Fpick | FAnyMethod;
+  public load: FHandleAudio | FAnyMethod;
+  public seek: FHandleAudio | FAnyMethod;
+  public rate: FHandleAudio | FAnyMethod;
+  public volume: FHandleAudio | FAnyMethod;
+  public mute: FHandleAudio | FAnyMethod;
+  public stop: FHandleAudio | FAnyMethod;
+  public unload: FHandleAudio | FAnyMethod;
+  public on: FEventBind | FAnyMethod;
+  public off: FEventUnBind | FAnyMethod;
+  public once: FEventBind | FAnyMethod;
+  public model: Fmodel | FAnyMethod;
 
-  public constructor (config: Iconfig) {
+  public constructor (config: Iconfig | void) {
     this.audio = this._createAudio(config)
 
     this.init = this.audio.init
@@ -99,7 +105,7 @@ export class EaseAudio {
    * 
    * @return {AudioH5 | AudioCtx | IAudio}
    */
-  private _createAudio (config: Iconfig): AudioH5 | AudioCtx | IAudio {
+  private _createAudio (config: Iconfig | void): AudioH5 | AudioCtx | IAudio {
     const audio = {
       init: initFunc,
       play: initFunc,

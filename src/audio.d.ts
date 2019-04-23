@@ -44,7 +44,6 @@ type Fcut = () => IreturnParams | void;
 type Fmodel = (model?: TplayStateSet) => TplayStateSet | void;
 type Fplaylist = (data: IsetPlaylist) => IreturnParams | void;
 type FHandleAudio = (arg1?: number | boolean) => TplayId | boolean | void;
-type TEaseAudioMethod = FAnyMethod | FEventBind | FEventUnBind | Finit | Fpick | Fcut | Fmodel | Fplaylist | FHandleAudio;
 
 interface IupdateConfig {
   src?: string;
@@ -154,24 +153,24 @@ interface IsetPlaylist {
 }
 
 interface IAudio {
-  init: TEaseAudioMethod;
-  play: TEaseAudioMethod;
-  pause: TEaseAudioMethod;
-  toggle: TEaseAudioMethod;
-  load: TEaseAudioMethod;
-  seek: TEaseAudioMethod;
-  volume: TEaseAudioMethod;
-  stop: TEaseAudioMethod;
-  unload: TEaseAudioMethod;
-  on: TEaseAudioMethod;
-  off: TEaseAudioMethod;
-  once: TEaseAudioMethod;
-  cut: TEaseAudioMethod;
-  pick: TEaseAudioMethod;
-  rate: TEaseAudioMethod;
-  model: TEaseAudioMethod;
-  mute: TEaseAudioMethod;
-  playlist: TEaseAudioMethod;
+  init: Finit;
+  play: FHandleAudio;
+  pause: FHandleAudio;
+  toggle: FHandleAudio;
+  load: FHandleAudio;
+  seek: FHandleAudio;
+  volume: FHandleAudio;
+  stop: FHandleAudio;
+  unload: FHandleAudio;
+  on: FEventBind;
+  off: FEventUnBind;
+  once: FEventBind;
+  cut: Fcut;
+  pick: Fpick;
+  rate: FHandleAudio;
+  model: Fmodel;
+  mute: FHandleAudio;
+  playlist: Fplaylist;
 }
 
 export {
@@ -212,7 +211,6 @@ export {
   Fmodel,
   Fplaylist,
   FHandleAudio,
-  TEaseAudioMethod,
   IupdateConfig,
   Iconfig,
   IlockTags,

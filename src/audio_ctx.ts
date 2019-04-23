@@ -1,7 +1,7 @@
 import { Iconfig } from './audio.d'
 
 export class AudioCtx {
-  constructor (config: Iconfig) {
+  constructor (config: Iconfig | void) {
     // this.audioCtx = typeof window !== 'undefined' && new (window.AudioContext || window.webkitAudioContext)()
     // this.audioDom = typeof window !== 'undefined' && new window.Audio()
     // this.audio = this.audioCtx.createMediaElementSource(this.audioDom)
