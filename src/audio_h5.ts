@@ -99,7 +99,7 @@ const defaultSrc: TdefaultSrc = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAA
 export class AudioH5 {
   public isInit: boolean;
   public audioH5: HTMLAudioElement | undefined | void
-  public constructor (config: Iconfig) {
+  public constructor (config: Iconfig | void) {
     this.isInit = false
 
     this.init = this.init.bind(this)
@@ -175,7 +175,7 @@ export class AudioH5 {
    * 
    * @returns {IreturnParams | void}
    */
-  public init (config: Iconfig): IreturnParams | void {
+  public init (config: Iconfig | void): IreturnParams | void {
     if (!this.isInit && config && this._checkType(config, 'object') && JSON.stringify(config) !== '{}') {
       this._initial(config)
       this._registerEvent(config)
