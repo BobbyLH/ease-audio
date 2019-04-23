@@ -28,17 +28,6 @@ module.exports = function (config) {
     },
 
     webpack: {
-      module: {
-        rules: [
-          {
-            test: /\.js$/,
-            exclude: /node_modules/,
-            use: [
-              {loader: 'babel-loader'}
-            ]
-          }
-        ]
-      },
       node: { fs: 'empty' },
       mode: 'production'
     },
