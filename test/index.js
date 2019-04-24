@@ -40,6 +40,8 @@ describe("EaseAudio's test module", function () {
       onplay: e => console.log('onplay:', e),
       onpause: e => console.log('onpause:', e),
       onstop: id => console.log('onstop', id),
+      onpick: id => console.log('onpick', id),
+      oncut: id => console.log('oncut', id),
       onseeking: e => console.log('onseeking:', e),
       onprogress: e => console.log('onprogress:', e),
       playlist: [
@@ -59,8 +61,10 @@ describe("EaseAudio's test module", function () {
     expect(loadRes).to.be.a('number')
   })
   it('audio - on', function () {
-    const onRes = audio.on('play', onPlay)
-    expect(onRes).to.be.a('boolean')
+    const onRes1 = audio.on('play', onPlay)
+    const onRes2 = audio.on('seek', e => console.log('seek'))
+    expect(onRes1).to.be.true
+    expect(onRes2).to.be.false
   })
   it('audio - off', function () {
     const offRes = audio.off('play', onPlay)
@@ -191,28 +195,106 @@ describe("EaseAudio's test module", function () {
     const modelRes2 = audio.model()
     audio.model('singles-loop') // set faild cause this model is not support
     const modelRes3 = audio.model()
+    audio.model('list-once')
     expect(modelRes1).to.be.equal('list-once')
     expect(modelRes2).to.be.equal('list-loop')
     expect(modelRes3).to.be.equal('list-loop')
   })
+  it('audio - play', function () {
+    createBtn('play', play)
+    function play () {
+      const playRes = audio.play()
+      const state = audio.playState
+      expect(playRes).to.be.a('number')
+      expect(state).to.be.a('string')
+      console.log('playState:', state)
+    }
+  })
   it('audio - toggle', function () {
-    const rootDom = document.body
-    const playBtn = document.createElement('button')
-    playBtn.innerText = 'toggle (play/pause)'
-    playBtn.onclick = toggle
-    rootDom.appendChild(playBtn)
-
+    createBtn('toggle (play/pause)', toggle)
     function toggle () {
       const toggleRes = audio.toggle()
       const state = audio.playState
       expect(toggleRes).to.be.a('number')
       expect(state).to.be.a('string')
-      expect(state).to.match(/(loaded|playing|paused)/)
-      console.log('playState:', audio.playState)
+      expect(state).to.match(/(loading|loaded|playing|paused|finished)/)
+      console.log('playState:', state)
+    }
+  })
+  it('audio - seek', function () {
+    createBtn('seek - 50 seconds', seek)
+    function seek () {
+      audio.seek(50)
+      const currentTime = audio.seek()
+      const state = audio.playState
+      expect(currentTime).to.be.a('number')
+      expect(currentTime).to.be.equal(50)
+      expect(state).to.be.a('string')
+      console.log('playState:', state)
+      console.log('currentTime:', currentTime)
+    }
+  })
+  it('audio - stop', function () {
+    createBtn('stop', stop)
+    function stop () {
+      const stopRes = audio.stop()
+      const state = audio.playState
+      expect(stopRes).to.be.a('number')
+      expect(state).to.be.a('string')
+      expect(state).to.match(/stopped/)
+      console.log('playState:', state)
+    }
+  })
+  it('audio - pick', function () {
+    createBtn('pick - 1010', pick)
+    function pick () {
+      const pickRes = audio.pick(1010)
+      const state = audio.playState
+      const playId = audio.playId
+      expect(pickRes).to.be.an('object')
+      expect(pickRes).to.with.property('playId').to.be.equal(1010)
+      expect(state).to.be.a('string')
+      expect(state).to.match(/(loading|loaded|playing|paused|finished)/)
+      expect(playId).to.be.equal(1010)
+      console.log('playState:', state)
+      console.log('playId:', playId)
+    }
+  })
+  it('audio - cut', function () {
+    createBtn('cut', cut)
+    function cut () {
+      const cutRes = audio.cut()
+      const state = audio.playState
+      const playId = audio.playId
+      expect(cutRes).to.be.an('object')
+      expect(state).to.be.a('string')
+      expect(state).to.match(/(loading|loaded|playing|paused|finished)/)
+      console.log('playState:', state)
+      console.log('playId:', playId)
+    }
+  })
+  it('audio - unload', function () {
+    createBtn('unload', unload)
+    function unload () {
+      const unloadRes = audio.unload()
+      const state = audio.playState
+      expect(unloadRes).to.be.true
+      expect(state).to.be.a('string')
+      expect(state).to.match(/(unloaded)/)
+      console.log('playState:', state)
     }
   })
 })
 
 function onPlay (e) {
   console.log('[test module]: bind event by on')
+}
+
+function createBtn (text, cb) {
+  const rootDom = document.body
+  const btn = document.createElement('button')
+  btn.innerText = text
+  btn.setAttribute('style', 'with: 100px; height: 50px; font-size: 16px; border: 1px solid green; margin: 0 30px 30px 0; cursor: pointer;')
+  btn.onclick = cb
+  rootDom.appendChild(btn)
 }

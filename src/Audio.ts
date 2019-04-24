@@ -49,8 +49,8 @@ export class EaseAudio {
     this.rate = this.audio.rate
     this.volume = this.audio.volume
     this.mute = this.audio.mute
-    this.stop = () => (<FHandleAudio>this.audio.stop)()
-    this.unload = () => (<FHandleAudio>this.audio.unload)()
+    this.stop = () => this.audio.stop()
+    this.unload = () => this.audio.unload()
     this.on = this.audio.on
     this.off = this.audio.off
     this.once = this.audio.once
