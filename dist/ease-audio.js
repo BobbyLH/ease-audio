@@ -2330,30 +2330,38 @@ function () {
       var _this10 = this;
 
       if (this._checkInit()) {
-        this.stop(true);
+        try {
+          this.stop(true);
 
-        this._unregisterEvent();
+          this._unregisterEvent();
 
-        this._playLockQueue(function () {
-          if (!forbidEvent) {
-            _this10._setPlayState(playStateSet.unloaded);
+          this._playLockQueue(function () {
+            if (!forbidEvent) {
+              _this10._setPlayState(playStateSet.unloaded);
 
-            _this10._fireEventQueue(_this10.playId, 'onunload');
-          }
+              _this10._fireEventQueue(_this10.playId, 'onunload');
+            }
 
-          _this10._abortLoad();
+            _this10._abortLoad();
 
-          delete _this10.audioH5;
-          _this10.isInit = false;
-        });
+            delete _this10.audioH5;
+            _this10.isInit = false;
+          });
+
+          return true;
+        } catch (error) {
+          this._logErr(error);
+        }
       }
+
+      return false;
     }
   }, {
     key: "model",
     value: function model(_model) {
       if (this._checkInit()) {
         if (_model) {
-          this.playModel = playModelSet[_model];
+          this.playModel = playModelSet[_model] !== undefined ? playModelSet[_model] : this.playModel;
         } else {
           return playModelSet[this.playModel || 0];
         }
@@ -2744,6 +2752,7 @@ function () {
           if (this.playList && !this.playList[this.playIndex]) {
             this._setPlayIndex(this.prevPlayIndex);
 
+            this.stop();
             return this.eventMethods && this.eventMethods.finish(this.playId);
           }
 
@@ -2856,20 +2865,20 @@ function () {
       });
       this.eventMethods = {
         loadstart: function loadstart(e) {
-          if (_this14.audioH5 && _this14.audioH5.src === defaultSrc) return;
+          if (!_this14.audioH5 || _this14.audioH5 && _this14.audioH5.src === defaultSrc) return;
 
           _this14._setPlayState(playStateSet.loading);
 
           _this14._fireEventQueue(e, 'onload');
         },
         seeking: function seeking(e) {
-          if (_this14.audioH5 && _this14.audioH5.src === defaultSrc) return;
+          if (!_this14.audioH5 || _this14.audioH5 && _this14.audioH5.src === defaultSrc) return;
           _this14.playState !== playStateSet.paused && _this14._setPlayState(playStateSet.loading);
 
           _this14._fireEventQueue(e, 'onseeking');
         },
         canplaythrough: function canplaythrough(e) {
-          if (_this14.audioH5 && _this14.audioH5.src === defaultSrc) return;
+          if (!_this14.audioH5 || _this14.audioH5 && _this14.audioH5.src === defaultSrc) return;
           _this14.playState === playStateSet.loading && _this14._setPlayState(playStateSet.loaded);
 
           _this14._fireEventQueue(e, 'oncanplaythrough');
@@ -2917,6 +2926,7 @@ function () {
           _this14._fireEventQueue(e, 'onplayerror');
         },
         progress: function progress(e) {
+          if (!_this14.audioH5 || _this14.audioH5 && _this14.audioH5.src === defaultSrc) return;
           var ranges = e.target.buffered;
           var total = e.total || 1;
           var buffered = 0;
@@ -2947,6 +2957,8 @@ function () {
         },
         loadeddata: function loadeddata(e) {},
         timeupdate: function timeupdate(e) {
+          if (!_this14.audioH5 || _this14.audioH5 && _this14.audioH5.src === defaultSrc) return;
+
           if (_this14.playState === playStateSet.loading) {
             _this14._logInfo("timeupdate's playing");
 
