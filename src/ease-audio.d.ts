@@ -173,6 +173,33 @@ interface IAudio {
   playlist: Fplaylist;
 }
 
+declare class EaseAudio {
+  constructor(config: Iconfig | void)
+  public init: Finit;
+  public play: FHandleAudio;
+  public pause: FHandleAudio;
+  public toggle: FHandleAudio;
+  public cut: Fcut;
+  public pick: Fpick;
+  public load: FHandleAudio;
+  public seek: FHandleAudio;
+  public rate: FHandleAudio;
+  public volume: FHandleAudio;
+  public mute: FHandleAudio;
+  public stop: FHandleAudio;
+  public unload: FHandleAudio;
+  public on: FEventBind;
+  public off: FEventUnBind;
+  public once: FEventBind;
+  public model: Fmodel;
+  public readonly duration: number;
+  public readonly playState: TplayStateStr;
+  public readonly playId: TplayId;
+  public readonly playingData: Iplaylist;
+  public readonly networkState: number;
+  public playlist: Tplaylist | [void];
+}
+
 export {
   TplayState,
   TplayStateSet,
@@ -221,5 +248,8 @@ export {
   IreturnParams,
   IblockEvent,
   IsetPlaylist,
-  IAudio
+  IAudio,
+  EaseAudio
 }
+
+export default EaseAudio

@@ -31,7 +31,7 @@ import {
   IreturnParams,
   IblockEvent,
   IsetPlaylist
-} from './audio.d'
+} from './ease-audio.d'
 
 enum playStateSet {
   'loading',
@@ -487,24 +487,32 @@ export class AudioH5 {
    * method - unload - unload the Audio
    * @param forbidEvent
    * 
-   * @return {void}
+   * @return {boolean} whether or not unload successful
    */
-  public unload (forbidEvent?: boolean): void {
+  public unload (forbidEvent?: boolean): boolean {
     if (this._checkInit()) {
-      this.stop(true)
-      this._unregisterEvent()
+      try {
+        this.stop(true)
+        this._unregisterEvent()
 
-      this._playLockQueue(() => {
-        if (!forbidEvent) {
-          this._setPlayState(playStateSet.unloaded)
-          this._fireEventQueue(this.playId, 'onunload')
-        }
+        this._playLockQueue(() => {
+          if (!forbidEvent) {
+            this._setPlayState(playStateSet.unloaded)
+            this._fireEventQueue(this.playId, 'onunload')
+          }
 
-        this._abortLoad()
-        delete this.audioH5
-        this.isInit = false
-      })
+          this._abortLoad()
+          delete this.audioH5
+          this.isInit = false
+        })
+
+        return true
+      } catch (error) {
+        this._logErr(error)
+      }
     }
+
+    return false
   }
 
   /**
@@ -517,7 +525,7 @@ export class AudioH5 {
     if (this._checkInit()) {
       // model contain: list-once, list-random, list-loop, single-once, single-loop
       if (model) {
-        this.playModel = playModelSet[model]
+        this.playModel = playModelSet[model] !== undefined ? playModelSet[model] : this.playModel
       } else {
         return (playModelSet[this.playModel || 0]) as TplayModelStr
       }
@@ -969,6 +977,7 @@ export class AudioH5 {
         // on finish
         if (this.playList && !this.playList[<TplayIndex>this.playIndex]) {
           this._setPlayIndex(this.prevPlayIndex)
+          this.stop()
           return this.eventMethods && this.eventMethods.finish(this.playId)
         }
 
@@ -1110,18 +1119,18 @@ export class AudioH5 {
     this.eventMethods = {
       // loading state
       loadstart: e => {
-        if (this.audioH5 && this.audioH5.src === defaultSrc) return
+        if (!this.audioH5 || (this.audioH5 && this.audioH5.src === defaultSrc)) return
         this._setPlayState(playStateSet.loading)
         this._fireEventQueue(e, 'onload')
       },
       seeking: e => {
-        if (this.audioH5 && this.audioH5.src === defaultSrc) return
+        if (!this.audioH5 || (this.audioH5 && this.audioH5.src === defaultSrc)) return
         this.playState !== playStateSet.paused && this._setPlayState(playStateSet.loading)
         this._fireEventQueue(e, 'onseeking')
       },
       // loaded state
       canplaythrough: e => {
-        if (this.audioH5 && this.audioH5.src === defaultSrc) return
+        if (!this.audioH5 || (this.audioH5 && this.audioH5.src === defaultSrc)) return
         this.playState === playStateSet.loading && this._setPlayState(playStateSet.loaded)
         this._fireEventQueue(e, 'oncanplaythrough')
       },
@@ -1172,6 +1181,7 @@ export class AudioH5 {
       },
       // others
       progress: e => {
+        if (!this.audioH5 || (this.audioH5 && this.audioH5.src === defaultSrc)) return
         const ranges = (e.target as HTMLMediaElement).buffered
         const total = (e.total || 1)
         let buffered = 0
@@ -1199,6 +1209,7 @@ export class AudioH5 {
       },
       loadeddata: e => {},
       timeupdate: e => {
+        if (!this.audioH5 || (this.audioH5 && this.audioH5.src === defaultSrc)) return
         // playState is loading but actually is playing
         if (this.playState === playStateSet.loading) {
           this._logInfo("timeupdate's playing")

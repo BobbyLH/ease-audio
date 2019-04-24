@@ -1,4 +1,4 @@
-import { Iconfig } from './audio.d'
+import { Iconfig } from './ease-audio.d'
 
 export class AudioCtx {
   constructor (config: Iconfig | void) {

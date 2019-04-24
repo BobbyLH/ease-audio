@@ -13,10 +13,9 @@ import {
   Fmodel,
   FHandleAudio,
   IAudio
-} from './audio.d'
+} from './ease-audio.d'
 
 export class EaseAudio {
-  public audio: AudioH5 | AudioCtx | IAudio;
   public init: Finit | FAnyMethod;
   public play: FHandleAudio | FAnyMethod;
   public pause: FHandleAudio | FAnyMethod;
@@ -35,6 +34,8 @@ export class EaseAudio {
   public once: FEventBind | FAnyMethod;
   public model: Fmodel | FAnyMethod;
 
+  private audio: AudioH5 | AudioCtx | IAudio;
+
   public constructor (config: Iconfig | void) {
     this.audio = this._createAudio(config)
 
@@ -49,8 +50,8 @@ export class EaseAudio {
     this.rate = this.audio.rate
     this.volume = this.audio.volume
     this.mute = this.audio.mute
-    this.stop = () => (<FHandleAudio>this.audio.stop)()
-    this.unload = () => (<FHandleAudio>this.audio.unload)()
+    this.stop = () => this.audio.stop()
+    this.unload = () => this.audio.unload()
     this.on = this.audio.on
     this.off = this.audio.off
     this.once = this.audio.once
