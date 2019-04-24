@@ -173,7 +173,7 @@ interface IAudio {
   playlist: Fplaylist;
 }
 
-declare class EaseAudio {
+declare class EaseAudio<Iconfig> {
   constructor(config: Iconfig | void)
   public init: Finit;
   public play: FHandleAudio;
@@ -197,7 +197,7 @@ declare class EaseAudio {
   public readonly playId: TplayId;
   public readonly playingData: Iplaylist;
   public readonly networkState: number;
-  public playlist: Tplaylist | [void];
+  public playlist: Tplaylist | IsetPlaylist;
 }
 
 export {
