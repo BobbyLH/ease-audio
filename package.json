@@ -14,6 +14,7 @@
     "html5 audio"
   ],
   "main": "dist/ease-audio.js",
+  "types": "dist/ease-audio.d.ts",
   "scripts": {
     "dev": "npm run build_tsc && webpack-dashboard -p 3300 -- node demo/server.js",
     "test": "npm run build_src && karma start",
@@ -25,7 +26,8 @@
     "build_version_beta": "node build/version.beta",
     "build_git": "node build/git.js master",
     "build_test": "karma start --single-run",
-    "build_src": "npm run build_tsc && npm run build_rollup && npm run build_webpack",
+    "build_src": "npm run build_tsc && npm run build_rollup && npm run build_webpack && npm run build_d_copy",
+    "build_d_copy": "node build/copy.js",
     "build_tsc": "tsc --build tsconfig.json",
     "build_webpack": "webpack --config build/webpack.config.js",
     "build_rollup": "rollup -c build/rollup.config.js"

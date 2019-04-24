@@ -13,10 +13,9 @@ import {
   Fmodel,
   FHandleAudio,
   IAudio
-} from './audio.d'
+} from './ease-audio.d'
 
 export class EaseAudio {
-  public audio: AudioH5 | AudioCtx | IAudio;
   public init: Finit | FAnyMethod;
   public play: FHandleAudio | FAnyMethod;
   public pause: FHandleAudio | FAnyMethod;
@@ -34,6 +33,8 @@ export class EaseAudio {
   public off: FEventUnBind | FAnyMethod;
   public once: FEventBind | FAnyMethod;
   public model: Fmodel | FAnyMethod;
+
+  private audio: AudioH5 | AudioCtx | IAudio;
 
   public constructor (config: Iconfig | void) {
     this.audio = this._createAudio(config)

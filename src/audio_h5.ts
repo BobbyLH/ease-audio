@@ -31,7 +31,7 @@ import {
   IreturnParams,
   IblockEvent,
   IsetPlaylist
-} from './audio.d'
+} from './ease-audio.d'
 
 enum playStateSet {
   'loading',
