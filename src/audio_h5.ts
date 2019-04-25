@@ -143,15 +143,6 @@ export class AudioH5 {
   }
 
   /**
-   * get playList
-   * 
-   * @return {Tplaylist}
-   */
-  public get playlists (): Tplaylist | Array<void> {
-    return this.playList || []
-  }
-
-  /**
    * get playId
    * 
    * @return {TplayId}
@@ -598,18 +589,21 @@ export class AudioH5 {
   }
 
   /**
-   * set play list
-   * @param {IsetPlaylist} data 
+   * set or get playlist
+   * @param {IsetPlaylist | void} data 
    * 
-   * @return {IreturnParams | void}
+   * @return {Tplaylist}
    */
-  public playlist (data: IsetPlaylist): IreturnParams | void {
-    const { action, list, playId, params } = data
-    if (this._checkInit() && this._checkType(action, 'string', true) && (!list || this._checkType(list, 'array', true)) && (!playId || this._checkType(playId, 'number', true)) && (!params || this._checkType(params, 'object', true))) {
-      this._handlePlayList(data)
-
-      return this._returnParams()
+  public playlist (data?: IsetPlaylist): Tplaylist {
+    if (this._checkInit()) {
+      if (typeof data === 'object') {
+        const { action, list, playId, params } = data
+        if (this._checkType(action, 'string', true) && (!list || this._checkType(list, 'array', true)) && (!playId || this._checkType(playId, 'number', true)) && (!params || this._checkType(params, 'object', true))) {
+          this._handlePlayList(data)
+        }
+      }
     }
+    return this.playList || []
   }
 
   /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */

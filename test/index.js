@@ -25,7 +25,7 @@ describe("EaseAudio's test module", function () {
     expect(audio).to.have.property('rate').to.be.a('function')
     expect(audio).to.have.property('model').to.be.a('function')
     expect(audio).to.have.property('mute').to.be.a('function')
-    expect(audio).to.have.property('playlist').to.be.an('array')
+    expect(audio).to.have.property('playlist').to.be.an('function')
     expect(audio).to.have.property('duration').to.be.equal(0)
     expect(audio).to.have.property('playState').to.be.equal(null)
     expect(audio).to.have.property('playId').to.be.equal(1000)
@@ -78,38 +78,35 @@ describe("EaseAudio's test module", function () {
     expect(onceRes).to.be.a('boolean')
   })
   it('audio - playlist - add', function () {
-    audio.playlist = {
+    const list = audio.playlist({
       action: 'add',
       list: [
         {src: 'http://audio.xmcdn.com/group36/M0A/28/2C/wKgJUloyLSPzMzrUAA_CiRLIGrE559.m4a', tag: 'this is old item', id: 5},
         {src: 'http://audio.xmcdn.com/group21/M0B/2E/08/wKgJLVrpYaLCVIMPABFX6j5WjMk013.m4a'}
       ]
-    }
-    const list = audio.playlist
+    })
     expect(list).to.be.an('array')
     expect(list).to.with.lengthOf(5)
     expect(list[3]).to.have.property('id').to.be.equal(5)
     expect(list[3]).to.have.property('tag').to.be.equal('this is old item')
   })
   it('audio - playlist - update', function () {
-    audio.playlist = {
+    const list = audio.playlist({
       action: 'update',
       params: {id: 12},
       playId: 1003
-    }
-    const list = audio.playlist
+    })
     expect(list).to.be.an('array')
     expect(list).to.with.lengthOf(5)
     expect(list[3]).to.have.property('id').to.be.equal(12)
     expect(list[3]).to.have.property('tag').to.be.equal('this is old item')
   })
   it('audio - playlist - replace', function () {
-    audio.playlist = {
+    const list = audio.playlist({
       action: 'replace',
       list: [{src: 'http://audio.xmcdn.com/group21/M0B/2E/08/wKgJLVrpYaLCVIMPABFX6j5WjMk013.m4a', tag: 'this is new item', newId: 6}],
       playId: 1003
-    }
-    const list = audio.playlist
+    })
     expect(list).to.be.an('array')
     expect(list).to.with.lengthOf(5)
     expect(list[3]).to.not.have.property('id')
@@ -118,42 +115,38 @@ describe("EaseAudio's test module", function () {
     expect(list[3]).to.have.property('tag').to.be.equal('this is new item')
   })
   it('audio - playlist - insert', function () {
-    audio.playlist = {
+    const list = audio.playlist({
       action: 'insert',
       list: [{src: 'http://audio.xmcdn.com/group21/M0B/2E/08/wKgJLVrpYaLCVIMPABFX6j5WjMk013.m4a', tag: 'this is insert item'}],
       playId: 1002
-    }
-    const list = audio.playlist
+    })
     expect(list).to.be.an('array')
     expect(list).to.with.lengthOf(6)
     expect(list[2]).to.have.property('playId').to.be.equal(1006)
     expect(list[2]).to.have.property('tag').to.be.equal('this is insert item')
   })
   it('audio - playlist - delete', function () {
-    audio.playlist = {
+    const list = audio.playlist({
       action: 'delete',
       playId: 1006
-    }
-    const list = audio.playlist
+    })
     expect(list).to.be.an('array')
     expect(list).to.with.lengthOf(5)
     expect(list[2]).to.have.property('playId').to.be.equal(1002)
-    reserveList = audio.playlist
+    reserveList = audio.playlist()
   })
   it('audio - playlist - reset', function () {
-    audio.playlist = {
+    const list = audio.playlist({
       action: 'reset'
-    }
-    const list = audio.playlist
+    })
     expect(list).to.be.an('array')
     expect(list).to.with.lengthOf(0)
   })
   it('audio - playlist - add', function () {
-    audio.playlist = {
+    const list = audio.playlist({
       action: 'add',
       list: reserveList
-    }
-    const list = audio.playlist
+    })
     const playId = list[0].playId
     expect(list).to.be.an('array')
     expect(list).to.with.lengthOf(5)

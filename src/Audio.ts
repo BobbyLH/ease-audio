@@ -2,7 +2,6 @@ import AudioCtx from './audio_ctx'
 import AudioH5 from './audio_h5'
 import {
   Iconfig,
-  IsetPlaylist,
   Tplaylist,
   FAnyMethod,
   FEventBind,
@@ -11,6 +10,7 @@ import {
   Fpick,
   Fcut,
   Fmodel,
+  Fplaylist,
   FHandleAudio,
   IAudio
 } from './ease-audio.d'
@@ -33,6 +33,7 @@ export class EaseAudio {
   public off: FEventUnBind | FAnyMethod;
   public once: FEventBind | FAnyMethod;
   public model: Fmodel | FAnyMethod;
+  public playlist: Fplaylist | FAnyMethod;
 
   private audio: AudioH5 | AudioCtx | IAudio;
 
@@ -56,6 +57,7 @@ export class EaseAudio {
     this.off = this.audio.off
     this.once = this.audio.once
     this.model = this.audio.model
+    this.playlist = this.audio.playlist
   }
 
   public get duration () {
@@ -75,7 +77,7 @@ export class EaseAudio {
 
     if (this.audio) {
       const playId = (<AudioH5>this.audio).playid
-      const playList = (<AudioH5>this.audio).playlists
+      const playList = (<AudioH5>this.audio).playlist()
       const len = playList.length
       for (let i = 0; i < len; i++) {
         if (+playId === +((<Tplaylist>playList)[i].playId as number)) {
@@ -86,14 +88,6 @@ export class EaseAudio {
     }
 
     return playingData
-  }
-
-  public set playlist (params: IsetPlaylist) {
-    this.audio && this.audio.playlist && (<AudioH5>this.audio).playlist(params)
-  }
-
-  public get playlist () {
-    return this.audio ? (<any>this.audio).playlists : []
   }
 
   public get networkState () {
