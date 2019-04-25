@@ -77,7 +77,7 @@ var sound = new EaseAudio({
   onend: e => {
     console.log('ended')
   },
-  onseek: e => {
+  onseeking: e => {
     console.log('seeking')
   }
 });
