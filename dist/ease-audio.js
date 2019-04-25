@@ -2423,16 +2423,20 @@ function () {
   }, {
     key: "playlist",
     value: function playlist(data) {
-      var action = data.action,
-          list = data.list,
-          playId = data.playId,
-          params = data.params;
+      if (this._checkInit()) {
+        if (typeof data === 'object') {
+          var action = data.action,
+              list = data.list,
+              playId = data.playId,
+              params = data.params;
 
-      if (this._checkInit() && this._checkType(action, 'string', true) && (!list || this._checkType(list, 'array', true)) && (!playId || this._checkType(playId, 'number', true)) && (!params || this._checkType(params, 'object', true))) {
-        this._handlePlayList(data);
-
-        return this._returnParams();
+          if (this._checkType(action, 'string', true) && (!list || this._checkType(list, 'array', true)) && (!playId || this._checkType(playId, 'number', true)) && (!params || this._checkType(params, 'object', true))) {
+            this._handlePlayList(data);
+          }
+        }
       }
+
+      return this.playList || [];
     }
   }, {
     key: "_initial",
@@ -3210,11 +3214,6 @@ function () {
       return this.audioH5 ? this.audioH5.networkState : 0;
     }
   }, {
-    key: "playlists",
-    get: function get() {
-      return this.playList || [];
-    }
-  }, {
     key: "playid",
     get: function get() {
       return this.playId || 1000;
@@ -3260,6 +3259,7 @@ function () {
     this.off = this.audio.off;
     this.once = this.audio.once;
     this.model = this.audio.model;
+    this.playlist = this.audio.playlist;
   }
 
   createClass(EaseAudio, [{
@@ -3324,7 +3324,7 @@ function () {
 
       if (this.audio) {
         var playId = this.audio.playid;
-        var playList = this.audio.playlists;
+        var playList = this.audio.playlist();
         var len = playList.length;
 
         for (var i = 0; i < len; i++) {
@@ -3336,14 +3336,6 @@ function () {
       }
 
       return playingData;
-    }
-  }, {
-    key: "playlist",
-    set: function set(params) {
-      this.audio && this.audio.playlist && this.audio.playlist(params);
-    },
-    get: function get() {
-      return this.audio ? this.audio.playlists : [];
     }
   }, {
     key: "networkState",

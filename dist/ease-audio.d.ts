@@ -42,7 +42,7 @@ type Finit = (arg1: Iconfig) => IreturnParams | void;
 type Fpick = (arg1: TplayId) => IreturnParams | void;
 type Fcut = () => IreturnParams | void;
 type Fmodel = (model?: TplayStateSet) => TplayStateSet | void;
-type Fplaylist = (data: IsetPlaylist) => IreturnParams | void;
+type Fplaylist = (data?: IsetPlaylist) => Tplaylist;
 type FHandleAudio = (arg1?: number | boolean) => TplayId | boolean | void;
 
 interface IupdateConfig {
@@ -173,7 +173,7 @@ interface IAudio {
   playlist: Fplaylist;
 }
 
-declare class EaseAudio {
+declare class EaseAudio<Iconfig> {
   constructor(config: Iconfig | void)
   public init: Finit;
   public play: FHandleAudio;
@@ -192,12 +192,12 @@ declare class EaseAudio {
   public off: FEventUnBind;
   public once: FEventBind;
   public model: Fmodel;
+  public playlist: Fplaylist;
   public readonly duration: number;
   public readonly playState: TplayStateStr;
   public readonly playId: TplayId;
   public readonly playingData: Iplaylist;
   public readonly networkState: number;
-  public playlist: Tplaylist | [void];
 }
 
 export {
