@@ -77,7 +77,7 @@ var sound = new EaseAudio({
   onend: e => {
     console.log('ended')
   },
-  onseek: e => {
+  onseeking: e => {
     console.log('seeking')
   }
 });
@@ -200,7 +200,7 @@ This property defines the level of messages that the EaseAudio will log. Valid l
 
 ### Methods
 #### init(config)
-If without config when new EaseAudio, you still can call this method with some configurations to construction.
+If without config when new construction the EaseAudio, you still can call this method with some configurations to construction.
 
 #### play()
 Begin playback of sound.
