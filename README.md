@@ -235,6 +235,7 @@ Get/set volume of sound. This method optionally takes 0 or 1 arguments.
 
 #### mute(muted)
 Mutes the sound, but doesn't pause the playback.
+If without arguments then return boolean which represent whether or not muted
 * **muted**: `Boolean` True to mute and false to unmute.
 
 #### stop()
@@ -258,31 +259,32 @@ Remove event listener that you've set. Call without parameters to remove all eve
 * **event**: `String` Name of event (`play`, `pause`, `stop`, `end`, `load`, `unload`, `canplay`, `canplaythrough`, `progress`, `volume`, `seek`, `rate`, `timeupdate`, `loaderror`, `playerror`).
 * **function**: `Function` `optional` The listener to remove. Omit this to remove all events of type.
 
+#### model([model])
+Get/set the play model. This method optionally takes 0 or 1 arguments.
+* **model**: Set the playModel to one of them: `list-once`, `list-random`, `list-loop`, `single-once`, `single-loop` .
+
+#### playlist([options])
+Get/set the playlist. This method optionally takes 0 or 1 arguments.
+* **options**: Set the playlist according to the options object which contain {`action`, `playId`, `list`, `params`} .
+* ***action***: `String` Action of setting (`add`, `delete`, `insert`, `replace`, `update`,  `reset`).
+* ***list***: `Array` `optional` Add/insert/replace the list to playlist when the action is `add`, `insert`, `replace`.
+* ***playId***: `Array` `optional` Delete/insert/replace/update a item according to playId.
+* ***params***: `Object` `optional` Update a item  from params according to playId.
 
 ### Properties
-#### duration `Number`
+#### duration `Number` `ReadOnly`
 Return the track duration property.
 
-#### playState `String`
+#### playState `String` `ReadOnly`
 Return the play state(`loading`, `loaded`, `playing`, `paused`, `stopped`, `ended`, `finished`, `loaderror`, `playerror`, `unloaded`).
 
-#### playId `Number`
+#### playId `Number` `ReadOnly`
 Return the current playing id.
 
-#### playingData `Object`
+#### playingData `Object` `ReadOnly`
 Return the current playing item data.
 
-#### playlist `Array`
-Return the playlist.
-
-#### playlist = `{action, list, playId, params}`
-Set the playlist according to `action` and `playId` arguments.
-* **action**: `String` Action of setting (`add`, `delete`, `insert`, `replace`, `update`,  `reset`).
-* **list**: `Array` `optional` Add/insert/replace the list to playlist when the action is `add`, `insert`, `replace`.
-* **playId**: `Array` `optional` Delete/insert/replace/update a item according to playId.
-* **params**: `Object` `optional` Update a item  from params according to playId.
-
-#### networkState `String`
+#### networkState `String` `ReadOnly`
 Return the track network state.
 
 ### Browser Compatibility
