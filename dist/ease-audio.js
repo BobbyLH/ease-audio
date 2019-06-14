@@ -2232,7 +2232,7 @@ function () {
 
       if (this._checkInit()) {
         if (this._checkType(val, 'number')) {
-          if (val > 2) val = 2;
+          if (val > 3) val = 3;
           if (val < 0.5) val = 0.5;
 
           this._commonLock('rate', function () {
