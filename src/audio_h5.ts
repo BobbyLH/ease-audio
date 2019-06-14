@@ -394,7 +394,7 @@ export class AudioH5 {
   public rate (val?: number): number | void {
     if (this._checkInit()) {
       if (this._checkType(val, 'number')) {
-        if (<number>val > 2) val = 2
+        if (<number>val > 3) val = 3
         if (<number>val < 0.5) val = 0.5
 
         this._commonLock('rate', () => ((<HTMLAudioElement>this.audioH5).playbackRate = <number>val))
