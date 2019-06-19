@@ -516,7 +516,6 @@ export class AudioH5 {
     if (this._checkInit()) {
       // model contain: list-once, list-random, list-loop, single-once, single-loop
       if (model) {
-        console.log('audio', model, playModelSet[model])
         this.playModel = playModelSet[model] !== undefined ? playModelSet[model] : this.playModel
       } else {
         return (playModelSet[this.playModel || 0]) as TplayModelStr
