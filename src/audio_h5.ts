@@ -923,6 +923,11 @@ export class AudioH5 {
           }
         }
         break
+      case 'replaceAll':
+        if (list) {
+          this.playList = [...list]
+        }
+        break
       case 'update':
         if (playId && params) {
           for (let i = 0; i < playlist.length; i++) {
