@@ -146,7 +146,7 @@ interface IblockEvent {
 }
 
 interface IsetPlaylist {
-  action: 'add' | 'delete' | 'insert' | 'replace' | 'update' | 'reset';
+  action: 'add' | 'delete' | 'insert' | 'replace' | 'update' | 'reverse' | 'reset';
   list?: Tplaylist;
   playId?: number;
   params?: Object;

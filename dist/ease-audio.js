@@ -2726,6 +2726,11 @@ function () {
 
           break;
 
+        case 'reverse':
+          playlist.reverse();
+          this.playList = toConsumableArray(playlist);
+          break;
+
         case 'reset':
           this._resetPlayList();
 
