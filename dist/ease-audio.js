@@ -2711,6 +2711,13 @@ function () {
 
           break;
 
+        case 'replaceAll':
+          if (list) {
+            this.playList = toConsumableArray(list);
+          }
+
+          break;
+
         case 'update':
           if (playId && params) {
             for (var _i3 = 0; _i3 < playlist.length; _i3++) {
